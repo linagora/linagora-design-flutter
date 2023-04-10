@@ -2,7 +2,7 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 
-abstract class LinagoraColors {
+class LinagoraColors {
   final Color primary;
 
   final Color? _primaryDark;
@@ -226,7 +226,13 @@ abstract class LinagoraColors {
         _outlineDark = outlineDark,
         _outlineVariantDark = outlineVariantDark;
 
-  const LinagoraColors.defaultColor()
+  static final LinagoraColors _default = LinagoraColors._defaultColor();
+
+  factory LinagoraColors.defaultColor() {
+    return _default;
+  }
+
+  LinagoraColors._defaultColor()
       : primary = const Color(0xFF0A84FF),
         onPrimary = const Color(0xFFFFFFFF),
         primaryContainer = const Color(0xFFF4F0F4),
