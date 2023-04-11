@@ -1,7 +1,6 @@
 library linagora_design_flutter;
 
-/// A Calculator.
-class Calculator {
-  /// Returns [value] plus 1.
-  int addOne(int value) => value + 1;
-}
+export 'package:linagora_design_flutter/colors/linagora_ref_colors.dart';
+export  'package:linagora_design_flutter/colors/linagora_sys_colors.dart';
+export  'package:linagora_design_flutter/colors/linagora_key_colors.dart';
+export  'package:linagora_design_flutter/colors/linagora_state_layer.dart';
