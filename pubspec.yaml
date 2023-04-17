@@ -7,6 +7,7 @@ environment:
   flutter: ">=1.17.0"
 
 dependencies:
+  auto_size_text: ^3.0.0
   flutter:
     sdk: flutter
 
@@ -20,7 +21,6 @@ dev_dependencies:
 
 # The following section is specific to Flutter packages.
 flutter:
-
   # To add assets to your package, add an assets section, like this:
   # assets:
   #   - images/a_dot_burr.jpeg
@@ -37,7 +37,6 @@ flutter:
   # "family" key with the font family name, and a "fonts" key with a
   # list giving the asset and other descriptors for the font. For
   # example:
-  # fonts:
   #   - family: Schyler
   #     fonts:
   #       - asset: fonts/Schyler-Regular.ttf
