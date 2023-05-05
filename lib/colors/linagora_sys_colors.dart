@@ -28,6 +28,12 @@ class LinagoraSysColors {
   Color get onPrimaryContainerDark =>
       _onPrimaryContainerDark ?? onPrimaryContainer;
 
+  final Color inversePrimary;
+
+  final Color? _inversePrimaryDark;
+
+  Color get inversePrimaryDark => _inversePrimaryDark ?? inversePrimary;
+
   final Color secondary;
 
   final Color? _secondaryDark;
@@ -140,6 +146,30 @@ class LinagoraSysColors {
 
   Color get onSurfaceVariantDark => _onSurfaceVariantDark ?? onSurfaceVariant;
 
+  final Color inverseSurface;
+
+  final Color? _inverseSurfaceDark;
+
+  Color get inverseSurfaceDark => _inverseSurfaceDark ?? inverseSurface;
+
+  final Color onInverseSurface;
+
+  final Color? _onInverseSurfaceDark;
+
+  Color get onInverseSurfaceDark => _onInverseSurfaceDark ?? onInverseSurface;
+
+  final Color shadow;
+
+  final Color? _shadowDark;
+
+  Color get shadowDark => _shadowDark ?? shadow;
+
+  final Color surfaceTint;
+
+  final Color? _surfaceTintDark;
+
+  Color get surfaceTintDark => _surfaceTintDark ?? surfaceTint;
+
   final Color outline;
 
   final Color? _outlineDark;
@@ -157,6 +187,7 @@ class LinagoraSysColors {
     required this.onPrimary,
     required this.primaryContainer,
     required this.onPrimaryContainer,
+    required this.inversePrimary,
     required this.secondary,
     required this.onSecondary,
     required this.secondaryContainer,
@@ -173,6 +204,10 @@ class LinagoraSysColors {
     required this.onBackground,
     required this.surface,
     required this.onSurface,
+    required this.inverseSurface,
+    required this.onInverseSurface,
+    required this.shadow,
+    required this.surfaceTint,
     required this.surfaceVariant,
     required this.onSurfaceVariant,
     required this.outline,
@@ -181,6 +216,7 @@ class LinagoraSysColors {
     onPrimaryDark,
     primaryContainerDark,
     onPrimaryContainerDark,
+    inversePrimaryDark,
     secondaryDark,
     onSecondaryDark,
     secondaryContainerDark,
@@ -197,6 +233,10 @@ class LinagoraSysColors {
     onBackgroundDark,
     surfaceDark,
     onSurfaceDark,
+    inverseSurfaceDark,
+    onInverseSurfaceDark,
+    shadowDark,
+    surfaceTintDark,
     surfaceVariantDark,
     onSurfaceVariantDark,
     outlineDark,
@@ -205,6 +245,7 @@ class LinagoraSysColors {
         _onPrimaryDark = onPrimaryDark,
         _primaryContainerDark = primaryContainerDark,
         _onPrimaryContainerDark = onPrimaryContainerDark,
+        _inversePrimaryDark = inversePrimaryDark,
         _secondaryDark = secondaryDark,
         _onSecondaryDark = onSecondaryDark,
         _secondaryContainerDark = secondaryContainerDark,
@@ -221,12 +262,17 @@ class LinagoraSysColors {
         _onBackgroundDark = onBackgroundDark,
         _surfaceDark = surfaceDark,
         _onSurfaceDark = onSurfaceDark,
+        _inverseSurfaceDark = inverseSurfaceDark,
+        _onInverseSurfaceDark = onInverseSurfaceDark,
+        _shadowDark = shadowDark,
+        _surfaceTintDark = surfaceTintDark,
         _surfaceVariantDark = surfaceVariantDark,
         _onSurfaceVariantDark = onSurfaceVariantDark,
         _outlineDark = outlineDark,
         _outlineVariantDark = outlineVariantDark;
 
-  static final LinagoraSysColors _materialLinagoraColors = LinagoraSysColors._material();
+  static final LinagoraSysColors _materialLinagoraColors =
+      LinagoraSysColors._material();
 
   factory LinagoraSysColors.material() {
     return _materialLinagoraColors;
@@ -237,6 +283,7 @@ class LinagoraSysColors {
         onPrimary = const Color(0xFFFFFFFF),
         primaryContainer = const Color(0xFFF4F0F4),
         onPrimaryContainer = const Color(0xFF0A84FF),
+        inversePrimary = const Color(0xFF9BC8FF),
         secondary = const Color(0xFF5C9CE6),
         onSecondary = const Color(0xFFFFFFFF),
         secondaryContainer = const Color(0xFFC8E2FF),
@@ -253,6 +300,10 @@ class LinagoraSysColors {
         onBackground = const Color(0xFF1C1B1F),
         surface = const Color(0xFFF4F4F4),
         onSurface = const Color(0xFF1C1B1F),
+        inverseSurface = const Color(0xFF313033),
+        onInverseSurface = const Color(0xFFF4EFF4),
+        shadow = const Color(0xFF000000),
+        surfaceTint = const Color(0xFF6750A4),
         surfaceVariant = const Color(0xFFF7F7F8),
         onSurfaceVariant = const Color(0xFF1C1B1F),
         outline = const Color(0xFFAEAEC0),
@@ -261,6 +312,7 @@ class LinagoraSysColors {
         _onPrimaryDark = const Color(0xFFFFFFFF),
         _primaryContainerDark = const Color(0xFF2D2D2E),
         _onPrimaryContainerDark = const Color(0xFFC9CACC),
+        _inversePrimaryDark = const Color(0xFF0A84FF),
         _secondaryDark = const Color(0xFFCCC2DC),
         _onSecondaryDark = const Color(0xFF332D41),
         _secondaryContainerDark = const Color(0xFF3F3F3F),
@@ -277,6 +329,10 @@ class LinagoraSysColors {
         _onBackgroundDark = const Color(0xFFE6E1E5),
         _surfaceDark = const Color(0xFF1C1B1F),
         _onSurfaceDark = const Color(0xFFE6E1E5),
+        _inverseSurfaceDark = const Color(0xFFFFFFFF),
+        _onInverseSurfaceDark = const Color(0xFF313033),
+        _shadowDark = const Color(0xFF000000),
+        _surfaceTintDark = const Color(0xFFD0BCFF),
         _surfaceVariantDark = const Color(0xFF3F3F3F),
         _onSurfaceVariantDark = const Color(0xFFCAC4D0),
         _outlineDark = const Color(0xFF525256),
