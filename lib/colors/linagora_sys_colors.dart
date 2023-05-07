@@ -281,7 +281,7 @@ class LinagoraSysColors {
   LinagoraSysColors._material()
       : primary = const Color(0xFF0A84FF),
         onPrimary = const Color(0xFFFFFFFF),
-        primaryContainer = const Color(0xFFF4F0F4),
+        primaryContainer = const Color(0xFFD2E9FF),
         onPrimaryContainer = const Color(0xFF0A84FF),
         inversePrimary = const Color(0xFF9BC8FF),
         secondary = const Color(0xFF5C9CE6),
