@@ -83,4 +83,10 @@ class AssetCounter extends ChangeNotifier {
       (key) => _isSelectedMap[key]?.value ?? false
     ).toList();
   }
+
+  void clear() {
+    _selectedIndexMap.clear();
+    _isSelectedMap.clear();
+    _totalSelected = 0;
+  }
 }

@@ -22,7 +22,7 @@ class UseCameraWidget extends StatelessWidget {
       child: Padding(
         padding: const EdgeInsets.all(2.0),
         child: ClipRRect(
-          borderRadius: BorderRadius.circular(4.0),
+          borderRadius: const BorderRadius.all(Radius.circular(4.0)),
           child: Stack(
             alignment: Alignment.center,
             children: [
@@ -30,7 +30,7 @@ class UseCameraWidget extends StatelessWidget {
                 decoration: BoxDecoration(
                   image: backgroundImage != null 
                     ? DecorationImage(
-                      image: backgroundImage!,
+                        image: backgroundImage!,
                     )
                     : null,
                 ),

@@ -30,37 +30,45 @@ class ImagePicker {
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16.0),
       ),
-      builder: (context) => Container(
-        padding: const EdgeInsets.symmetric(horizontal: 2.0),
-        height: MediaQuery.of(context).size.height / 2,
+      isScrollControlled: true,
+      builder: (context) => SingleChildScrollView(
         child: Column(
+          mainAxisSize: MainAxisSize.min,
           children: [
-            Expanded(
-              child: assetPath != null 
-                ? counterImageBuilder != null 
-                  ? ImagePickerGridWithCounter(
-                    assetPath: assetPath, 
-                    counterBuilder: counterImageBuilder,
-                    controller: controller,
-                    assetBackgroundColor: assetBackgroundColor,
-                    backgroundImageCamera: backgroundImageCamera,
-                    cameraWidget: cameraWidget,
-                  )
-                  : ImagesPickerGrid(
-                    assetPath: assetPath,
-                    controller: controller,
-                    assetBackgroundColor: assetBackgroundColor,
-                    backgroundImage: backgroundImageCamera,
-                    cameraWidget: cameraWidget,
-                  )
-                : noImagesWidget ?? const SizedBox.shrink(),
-            ),
-            Padding(
-              padding: const EdgeInsets.only(top: 6.0),
-              child: bottomWidget ?? const SizedBox.shrink(),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 2.0) + MediaQuery.of(context).viewInsets,
+              height: MediaQuery.of(context).size.height / 2 + MediaQuery.of(context).viewInsets.bottom, 
+              child: Column(
+                children: [
+                  Expanded(
+                    child: assetPath != null 
+                      ? counterImageBuilder != null 
+                        ? ImagePickerGridWithCounter(
+                          assetPath: assetPath, 
+                          counterBuilder: counterImageBuilder,
+                          controller: controller,
+                          assetBackgroundColor: assetBackgroundColor,
+                          backgroundImageCamera: backgroundImageCamera,
+                          cameraWidget: cameraWidget,
+                        )
+                        : ImagesPickerGrid(
+                          assetPath: assetPath,
+                          controller: controller,
+                          assetBackgroundColor: assetBackgroundColor,
+                          backgroundImage: backgroundImageCamera,
+                          cameraWidget: cameraWidget,
+                        )
+                      : noImagesWidget ?? const SizedBox.shrink(),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(top: 6.0),
+                    child: bottomWidget ?? const SizedBox.shrink(),
+                  ),
+                ],
+              )
             ),
           ],
-        )
+        ),
       ),
     );
   }

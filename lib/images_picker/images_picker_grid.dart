@@ -3,6 +3,7 @@ import 'package:linagora_design_flutter/images_picker/asset_counter.dart';
 import 'package:linagora_design_flutter/images_picker/image_item_widget.dart';
 import 'package:linagora_design_flutter/images_picker/images_picker.dart';
 import 'package:photo_manager/photo_manager.dart';
+import 'package:collection/collection.dart';
 
 class ImagesPickerGrid extends StatefulWidget {
 
@@ -15,6 +16,7 @@ class ImagesPickerGrid extends StatefulWidget {
     this.backgroundImage,
     this.pageSize = maxImagesPerPage,
     this.itemsPerWidth = 3,
+    this.assetBackgroundColor,
     this.thumbnailOption = const ThumbnailOption(size: ImageItemWidget.thumbnailDefaultSize),
   });
 
@@ -35,6 +37,8 @@ class ImagesPickerGrid extends StatefulWidget {
   final int itemsPerWidth;
 
   final ThumbnailOption thumbnailOption;
+
+  final Color? assetBackgroundColor;
 
   @override
   State<ImagesPickerGrid> createState() => _ImagesPickerGridState();
@@ -112,7 +116,7 @@ class _ImagesPickerGridState extends State<ImagesPickerGrid> {
             _loadMoreAsset();
           }
 
-          assetCounter.initializeIfNeeded(imageIndex);
+          assetCounter.initializeIfNeeded(index: imageIndex);
 
           return ImageItemWidget(
             key: ValueKey(imageIndex),
@@ -146,9 +150,7 @@ class ImagePickerGridController extends ChangeNotifier {
   List<AssetEntity> get totalAssets => _totalAssets;
 
   void registerAssetCounterListener() {
-    _assetCounter.addListener(() {
-      notifyListeners();
-    });
+    _assetCounter.addListener(notifyListeners);
   }
 
   Future<List<AssetEntity>> _getAllAssets({
@@ -168,6 +170,14 @@ class ImagePickerGridController extends ChangeNotifier {
         asset: _totalAssets[index])
       )
       .toList();
+  }
+
+  void clearAssetCounter() {
+    _assetCounter.clear();
+  }
+
+  List<IndexedAssetEntity> get sortedSelectedAssets {
+    return selectedAssets.sorted((a, b) => a.index.compareTo(b.index));
   }
 }
 
