@@ -1,5 +1,7 @@
 import 'package:example/demos/circle_avatar_example.dart';
 import 'package:example/demos/circle_avatar_load_from_memory_example.dart';
+import 'package:example/demos/image_picker_bottom_sheet_example.dart';
+import 'package:example/demos/image_picker_example.dart';
 import 'package:flutter/material.dart';
 
 
@@ -35,6 +37,8 @@ class MyHomePage extends StatelessWidget {
         children: [
           DemoTile(component: CircleAvatarExample(), title: 'Demo CircleAvatar component',),
           DemoTile(title: 'Demo CircleAvatar component with load image from bytes', component: CircleAvatarLoadFromMemoryExample()),
+          DemoTile(title: 'Demo Image picker', component: ImagesPickerExample()),
+          DemoTile(title: "Demo Image picker with bottom sheet", component: ImagePickerBottomSheetExample()),
         ],
       ),
     );

@@ -3,7 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:linagora_design_flutter/images_picker/asset_counter.dart';
 
 void main() {
-  final AssetCounter assetCounter = AssetCounter();
+  late AssetCounter assetCounter;
 
   setUp(() {
     assetCounter = AssetCounter();

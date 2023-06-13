@@ -31,7 +31,9 @@
 	<key>NSMicrophoneUsageDescription</key>
 	<string>c</string>
 	<key>NSPhotoLibraryUsageDescription</key>
-	<string>a</string>
+	<string>In order to access your photos library</string>
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string> In order to edit your photos</string>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
 	<key>UILaunchStoryboardName</key>
