@@ -28,7 +28,7 @@ class ImageItemWidget extends StatefulWidget {
     required this.assetCounter,
     required this.index,
     this.backgroundColor,
-    this.isOriginal = true,
+    this.isOriginal = false,
     this.onTap,
   }) : super(key: key);
 
@@ -105,6 +105,7 @@ class _ImageItemWidgetState extends State<ImageItemWidget> with SingleTickerProv
                   height: widget.option.size.height.toDouble(),
                   isOriginal: widget.isOriginal,
                   fit: BoxFit.cover,
+                  filterQuality: FilterQuality.high,
                   loadingBuilder:(context, child, loadingProgress) {
                     if (loadingProgress != null && loadingProgress.cumulativeBytesLoaded != loadingProgress.expectedTotalBytes) {
                       return const Center(
@@ -124,20 +125,31 @@ class _ImageItemWidgetState extends State<ImageItemWidget> with SingleTickerProv
           )
         ),
         Positioned(
-          top: 6.0,
-          right: 6.0,
-          child: InkWell(
-            onTap: () {
-              _onSelectedAsset();
-            },
-            child: ValueListenableBuilder(
-              valueListenable: cardinalNumberNotifier,
-              builder: (context, value, child) {
-                return SelectedAssetWidget(
-                  cardinalNumber: cardinalNumberNotifier.value,
-                );
-              }
-            ),
+          top: 0,
+          right: 0,
+          child: Stack(
+            alignment: Alignment.center,
+            children: [
+              GestureDetector(
+                behavior: HitTestBehavior.translucent,
+                onTap: _onSelectedAsset,
+                child: const SizedBox(
+                  height: 35,
+                  width: 35,
+                ),
+              ),
+              InkWell(
+                onTap: _onSelectedAsset,
+                child: ValueListenableBuilder(
+                  valueListenable: cardinalNumberNotifier,
+                  builder: (context, value, child) {
+                    return SelectedAssetWidget(
+                      cardinalNumber: cardinalNumberNotifier.value,
+                    );
+                  }
+                ),
+              ),
+            ],
           ),
         ),
       ],
