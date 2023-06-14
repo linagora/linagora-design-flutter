@@ -43,6 +43,7 @@ dependencies:
   image: ^4.0.15
   photo_manager: ^2.6.0
   auto_size_text: ^3.0.0
+  permission_handler: ^10.2.0
 
 dev_dependencies:
   flutter_test:
