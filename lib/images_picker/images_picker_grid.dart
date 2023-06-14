@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:linagora_design_flutter/colors/linagora_sys_colors.dart';
 import 'package:linagora_design_flutter/images_picker/asset_counter.dart';
 import 'package:linagora_design_flutter/images_picker/image_item_widget.dart';
 import 'package:linagora_design_flutter/images_picker/images_picker.dart';
@@ -18,6 +20,8 @@ class ImagesPickerGrid extends StatefulWidget {
     this.itemsPerWidth = 3,
     this.assetBackgroundColor,
     this.thumbnailOption = const ThumbnailOption(size: ImageItemWidget.thumbnailDefaultSize),
+    this.isLimitSelectImage = false,
+    this.widgetSelectMoreImage
   });
 
   static const maxImagesPerPage = 10;
@@ -40,6 +44,12 @@ class ImagesPickerGrid extends StatefulWidget {
 
   final Color? assetBackgroundColor;
 
+  /// ONLY SUPPORT FOR IOS 14+
+  final Widget? widgetSelectMoreImage;
+
+  final bool? isLimitSelectImage;
+
+
   @override
   State<ImagesPickerGrid> createState() => _ImagesPickerGridState();
 }
@@ -55,8 +65,20 @@ class _ImagesPickerGridState extends State<ImagesPickerGrid> {
   @override
   void initState() {
     super.initState();
+
+    /// Register your callback.
+    PhotoManager.addChangeCallback(changeNotify);
+
+    /// Enable change notify.
+    PhotoManager.startChangeNotify();
     controller.assetPath = widget.assetPath;
     _loadAssets(_currentPage);
+  }
+
+  void changeNotify(MethodCall call) {
+    if (call.arguments['newCount'] != call.arguments['oldCount']) {
+      _loadAssets(_currentPage);
+    }
   }
 
   Future<void> _loadAssets(int page) async {
@@ -97,6 +119,12 @@ class _ImagesPickerGridState extends State<ImagesPickerGrid> {
 
     final assetCounter = controller._assetCounter;
 
+    int childCount = controller._totalAssets.length + 1;
+
+    if (widget.isLimitSelectImage == true) {
+      childCount = childCount + 1;
+    }
+
     return GridView.custom(
       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: widget.itemsPerWidth,
@@ -118,6 +146,18 @@ class _ImagesPickerGridState extends State<ImagesPickerGrid> {
 
           assetCounter.initializeIfNeeded(index: imageIndex);
 
+          if (index == childCount - 1 && widget.isLimitSelectImage == true) {
+            return GestureDetector(
+              onTap: () async {
+                await PhotoManager.presentLimited();
+              },
+              child: Icon(
+                Icons.add_photo_alternate,
+                size: 40,
+                color: LinagoraSysColors.material().primary)
+            );
+          }
+
           return ImageItemWidget(
             key: ValueKey(imageIndex),
             index: imageIndex,
@@ -127,7 +167,7 @@ class _ImagesPickerGridState extends State<ImagesPickerGrid> {
             backgroundColor: widget.assetBackgroundColor,
           );
         },
-        childCount: controller._totalAssets.length + 1,
+        childCount: childCount,
       ),
     );
   }
