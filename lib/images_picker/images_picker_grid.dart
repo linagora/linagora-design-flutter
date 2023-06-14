@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:linagora_design_flutter/colors/linagora_sys_colors.dart';
@@ -21,7 +23,7 @@ class ImagesPickerGrid extends StatefulWidget {
     this.assetBackgroundColor,
     this.thumbnailOption = const ThumbnailOption(size: ImageItemWidget.thumbnailDefaultSize),
     this.isLimitSelectImage = false,
-    this.widgetSelectMoreImage
+    this.selectMoreImageWidget
   });
 
   static const maxImagesPerPage = 10;
@@ -45,10 +47,9 @@ class ImagesPickerGrid extends StatefulWidget {
   final Color? assetBackgroundColor;
 
   /// ONLY SUPPORT FOR IOS 14+
-  final Widget? widgetSelectMoreImage;
+  final Widget? selectMoreImageWidget;
 
   final bool? isLimitSelectImage;
-
 
   @override
   State<ImagesPickerGrid> createState() => _ImagesPickerGridState();
@@ -75,10 +76,31 @@ class _ImagesPickerGridState extends State<ImagesPickerGrid> {
     _loadAssets(_currentPage);
   }
 
-  void changeNotify(MethodCall call) {
-    if (call.arguments['newCount'] != call.arguments['oldCount']) {
-      _loadAssets(_currentPage);
+  void changeNotify(MethodCall call) async {
+    log("ImagesPickerGrid::changeNotify(): MethodCall = $call");
+    final newCount = call.arguments['newCount'];
+    final oldCount = call.arguments['oldCount'];
+    if (newCount == 0) {
+      _loadAssets(0);
+    } else {
+      _getAssetListIncrease(newCount, oldCount);
     }
+  }
+
+  Future<void> _getAssetListIncrease(int newCount, int oldCount) async {
+    final newItems = await controller._getAssetListRange(start: 0, end: newCount);
+    _totalEntitiesCount = newItems.length;
+    if (mounted) {
+      setState(() {
+        _currentPage = _calculateNumberOfPages(oldCount, widget.pageSize);
+        _hasMoreToLoad = controller._totalAssets.length < _totalEntitiesCount;
+        controller.removeAllSelectedItem();
+      });
+    }
+  }
+
+  int _calculateNumberOfPages(int totalImages, int imagesPerPage) {
+    return (totalImages - 1) ~/ imagesPerPage;
   }
 
   Future<void> _loadAssets(int page) async {
@@ -108,7 +130,6 @@ class _ImagesPickerGridState extends State<ImagesPickerGrid> {
         _hasMoreToLoad = controller._totalAssets.length < _totalEntitiesCount;
       });
     }
-    
   }
 
   @override
@@ -151,7 +172,7 @@ class _ImagesPickerGridState extends State<ImagesPickerGrid> {
               onTap: () async {
                 await PhotoManager.presentLimited();
               },
-              child: Icon(
+              child: widget.selectMoreImageWidget ?? Icon(
                 Icons.add_photo_alternate,
                 size: 40,
                 color: LinagoraSysColors.material().primary)
@@ -201,6 +222,14 @@ class ImagePickerGridController extends ChangeNotifier {
     return _totalAssets;
   }
 
+  Future<List<AssetEntity>> _getAssetListRange({
+    required int start,
+    required int end
+  }) async {
+    _totalAssets = await assetPath!.getAssetListRange(start: start, end: end);
+    return _totalAssets;
+  }
+
   List<IndexedAssetEntity> get selectedAssets {
     final selectedIndexes = _assetCounter.selectedIndexes;
 
@@ -214,6 +243,10 @@ class ImagePickerGridController extends ChangeNotifier {
 
   void clearAssetCounter() {
     _assetCounter.clear();
+  }
+
+  void removeAllSelectedItem() {
+    _assetCounter.removeAllSelectedItem();
   }
 
   List<IndexedAssetEntity> get sortedSelectedAssets {

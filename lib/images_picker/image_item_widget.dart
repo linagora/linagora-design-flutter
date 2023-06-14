@@ -48,14 +48,17 @@ class _ImageItemWidgetState extends State<ImageItemWidget> with SingleTickerProv
     end: 0.75,
   ).animate(_animationController);
 
-  late final assetCounter = widget.assetCounter;
+  late AssetCounter assetCounter;
 
-  late final cardinalNumberNotifier = ValueNotifier(widget.assetCounter.getSelectedIndexAt(widget.index));
+  late ValueNotifier<int> cardinalNumberNotifier;
 
   @override
   void initState() {
     super.initState();
+    assetCounter = widget.assetCounter;
+    cardinalNumberNotifier = ValueNotifier(widget.assetCounter.getSelectedIndexAt(widget.index));
     assetCounter.registerListenerAtSelectedIndex(widget.index, () {
+      log("ImageItemWidget::cardinalNumberNotifier() ${assetCounter.currentTotalSelectedIndex}");
       cardinalNumberNotifier.value = assetCounter.getSelectedIndexAt(widget.index);
     });
   }

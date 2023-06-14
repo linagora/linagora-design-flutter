@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 
 typedef IsSelectedNotifier =  ValueNotifier<bool>;
@@ -82,6 +81,10 @@ class AssetCounter extends ChangeNotifier {
     return _selectedIndexMap.keys.where(
       (key) => _isSelectedMap[key]?.value ?? false
     ).toList();
+  }
+
+  void removeAllSelectedItem() {
+    _isSelectedMap.values.map((valueNotifier) => valueNotifier.value = false).toList();
   }
 
   void clear() {

@@ -12,7 +12,7 @@ dependencies:
   flutter:
     sdk: flutter
   photo_manager: ^2.6.0
-  permission_handler: ^10.2.0
+  permission_handler_platform_interface: 3.10.0
 
 dev_dependencies:
   flutter_test:

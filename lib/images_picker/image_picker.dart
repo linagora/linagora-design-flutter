@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:linagora_design_flutter/images_picker/image_picker_grid_with_counter.dart';
 import 'package:linagora_design_flutter/images_picker/view_permission_not_authorized.dart';
-import 'package:permission_handler/permission_handler.dart';
+import 'package:permission_handler_platform_interface/permission_handler_platform_interface.dart';
 import 'package:photo_manager/photo_manager.dart';
 
 import 'images_picker_grid.dart';
@@ -18,6 +18,7 @@ class ImagePicker {
     ImageProvider<Object>? backgroundImageCamera,
     Color? backgroundColor,
     Color? assetBackgroundColor,
+    Widget? selectMoreImageWidget,
   }) async {
     AssetPathEntity? assetPath;
 
@@ -25,7 +26,7 @@ class ImagePicker {
     if (permission) {
       final assetsPath = await getAllAssetPaths(hasAll: true, onlyAll: false);
       if (assetsPath.isNotEmpty) {
-        assetPath = assetsPath[0];
+        assetPath = assetsPath.first;
       }
     }
 
@@ -45,12 +46,14 @@ class ImagePicker {
                 assetBackgroundColor: assetBackgroundColor,
                 backgroundImageCamera: backgroundImageCamera,
                 cameraWidget: cameraWidget,
+                selectMoreImageWidget: selectMoreImageWidget,
                 isLimitSelectImage: permissionStatus == PermissionStatus.limited)
             : ImagesPickerGrid(
                 assetPath: assetPathEntity,
                 controller: controller,
                 assetBackgroundColor: assetBackgroundColor,
                 backgroundImage: backgroundImageCamera,
+                selectMoreImageWidget: selectMoreImageWidget,
                 isLimitSelectImage: permissionStatus == PermissionStatus.limited,
                 cameraWidget: cameraWidget);
         } else {
@@ -73,7 +76,7 @@ class ImagePicker {
           children: [
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 2.0) + MediaQuery.of(context).viewInsets,
-              height: MediaQuery.of(context).size.height / 2 + MediaQuery.of(context).viewInsets.bottom, 
+              height: MediaQuery.of(context).size.height * 0.8 - MediaQuery.of(context).viewInsets.bottom,
               child: Column(
                 children: [
                   Expanded(child: buildBodyBottomSheet(assetPath)),
