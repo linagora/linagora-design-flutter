@@ -18,6 +18,8 @@ class ImagePickerGridWithCounter extends StatefulWidget {
 
   final ImageProvider<Object>? backgroundImageCamera;
 
+  final bool? isLimitSelectImage;
+
   const ImagePickerGridWithCounter({
     super.key,
     required this.assetPath,
@@ -26,6 +28,7 @@ class ImagePickerGridWithCounter extends StatefulWidget {
     this.cameraWidget,
     this.backgroundImageCamera,
     this.controller,
+    this.isLimitSelectImage = false,
   });
 
   @override
@@ -84,6 +87,7 @@ class _ImagePickerGridWithCounterState extends State<ImagePickerGridWithCounter>
               assetBackgroundColor: widget.assetBackgroundColor,
               cameraWidget: widget.cameraWidget,
               backgroundImage: widget.backgroundImageCamera,
+              isLimitSelectImage: widget.isLimitSelectImage,
             ),
           ),
         ),
