@@ -92,15 +92,19 @@ class _ImagesPickerGridState extends State<ImagesPickerGrid> {
     _totalEntitiesCount = newItems.length;
     if (mounted) {
       setState(() {
-        _currentPage = _calculateNumberOfPages(oldCount, widget.pageSize);
+        _currentPage = _calculateCurrentPage(oldCount, widget.pageSize);
         _hasMoreToLoad = controller._totalAssets.length < _totalEntitiesCount;
         controller.removeAllSelectedItem();
       });
     }
   }
 
-  int _calculateNumberOfPages(int totalImages, int imagesPerPage) {
-    return (totalImages - 1) ~/ imagesPerPage;
+  int _calculateCurrentPage(int totalImages, int imagesPerPage) {
+    if (imagesPerPage != 0) {
+      return (totalImages - 1) ~/ imagesPerPage;
+    } else {
+      return imagesPerPage;
+    }
   }
 
   Future<void> _loadAssets(int page) async {
