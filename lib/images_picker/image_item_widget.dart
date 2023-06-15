@@ -58,7 +58,6 @@ class _ImageItemWidgetState extends State<ImageItemWidget> with SingleTickerProv
     assetCounter = widget.assetCounter;
     cardinalNumberNotifier = ValueNotifier(widget.assetCounter.getSelectedIndexAt(widget.index));
     assetCounter.registerListenerAtSelectedIndex(widget.index, () {
-      log("ImageItemWidget::cardinalNumberNotifier() ${assetCounter.currentTotalSelectedIndex}");
       cardinalNumberNotifier.value = assetCounter.getSelectedIndexAt(widget.index);
     });
   }
@@ -128,31 +127,20 @@ class _ImageItemWidgetState extends State<ImageItemWidget> with SingleTickerProv
           )
         ),
         Positioned(
-          top: 0,
-          right: 0,
-          child: Stack(
-            alignment: Alignment.center,
-            children: [
-              GestureDetector(
-                behavior: HitTestBehavior.translucent,
-                onTap: _onSelectedAsset,
-                child: const SizedBox(
-                  height: 35,
-                  width: 35,
-                ),
-              ),
-              InkWell(
-                onTap: _onSelectedAsset,
-                child: ValueListenableBuilder(
-                  valueListenable: cardinalNumberNotifier,
-                  builder: (context, value, child) {
-                    return SelectedAssetWidget(
-                      cardinalNumber: cardinalNumberNotifier.value,
-                    );
-                  }
-                ),
-              ),
-            ],
+          top: 6.0,
+          right: 6.0,
+          child: InkWell(
+            onTap: () {
+              _onSelectedAsset();
+            },
+            child: ValueListenableBuilder(
+              valueListenable: cardinalNumberNotifier,
+              builder: (context, value, child) {
+                return SelectedAssetWidget(
+                  cardinalNumber: cardinalNumberNotifier.value,
+                );
+              }
+            ),
           ),
         ),
       ],
