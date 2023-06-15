@@ -7,7 +7,7 @@ import 'package:photo_manager/photo_manager.dart';
 import 'images_picker_grid.dart';
 
 class ImagePicker {
-  static showImagesGridBottomSheet({
+  static Future<T?> showImagesGridBottomSheet<T>({
     required BuildContext context,
     required ImagePickerGridController controller,
     required PermissionStatus permissionStatus,
@@ -64,7 +64,7 @@ class ImagePicker {
     }
 
     // ignore: use_build_context_synchronously
-    showModalBottomSheet(
+    return showModalBottomSheet(
       context: context,
       backgroundColor: backgroundColor ?? Theme.of(context).colorScheme.background,
       shape: RoundedRectangleBorder(
