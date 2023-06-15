@@ -11,6 +11,7 @@ class ImagePicker {
     required BuildContext context,
     required ImagePickerGridController controller,
     required PermissionStatus permissionStatus,
+    double? heightOfBottomSheet,
     Widget? goToSettingsWidget,
     CounterImageBuilder? counterImageBuilder,
     Widget? cameraWidget,
@@ -76,7 +77,7 @@ class ImagePicker {
           children: [
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 2.0) + MediaQuery.of(context).viewInsets,
-              height: MediaQuery.of(context).size.height * 0.8 - MediaQuery.of(context).viewInsets.bottom,
+              height: heightOfBottomSheet ?? _defaultBottomSheetHeight(context),
               child: Column(
                 children: [
                   Expanded(child: buildBodyBottomSheet(assetPath)),
@@ -91,6 +92,10 @@ class ImagePicker {
         ),
       ),
     );
+  }
+
+  static double _defaultBottomSheetHeight(BuildContext context) {
+    return MediaQuery.of(context).size.height * 0.8 - MediaQuery.of(context).viewInsets.bottom;
   }
 
   static Future<List<AssetPathEntity>> getAllAssetPaths({
