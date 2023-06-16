@@ -23,8 +23,8 @@ class ImagePicker {
     double initialChildSize = 0.4,
     double minChildSize = 0.4,
     double maxChildSize = 0.9,
-    isScrollControlled = true,
-    expandDraggableScrollableSheet = false
+    bool isScrollControlled = true,
+    bool expandDraggableScrollableSheet = false
   }) async {
     AssetPathEntity? assetPath;
 
