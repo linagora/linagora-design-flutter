@@ -20,6 +20,11 @@ class ImagePicker {
     Color? backgroundColor,
     Color? assetBackgroundColor,
     Widget? selectMoreImageWidget,
+    double initialChildSize = 0.4,
+    double minChildSize = 0.4,
+    double maxChildSize = 0.9,
+    isScrollControlled = true,
+    expandDraggableScrollableSheet = false
   }) async {
     AssetPathEntity? assetPath;
 
@@ -31,7 +36,7 @@ class ImagePicker {
       }
     }
 
-    Widget buildBodyBottomSheet(AssetPathEntity? assetPathEntity) {
+    Widget buildBodyBottomSheet(AssetPathEntity? assetPathEntity, ScrollController scrollController) {
       if (permissionStatus == PermissionStatus.permanentlyDenied || permissionStatus == PermissionStatus.denied) {
         return PermissionNotAuthorizedWidget(
           backgroundColor: backgroundColor,
@@ -48,10 +53,12 @@ class ImagePicker {
                 backgroundImageCamera: backgroundImageCamera,
                 cameraWidget: cameraWidget,
                 selectMoreImageWidget: selectMoreImageWidget,
-                isLimitSelectImage: permissionStatus == PermissionStatus.limited)
+                isLimitSelectImage: permissionStatus == PermissionStatus.limited,
+                scrollController: scrollController)
             : ImagesPickerGrid(
                 assetPath: assetPathEntity,
                 controller: controller,
+                scrollController: scrollController,
                 assetBackgroundColor: assetBackgroundColor,
                 backgroundImage: backgroundImageCamera,
                 selectMoreImageWidget: selectMoreImageWidget,
@@ -70,32 +77,42 @@ class ImagePicker {
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16.0),
       ),
-      isScrollControlled: true,
-      builder: (context) => SingleChildScrollView(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 2.0) + MediaQuery.of(context).viewInsets,
-              height: heightOfBottomSheet ?? _defaultBottomSheetHeight(context),
-              child: Column(
-                children: [
-                  Expanded(child: buildBodyBottomSheet(assetPath)),
-                  Padding(
-                    padding: const EdgeInsets.only(top: 6.0),
-                    child: bottomWidget ?? const SizedBox.shrink(),
-                  ),
-                ],
-              )
+      isScrollControlled: isScrollControlled,
+      builder: (context) => DraggableScrollableSheet(
+        initialChildSize: initialChildSize,
+        minChildSize: minChildSize,
+        maxChildSize: maxChildSize,
+        expand: expandDraggableScrollableSheet,
+        builder: (BuildContext context, ScrollController scrollController) {
+          return SingleChildScrollView(
+            physics: const NeverScrollableScrollPhysics(),
+            controller: scrollController,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 2.0) + MediaQuery.of(context).viewInsets,
+                    height: heightOfBottomSheet ?? _defaultBottomSheetHeight(context),
+                    child: Column(
+                      children: [
+                        Expanded(child: buildBodyBottomSheet(assetPath, scrollController)),
+                        Padding(
+                          padding: const EdgeInsets.only(top: 6.0),
+                          child: bottomWidget ?? const SizedBox.shrink(),
+                        ),
+                      ],
+                    )
+                ),
+              ],
             ),
-          ],
-        ),
+          );
+        },
       ),
     );
   }
 
   static double _defaultBottomSheetHeight(BuildContext context) {
-    return MediaQuery.of(context).size.height * 0.8 - MediaQuery.of(context).viewInsets.bottom;
+    return MediaQuery.of(context).size.height * 0.9 - MediaQuery.of(context).viewInsets.bottom;
   }
 
   static Future<List<AssetPathEntity>> getAllAssetPaths({
