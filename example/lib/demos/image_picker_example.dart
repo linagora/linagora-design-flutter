@@ -14,6 +14,7 @@ class ImagesPickerExample extends StatefulWidget {
 
 class _ImagesPickerExampleState extends State<ImagesPickerExample> {
   final controller = ImagePickerGridController();
+  final scrollController = ScrollController();
 
   Future<AssetPathEntity> loadAssetsPath() async {
     final List<AssetPathEntity> paths = await PhotoManager.getAssetPathList(
@@ -51,6 +52,7 @@ class _ImagesPickerExampleState extends State<ImagesPickerExample> {
               return const Center(child: CircularProgressIndicator.adaptive(),);
             }
             return ImagesPickerGrid(
+              scrollController: scrollController,
               assetPath: snapshot.data!,
               controller: controller,
               isLimitSelectImage: widget.permissionStatus == PermissionStatus.limited,

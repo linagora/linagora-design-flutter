@@ -15,6 +15,7 @@ class ImagesPickerGrid extends StatefulWidget {
     super.key,
     this.controller,
     required this.assetPath,
+    required this.scrollController,
     this.cameraWidget,
     this.onCameraPressed,
     this.backgroundImage,
@@ -27,6 +28,8 @@ class ImagesPickerGrid extends StatefulWidget {
   });
 
   static const maxImagesPerPage = 10;
+
+  final ScrollController scrollController;
 
   final AssetPathEntity assetPath;
 
@@ -151,6 +154,8 @@ class _ImagesPickerGridState extends State<ImagesPickerGrid> {
     }
 
     return GridView.custom(
+      physics: const ClampingScrollPhysics(),
+      controller: widget.scrollController,
       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: widget.itemsPerWidth,
       ), 

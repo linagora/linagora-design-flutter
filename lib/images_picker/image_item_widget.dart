@@ -20,7 +20,7 @@ class ImageItemWidget extends StatefulWidget {
   static const thumbnailDefaultSize = ThumbnailSize.square(200);
 
   final Color? backgroundColor;
-  
+
   const ImageItemWidget({
     Key? key,
     required this.entity,
@@ -88,7 +88,10 @@ class _ImageItemWidgetState extends State<ImageItemWidget> with SingleTickerProv
       alignment: Alignment.topRight,
       children: [
         GestureDetector(
-          onTap: widget.onTap,
+          onTap: () {
+            widget.onTap?.call();
+            _onSelectedAsset();
+          },
           child: Container(
             decoration: BoxDecoration(
               color: widget.backgroundColor ?? Theme.of(context).colorScheme.surface,
