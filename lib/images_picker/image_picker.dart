@@ -24,7 +24,8 @@ class ImagePicker {
     double minChildSize = 0.4,
     double maxChildSize = 0.9,
     bool isScrollControlled = true,
-    bool expandDraggableScrollableSheet = false
+    bool expandDraggableScrollableSheet = false,
+    Widget? expandedWidget,
   }) async {
     AssetPathEntity? assetPath;
 
@@ -84,27 +85,29 @@ class ImagePicker {
         maxChildSize: maxChildSize,
         expand: expandDraggableScrollableSheet,
         builder: (BuildContext context, ScrollController scrollController) {
-          return SingleChildScrollView(
-            physics: const NeverScrollableScrollPhysics(),
-            controller: scrollController,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 2.0) + MediaQuery.of(context).viewInsets,
-                    height: heightOfBottomSheet ?? _defaultBottomSheetHeight(context),
-                    child: Column(
-                      children: [
-                        Expanded(child: buildBodyBottomSheet(assetPath, scrollController)),
-                        Padding(
-                          padding: const EdgeInsets.only(top: 6.0),
-                          child: bottomWidget ?? const SizedBox.shrink(),
-                        ),
-                      ],
-                    )
+          return Stack(
+            children: [
+              SingleChildScrollView(
+                physics: const NeverScrollableScrollPhysics(),
+                controller: scrollController,
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 2.0) + MediaQuery.of(context).viewInsets,
+                  height: heightOfBottomSheet ?? _defaultBottomSheetHeight(context),
+                  child: Column(
+                    children: [
+                      Expanded(child: buildBodyBottomSheet(assetPath, scrollController)),
+                      expandedWidget ?? const SizedBox.shrink(),
+                    ],
+                  )
                 ),
-              ],
-            ),
+              ),
+              Positioned(
+                bottom: 0,
+                left: 0,
+                right: 0,
+                child:  bottomWidget ?? const SizedBox.shrink(),
+              ),
+            ],
           );
         },
       ),
