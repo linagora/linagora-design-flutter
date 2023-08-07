@@ -17,6 +17,7 @@ class ImagePicker {
     Widget? cameraWidget,
     Widget? bottomWidget,
     ImageProvider<Object>? backgroundImageCamera,
+    void Function()? onCameraPressed,
     Color? backgroundColor,
     Color? assetBackgroundColor,
     Widget? selectMoreImageWidget,
@@ -41,7 +42,10 @@ class ImagePicker {
       if (permissionStatus == PermissionStatus.permanentlyDenied || permissionStatus == PermissionStatus.denied) {
         return PermissionNotAuthorizedWidget(
           backgroundColor: backgroundColor,
+          backgroundImageCamera: backgroundImageCamera,
           goToSettingsWidget: goToSettingsWidget,
+          cameraWidget: cameraWidget,
+          onCameraPressed: onCameraPressed,
         );
       } else {
         if (assetPathEntity != null) {
@@ -52,10 +56,12 @@ class ImagePicker {
                 controller: controller,
                 assetBackgroundColor: assetBackgroundColor,
                 backgroundImageCamera: backgroundImageCamera,
+                onCameraPressed: onCameraPressed,
                 cameraWidget: cameraWidget,
                 selectMoreImageWidget: selectMoreImageWidget,
                 isLimitSelectImage: permissionStatus == PermissionStatus.limited,
-                scrollController: scrollController)
+                scrollController: scrollController,
+              )
             : ImagesPickerGrid(
                 assetPath: assetPathEntity,
                 controller: controller,
@@ -64,7 +70,9 @@ class ImagePicker {
                 backgroundImage: backgroundImageCamera,
                 selectMoreImageWidget: selectMoreImageWidget,
                 isLimitSelectImage: permissionStatus == PermissionStatus.limited,
-                cameraWidget: cameraWidget);
+                cameraWidget: cameraWidget,
+                onCameraPressed: onCameraPressed,
+              );
         } else {
           return const SizedBox.shrink();
         }
