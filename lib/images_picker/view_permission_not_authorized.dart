@@ -10,7 +10,8 @@ class PermissionNotAuthorizedWidget extends StatelessWidget {
     this.backgroundColor,
     this.goToSettingsWidget,
     this.onCameraPressed,
-    this.backgroundImageCamera
+    this.backgroundImageCamera,
+    this.cameraWidget,
   });
 
   final Color? backgroundColor;
@@ -20,6 +21,8 @@ class PermissionNotAuthorizedWidget extends StatelessWidget {
   final ImageProvider<Object>? backgroundImageCamera;
 
   final void Function()? onCameraPressed;
+
+  final Widget? cameraWidget;
 
   @override
   Widget build(BuildContext context) {
@@ -41,10 +44,10 @@ class PermissionNotAuthorizedWidget extends StatelessWidget {
             ),
             childrenDelegate: SliverChildBuilderDelegate((context, index) {
               if (index == 0) {
-                return UseCameraWidget(
-                  onPressed: onCameraPressed,
-                  backgroundImage: backgroundImageCamera
-                );
+                return cameraWidget ?? UseCameraWidget(
+                     backgroundImage: backgroundImageCamera,
+                     onPressed: onCameraPressed,
+                  );
               }
               return GestureDetector(
                 onTap: () => PhotoManager.openSetting(),
