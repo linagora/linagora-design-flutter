@@ -7,6 +7,7 @@ import 'package:linagora_design_flutter/images_picker/asset_counter.dart';
 import 'package:linagora_design_flutter/images_picker/image_item_widget.dart';
 import 'package:linagora_design_flutter/images_picker/images_picker.dart';
 import 'package:photo_manager/photo_manager.dart';
+// ignore_for_file: depend_on_referenced_packages
 import 'package:collection/collection.dart';
 
 class ImagesPickerGrid extends StatefulWidget {
@@ -22,9 +23,10 @@ class ImagesPickerGrid extends StatefulWidget {
     this.pageSize = maxImagesPerPage,
     this.itemsPerWidth = 3,
     this.assetBackgroundColor,
-    this.thumbnailOption = const ThumbnailOption(size: ImageItemWidget.thumbnailDefaultSize),
+    this.thumbnailOption = const ThumbnailOption(size: ImagePickerItemWidget.thumbnailDefaultSize),
     this.isLimitSelectImage = false,
-    this.selectMoreImageWidget
+    this.selectMoreImageWidget,
+    this.assetItemBuilder,
   });
 
   static const maxImagesPerPage = 10;
@@ -53,6 +55,8 @@ class ImagesPickerGrid extends StatefulWidget {
   final Widget? selectMoreImageWidget;
 
   final bool? isLimitSelectImage;
+
+  final AssetItemBuilder? assetItemBuilder;
 
   @override
   State<ImagesPickerGrid> createState() => _ImagesPickerGridState();
@@ -188,13 +192,14 @@ class _ImagesPickerGridState extends State<ImagesPickerGrid> {
             );
           }
 
-          return ImageItemWidget(
+          return ImagePickerItemWidget(
             key: ValueKey(imageIndex),
             index: imageIndex,
             entity: controller._totalAssets[imageIndex], 
             option: widget.thumbnailOption,
             assetCounter: assetCounter,
             backgroundColor: widget.assetBackgroundColor,
+            assetItemBuilder: widget.assetItemBuilder,
           );
         },
         childCount: childCount,

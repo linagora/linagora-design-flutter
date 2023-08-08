@@ -1,9 +1,13 @@
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:linagora_design_flutter/images_picker/asset_counter.dart';
+import 'package:linagora_design_flutter/images_picker/items/image_item_widget.dart';
+import 'package:linagora_design_flutter/images_picker/items/video_item_widget.dart';
 import 'package:photo_manager/photo_manager.dart';
 
-class ImageItemWidget extends StatefulWidget {
+typedef AssetItemBuilder = Widget Function(AssetEntity entity, ThumbnailOption option, bool isOriginal); 
+
+class ImagePickerItemWidget extends StatefulWidget {
 
   final AssetEntity entity;
 
@@ -21,7 +25,9 @@ class ImageItemWidget extends StatefulWidget {
 
   final Color? backgroundColor;
 
-  const ImageItemWidget({
+  final AssetItemBuilder? assetItemBuilder;
+
+  const ImagePickerItemWidget({
     Key? key,
     required this.entity,
     required this.option,
@@ -30,13 +36,14 @@ class ImageItemWidget extends StatefulWidget {
     this.backgroundColor,
     this.isOriginal = false,
     this.onTap,
+    this.assetItemBuilder,
   }) : super(key: key);
 
   @override
-  State<ImageItemWidget> createState() => _ImageItemWidgetState();
+  State<ImagePickerItemWidget> createState() => _ImagePickerItemWidgetState();
 }
 
-class _ImageItemWidgetState extends State<ImageItemWidget> with SingleTickerProviderStateMixin {
+class _ImagePickerItemWidgetState extends State<ImagePickerItemWidget> with SingleTickerProviderStateMixin {
 
   late final AnimationController _animationController = AnimationController(
     vsync: this,
@@ -102,28 +109,10 @@ class _ImageItemWidgetState extends State<ImageItemWidget> with SingleTickerProv
               scale: _scaleAnimation,
               child: ClipRRect(
                 borderRadius: const BorderRadius.all(Radius.circular(4.0)),
-                child: AssetEntityImage(
-                  widget.entity,
-                  thumbnailSize: widget.option.size,
-                  thumbnailFormat: widget.option.format,
-                  width: widget.option.size.width.toDouble(),
-                  height: widget.option.size.height.toDouble(),
+                child: itemWidgetFactory(
+                  entity: widget.entity,
+                  option: widget.option,
                   isOriginal: widget.isOriginal,
-                  fit: BoxFit.cover,
-                  filterQuality: FilterQuality.high,
-                  loadingBuilder:(context, child, loadingProgress) {
-                    if (loadingProgress != null && loadingProgress.cumulativeBytesLoaded != loadingProgress.expectedTotalBytes) {
-                      return const Center(
-                        child: CircularProgressIndicator.adaptive(),
-                      ); 
-                    }
-                    return child;
-                  },
-                  errorBuilder: (context, error, stackTrace) {
-                    return const Center(
-                      child: Icon(Icons.error_outline),
-                    );
-                  },
                 ),
               ),
             ),
@@ -148,6 +137,30 @@ class _ImageItemWidgetState extends State<ImageItemWidget> with SingleTickerProv
         ),
       ],
     );
+  }
+
+  Widget itemWidgetFactory({
+    required AssetEntity entity, 
+    required ThumbnailOption option,
+    required bool isOriginal,
+    AssetItemBuilder? assetItemBuilder,
+  }) {
+    switch (entity.type) {
+      case AssetType.video:
+        return assetItemBuilder?.call(entity, option, isOriginal) ?? VideoItemWidget(
+          entity: entity,
+          option: option,
+          isOriginal: isOriginal,
+        );
+      case AssetType.other:
+      case AssetType.image:
+      case AssetType.audio:
+        return assetItemBuilder?.call(entity, option, isOriginal) ?? ImageItemWidget(
+          entity: entity, 
+          option: option, 
+          isOriginal: isOriginal,
+      );
+    }
   }
 }
 
