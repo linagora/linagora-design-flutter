@@ -1,4 +1,3 @@
-import 'package:extended_image/extended_image.dart';
 import 'package:flutter/material.dart';
 import 'package:linagora_design_flutter/extensions/duration_extension.dart';
 import 'package:linagora_design_flutter/images_picker/image_item_widget.dart';
@@ -21,34 +20,19 @@ class VideoItemWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final assetProvider = AssetEntityImageProvider(
-      entity,
-      isOriginal: isOriginal,
-      thumbnailSize: ImagePickerItemWidget.thumbnailDefaultSize,
-    );
     return Stack(
       alignment: Alignment.center,
       children: [
-        ExtendedImage(
-          image: assetProvider,
+        AssetEntityImage(
+          entity,
           width: option.size.width.toDouble(),
           height: option.size.height.toDouble(),
           fit: BoxFit.cover,
           filterQuality: FilterQuality.high,
-          loadStateChanged: (ExtendedImageState state) {
-            Widget loader = const SizedBox.shrink();
-            switch (state.extendedImageLoadState) {
-              case LoadState.loading:
-                loader = const ColoredBox(color: Color(0x10ffffff));
-                break;
-              case LoadState.completed:
-                loader = RepaintBoundary(child: state.completedWidget);
-                break;
-              case LoadState.failed:
-                loader = const Center(child: Icon(Icons.error),);
-                break;
-            }
-            return loader;
+          errorBuilder: (context, error, stackTrace) {
+            return const Center(
+              child: Icon(Icons.error),
+            );
           },
         ),
         Container(
@@ -73,7 +57,7 @@ class VideoItemWidget extends StatelessWidget {
             ),
           ),
           child: Text(
-            entity.videoDuration.durationIndicatorBuilder(),
+            entity.videoDuration.mediaTimeLength(),
             style: const TextStyle(
               color: Colors.white,
               fontSize: 16,

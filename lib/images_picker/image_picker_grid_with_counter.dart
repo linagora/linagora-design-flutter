@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:linagora_design_flutter/images_picker/image_item_widget.dart';
 import 'package:linagora_design_flutter/images_picker/images_picker.dart';
 import 'package:photo_manager/photo_manager.dart';
 
@@ -26,6 +27,8 @@ class ImagePickerGridWithCounter extends StatefulWidget {
 
   final void Function()? onCameraPressed;
 
+  final AssetItemBuilder? assetItemBuilder;
+
   const ImagePickerGridWithCounter({
     super.key,
     required this.assetPath,
@@ -38,6 +41,7 @@ class ImagePickerGridWithCounter extends StatefulWidget {
     this.isLimitSelectImage = false,
     this.selectMoreImageWidget,
     this.onCameraPressed,
+    this.assetItemBuilder,
   });
 
   @override
@@ -100,6 +104,7 @@ class _ImagePickerGridWithCounterState extends State<ImagePickerGridWithCounter>
               selectMoreImageWidget: widget.selectMoreImageWidget,
               scrollController: widget.scrollController,
               onCameraPressed: widget.onCameraPressed,
+              assetItemBuilder: widget.assetItemBuilder,
             ),
           ),
         ),

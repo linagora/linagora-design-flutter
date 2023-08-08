@@ -13,7 +13,6 @@ dependencies:
     sdk: flutter
   photo_manager: ^2.6.0
   permission_handler_platform_interface: ^3.10.0
-  extended_image: ^8.0.2
 
 dev_dependencies:
   flutter_test:

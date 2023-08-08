@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:linagora_design_flutter/images_picker/image_item_widget.dart';
 import 'package:linagora_design_flutter/images_picker/image_picker_grid_with_counter.dart';
 import 'package:linagora_design_flutter/images_picker/view_permission_not_authorized.dart';
 import 'package:permission_handler_platform_interface/permission_handler_platform_interface.dart';
@@ -27,6 +28,7 @@ class ImagePicker {
     bool isScrollControlled = true,
     bool expandDraggableScrollableSheet = false,
     Widget? expandedWidget,
+    AssetItemBuilder? assetItemBuilder,
   }) async {
     AssetPathEntity? assetPath;
 
@@ -61,6 +63,7 @@ class ImagePicker {
                 selectMoreImageWidget: selectMoreImageWidget,
                 isLimitSelectImage: permissionStatus == PermissionStatus.limited,
                 scrollController: scrollController,
+                assetItemBuilder: assetItemBuilder,
               )
             : ImagesPickerGrid(
                 assetPath: assetPathEntity,
@@ -72,6 +75,7 @@ class ImagePicker {
                 isLimitSelectImage: permissionStatus == PermissionStatus.limited,
                 cameraWidget: cameraWidget,
                 onCameraPressed: onCameraPressed,
+                assetItemBuilder: assetItemBuilder,
               );
         } else {
           return const SizedBox.shrink();
