@@ -223,8 +223,22 @@ class ImagePickerGridController extends ChangeNotifier {
 
   List<AssetEntity> get totalAssets => _totalAssets;
 
+  bool _pickFromCamera = false;
+  bool pickFromCamera() => _pickFromCamera;
+
+  AssetEntity? _assetEntityFromCamera;
+
+  void pickAssetFromCamera(AssetEntity assetEntityFromCamera) {
+    _assetEntityFromCamera = _assetEntityFromCamera;
+    _pickFromCamera = true;
+    notifyListeners();
+  }
+
   void registerAssetCounterListener() {
-    _assetCounter.addListener(notifyListeners);
+    _assetCounter.addListener(() {
+      _pickFromCamera = false;
+      notifyListeners();
+    });
   }
 
   Future<List<AssetEntity>> _getAllAssets({
@@ -244,14 +258,19 @@ class ImagePickerGridController extends ChangeNotifier {
   }
 
   List<IndexedAssetEntity> get selectedAssets {
-    final selectedIndexes = _assetCounter.selectedIndexes;
+    if (_pickFromCamera && _assetEntityFromCamera != null) {
+      return [IndexedAssetEntity(index: 0, asset: _assetEntityFromCamera!)];
+    } else {
+      final selectedIndexes = _assetCounter.selectedIndexes;
 
-    return selectedIndexes
-      .map((index) => IndexedAssetEntity(
-        index: _assetCounter.getSelectedIndexAt(index), 
-        asset: _totalAssets[index])
+      return selectedIndexes
+          .map((index) =>
+          IndexedAssetEntity(
+              index: _assetCounter.getSelectedIndexAt(index),
+              asset: _totalAssets[index])
       )
-      .toList();
+          .toList();
+    }
   }
 
   void clearAssetCounter() {
@@ -260,6 +279,8 @@ class ImagePickerGridController extends ChangeNotifier {
 
   void removeAllSelectedItem() {
     _assetCounter.removeAllSelectedItem();
+    _pickFromCamera = false;
+    _assetEntityFromCamera = null;
   }
 
   List<IndexedAssetEntity> get sortedSelectedAssets {
