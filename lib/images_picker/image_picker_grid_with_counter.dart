@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:linagora_design_flutter/images_picker/asset_counter.dart';
 import 'package:linagora_design_flutter/images_picker/image_item_widget.dart';
 import 'package:linagora_design_flutter/images_picker/images_picker.dart';
 import 'package:photo_manager/photo_manager.dart';
@@ -49,7 +50,7 @@ class ImagePickerGridWithCounter extends StatefulWidget {
 }
 
 class _ImagePickerGridWithCounterState extends State<ImagePickerGridWithCounter> {
-  late final controller = widget.controller ?? ImagePickerGridController();
+  late final controller = widget.controller ?? ImagePickerGridController(AssetCounter());
 
   final imageCounterNotifier = ValueNotifier(0);
 

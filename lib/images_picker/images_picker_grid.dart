@@ -68,7 +68,7 @@ class _ImagesPickerGridState extends State<ImagesPickerGrid> {
   bool _hasMoreToLoad = true;
   int _totalEntitiesCount = 0;
 
-  late final controller = widget.controller ?? ImagePickerGridController();
+  late final controller = widget.controller ?? ImagePickerGridController(AssetCounter(imagePickerMode: ImagePickerMode.multiple));
 
   @override
   void initState() {
@@ -123,7 +123,7 @@ class _ImagesPickerGridState extends State<ImagesPickerGrid> {
       });
     }
   }
-  
+
   Future<void> _loadMoreAsset() async {
     final List<AssetEntity> entities = await controller.assetPath!.getAssetListPaged(
       page: _currentPage + 1,
@@ -162,7 +162,7 @@ class _ImagesPickerGridState extends State<ImagesPickerGrid> {
       controller: widget.scrollController,
       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: widget.itemsPerWidth,
-      ), 
+      ),
       childrenDelegate: SliverChildBuilderDelegate(
         (context, index) {
           if (index == 0) {
@@ -195,7 +195,7 @@ class _ImagesPickerGridState extends State<ImagesPickerGrid> {
           return ImagePickerItemWidget(
             key: ValueKey(imageIndex),
             index: imageIndex,
-            entity: controller._totalAssets[imageIndex], 
+            entity: controller._totalAssets[imageIndex],
             option: widget.thumbnailOption,
             assetCounter: assetCounter,
             backgroundColor: widget.assetBackgroundColor,
@@ -209,14 +209,13 @@ class _ImagesPickerGridState extends State<ImagesPickerGrid> {
 }
 
 class ImagePickerGridController extends ChangeNotifier {
+  final AssetCounter _assetCounter;
 
-  ImagePickerGridController() {
+  ImagePickerGridController(this._assetCounter) {
     registerAssetCounterListener();
   }
 
   AssetPathEntity? assetPath;
-
-  final _assetCounter = AssetCounter();
 
   Future<int> get totalAssetCount => assetPath!.assetCountAsync;
 
@@ -268,3 +267,7 @@ class ImagePickerGridController extends ChangeNotifier {
   }
 }
 
+enum ImagePickerMode {
+  single,
+  multiple,
+}
