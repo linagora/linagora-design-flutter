@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:linagora_design_flutter/images_picker/asset_counter.dart';
 import 'package:linagora_design_flutter/images_picker/images_picker.dart';
 import 'package:linagora_design_flutter/images_picker/images_picker_grid.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -13,7 +14,7 @@ class ImagesPickerExample extends StatefulWidget {
 }
 
 class _ImagesPickerExampleState extends State<ImagesPickerExample> {
-  final controller = ImagePickerGridController();
+  final controller = ImagePickerGridController(AssetCounter());
   final scrollController = ScrollController();
 
   Future<AssetPathEntity> loadAssetsPath() async {

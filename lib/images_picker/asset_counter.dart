@@ -1,10 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:linagora_design_flutter/images_picker/images_picker.dart';
 
 typedef IsSelectedNotifier =  ValueNotifier<bool>;
 
 typedef SelectedIndexNotifier = ValueNotifier<int>;
 
 class AssetCounter extends ChangeNotifier {
+  final ImagePickerMode imagePickerMode;
+
+  AssetCounter({this.imagePickerMode = ImagePickerMode.multiple});
   
   final Map<int, IsSelectedNotifier> _isSelectedMap = {};
 
@@ -29,9 +33,27 @@ class AssetCounter extends ChangeNotifier {
   }
 
   void toggleAssetSelection(int index) {
-    if (_isSelectedMap[index] != null) {
+    if (_isValidToToggle(index)) {
       _isSelectedMap[index]!.value = !_isSelectedMap[index]!.value;
     }
+  }
+
+  bool _isValidToToggle(int index) {
+    if (_isSelectedMap[index] == null) {
+      return false;
+    }
+
+    if (imagePickerMode == ImagePickerMode.multiple) {
+      return true;
+    }
+
+    if (imagePickerMode == ImagePickerMode.single) {
+      if (_totalSelected >= 1) {
+        return _isSelectedMap[index]!.value == true;
+      }
+    }
+
+    return true;
   }
 
   void _registerListenerInSelectionAt(int index) {
