@@ -229,7 +229,7 @@ class ImagePickerGridController extends ChangeNotifier {
   AssetEntity? _assetEntityFromCamera;
 
   void pickAssetFromCamera(AssetEntity assetEntityFromCamera) {
-    _assetEntityFromCamera = _assetEntityFromCamera;
+    _assetEntityFromCamera = assetEntityFromCamera;
     _pickFromCamera = true;
     notifyListeners();
   }
