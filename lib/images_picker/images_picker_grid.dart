@@ -87,10 +87,14 @@ class _ImagesPickerGridState extends State<ImagesPickerGrid> {
     log("ImagesPickerGrid::changeNotify(): MethodCall = $call");
     final newCount = call.arguments['newCount'];
     final oldCount = call.arguments['oldCount'];
-    if (newCount == 0) {
-      _loadAssets(0);
-    } else {
-      _getAssetListIncrease(newCount, oldCount);
+    if (newCount != null) {
+      if (newCount == 0) {
+        _loadAssets(0);
+      } else {
+        if (oldCount != null) {
+          _getAssetListIncrease(newCount, oldCount);
+        }
+      }
     }
   }
 
