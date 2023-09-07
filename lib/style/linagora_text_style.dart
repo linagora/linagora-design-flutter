@@ -1,4 +1,5 @@
-import 'dart:ui';
+
+import 'package:flutter/painting.dart';
 
 class LinagoraTextStyle {
   final TextStyle bodyLarge1;
@@ -19,27 +20,27 @@ class LinagoraTextStyle {
   }
 
   LinagoraTextStyle._material()
-      : bodyLarge1 = TextStyle(
+      : bodyLarge1 = const TextStyle(
           fontSize: 17,
           fontWeight: FontWeight.w600,
           letterSpacing: -0.15,
         ),
-        bodyLarge2 = TextStyle(
+        bodyLarge2 = const TextStyle(
           fontSize: 17,
           fontWeight: FontWeight.w400,
           letterSpacing: -0.15,
         ),
-        bodyMedium1 = TextStyle(
+        bodyMedium1 = const TextStyle(
           fontSize: 16,
           fontWeight: FontWeight.w400,
           letterSpacing: -0.15,
         ),
-        bodyMedium2 = TextStyle(
+        bodyMedium2 = const TextStyle(
           fontSize: 14,
           fontWeight: FontWeight.w600,
           letterSpacing: 0.25,
         ),
-        bodyMedium3 = TextStyle(
+        bodyMedium3 = const TextStyle(
           fontSize: 14,
           fontWeight: FontWeight.w400,
           letterSpacing: 0.25,
