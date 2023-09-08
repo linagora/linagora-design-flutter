@@ -20,7 +20,7 @@ class PermissionHandlerService {
     switch (permissionType) {
       case PermissionType.photos:
         if (Platform.isAndroid) {
-          return await Permission.storage.request();
+          return await Permission.photos.request();
         } else {
           return await Permission.photos.request();
         }
