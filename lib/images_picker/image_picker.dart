@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:linagora_design_flutter/images_picker/image_item_widget.dart';
 import 'package:linagora_design_flutter/images_picker/image_picker_grid_with_counter.dart';
+import 'package:linagora_design_flutter/images_picker/use_camera_widget.dart';
 import 'package:linagora_design_flutter/images_picker/view_permission_not_authorized.dart';
 import 'package:permission_handler_platform_interface/permission_handler_platform_interface.dart';
 import 'package:photo_manager/photo_manager.dart';
@@ -78,7 +79,19 @@ class ImagePicker {
                 assetItemBuilder: assetItemBuilder,
               );
         } else {
-          return const SizedBox.shrink();
+          return Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              SingleChildScrollView(
+                child: Container(
+                  padding: const EdgeInsets.only(left: 4.0, top: 12.0),
+                  width: 100,
+                  height: 100,
+                  child: cameraWidget ?? UseCameraWidget(backgroundImage: backgroundImageCamera, onPressed: onCameraPressed),
+                ),
+              )
+            ],
+          );
         }
       }
     }
@@ -139,7 +152,7 @@ class ImagePicker {
     return await PhotoManager.getAssetPathList(
       hasAll: hasAll,
       onlyAll: onlyAll,
-      type: RequestType.common,
+      type: type,
       filterOption: filterOption,
     );
   }
