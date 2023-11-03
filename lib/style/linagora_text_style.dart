@@ -1,5 +1,6 @@
 
 import 'package:flutter/painting.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class LinagoraTextStyle {
   final TextStyle bodyLarge1;
@@ -20,27 +21,27 @@ class LinagoraTextStyle {
   }
 
   LinagoraTextStyle._material()
-      : bodyLarge1 = const TextStyle(
+      : bodyLarge1 = GoogleFonts.inter(
           fontSize: 17,
           fontWeight: FontWeight.w600,
           letterSpacing: -0.15,
         ),
-        bodyLarge2 = const TextStyle(
+        bodyLarge2 = GoogleFonts.inter(
           fontSize: 17,
           fontWeight: FontWeight.w400,
           letterSpacing: -0.15,
         ),
-        bodyMedium1 = const TextStyle(
+        bodyMedium1 = GoogleFonts.inter(
           fontSize: 16,
           fontWeight: FontWeight.w400,
           letterSpacing: -0.15,
         ),
-        bodyMedium2 = const TextStyle(
+        bodyMedium2 = GoogleFonts.inter(
           fontSize: 14,
           fontWeight: FontWeight.w600,
           letterSpacing: 0.25,
         ),
-        bodyMedium3 = const TextStyle(
+        bodyMedium3 = GoogleFonts.inter(
           fontSize: 14,
           fontWeight: FontWeight.w400,
           letterSpacing: 0.25,
