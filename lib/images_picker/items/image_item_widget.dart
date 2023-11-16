@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:photo_manager/photo_manager.dart';
 
@@ -20,9 +18,7 @@ class ImageItemWidget extends StatelessWidget {
   
   @override
   Widget build(BuildContext context) {
-    final thumbnailSize = Platform.isIOS
-        ? ThumbnailSize.square((option.size.width * MediaQuery.of(context).devicePixelRatio).toInt())
-        : option.size;
+    final thumbnailSize = ThumbnailSize.square((option.size.width * MediaQuery.of(context).devicePixelRatio).toInt());
     return AssetEntityImage(
       entity,
       thumbnailSize: thumbnailSize,
@@ -31,7 +27,7 @@ class ImageItemWidget extends StatelessWidget {
       height: thumbnailSize.height.toDouble(),
       isOriginal: isOriginal,
       fit: BoxFit.cover,
-      filterQuality: FilterQuality.high,
+      filterQuality: FilterQuality.medium,
       loadingBuilder:(context, child, loadingProgress) {
         if (loadingProgress != null && loadingProgress.cumulativeBytesLoaded != loadingProgress.expectedTotalBytes) {
           return const Center(
