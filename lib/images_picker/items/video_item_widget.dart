@@ -20,20 +20,24 @@ class VideoItemWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final thumbnailSize = ThumbnailSize.square((option.size.width * MediaQuery.of(context).devicePixelRatio).toInt());
     return Stack(
       alignment: Alignment.center,
       children: [
         AssetEntityImage(
           entity,
-          width: option.size.width.toDouble(),
-          height: option.size.height.toDouble(),
+          thumbnailSize: thumbnailSize,
+          width: thumbnailSize.width.toDouble(),
+          height: thumbnailSize.height.toDouble(),
           fit: BoxFit.cover,
-          filterQuality: FilterQuality.high,
+          filterQuality: FilterQuality.medium,
           errorBuilder: (context, error, stackTrace) {
             return const Center(
               child: Icon(Icons.error),
             );
           },
+          gaplessPlayback: true,
+          isOriginal: isOriginal,
         ),
         Container(
           width: ImagePickerItemWidget.thumbnailDefaultSize.width.toDouble(),
