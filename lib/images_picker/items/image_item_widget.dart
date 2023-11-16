@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:photo_manager/photo_manager.dart';
 
@@ -18,12 +20,15 @@ class ImageItemWidget extends StatelessWidget {
   
   @override
   Widget build(BuildContext context) {
+    final thumbnailSize = Platform.isIOS
+        ? ThumbnailSize.square((option.size.width * MediaQuery.of(context).devicePixelRatio).toInt())
+        : option.size;
     return AssetEntityImage(
       entity,
-      thumbnailSize: option.size,
+      thumbnailSize: thumbnailSize,
       thumbnailFormat: option.format,
-      width: option.size.width.toDouble(),
-      height: option.size.height.toDouble(),
+      width: thumbnailSize.width.toDouble(),
+      height: thumbnailSize.height.toDouble(),
       isOriginal: isOriginal,
       fit: BoxFit.cover,
       filterQuality: FilterQuality.high,
@@ -40,6 +45,7 @@ class ImageItemWidget extends StatelessWidget {
           child: Icon(Icons.error_outline),
         );
       },
+      gaplessPlayback: true,
     );
   }
 
