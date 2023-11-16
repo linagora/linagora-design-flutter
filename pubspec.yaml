@@ -11,7 +11,7 @@ dependencies:
   equatable: ^2.0.5
   flutter:
     sdk: flutter
-  photo_manager: ^2.6.0
+  photo_manager: ^2.8.1
   permission_handler_platform_interface: ^3.10.0
 
 dev_dependencies:
