@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:linagora_design_flutter/extensions/duration_extension.dart';
 import 'package:linagora_design_flutter/images_picker/image_item_widget.dart';
 import 'package:photo_manager/photo_manager.dart';
+import 'package:photo_manager_image_provider/photo_manager_image_provider.dart';
 
 class VideoItemWidget extends StatelessWidget {
 
