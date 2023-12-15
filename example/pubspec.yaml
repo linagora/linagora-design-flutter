@@ -41,7 +41,8 @@ dependencies:
   file_picker: ^5.2.9
   image_picker: ^0.8.7+2
   image: ^4.0.15
-  photo_manager: ^2.6.0
+  photo_manager: ^3.0.0-dev.2
+  photo_manager_image_provider: ^2.1.0
   auto_size_text: ^3.0.0
   permission_handler: ^10.2.0
 
