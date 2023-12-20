@@ -182,6 +182,17 @@ class LinagoraSysColors {
 
   Color get outlineVariantDark => _outlineVariantDark ?? outlineVariant;
 
+  LinearGradient get linearGradientStartingPage => const LinearGradient(
+        begin: Alignment.bottomLeft,
+        end: Alignment.bottomRight,
+        colors: [
+          Color.fromRGBO(248, 169, 52, 0.2),
+          Color.fromRGBO(203, 40, 206, 0.2),
+          Color.fromRGBO(10, 132, 255, 0.2),
+        ],
+        stops: [0.0, 0.436, 1.0],
+      );
+
   LinagoraSysColors({
     required this.primary,
     required this.onPrimary,
