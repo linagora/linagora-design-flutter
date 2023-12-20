@@ -1,6 +1,6 @@
 import 'package:flutter/rendering.dart';
 
-class LinagoraHomeserverScreen {
+class TwakeIdScreenStyle {
   static const packageAssets = 'linagora_design_flutter';
   static const double imageWidth = 178;
   static const double imageHeight = 88;
