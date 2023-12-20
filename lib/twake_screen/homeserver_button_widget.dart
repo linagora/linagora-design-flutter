@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:linagora_design_flutter/colors/linagora_sys_colors.dart';
-import 'package:linagora_design_flutter/homeserver_screen/homeserver_button_style.dart';
+import 'package:linagora_design_flutter/twake_screen/homeserver_button_style.dart';
 
 class HomeserverButtonWidget extends StatelessWidget {
   final Color? backgroundColor;
