@@ -103,38 +103,28 @@ class ImagePicker {
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16.0),
       ),
-      isScrollControlled: isScrollControlled,
-      builder: (context) => DraggableScrollableSheet(
-        initialChildSize: initialChildSize,
-        minChildSize: minChildSize,
-        maxChildSize: maxChildSize,
-        expand: expandDraggableScrollableSheet,
-        builder: (BuildContext context, ScrollController scrollController) {
-          return Stack(
-            children: [
-              SingleChildScrollView(
-                physics: const NeverScrollableScrollPhysics(),
-                controller: scrollController,
-                child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 2.0) + MediaQuery.of(context).viewInsets,
-                  height: heightOfBottomSheet ?? _defaultBottomSheetHeight(context),
-                  child: Column(
-                    children: [
-                      Expanded(child: buildBodyBottomSheet(assetPath, scrollController)),
-                      expandedWidget ?? const SizedBox.shrink(),
-                    ],
-                  )
-                ),
-              ),
-              Positioned(
-                bottom: 0,
-                left: 0,
-                right: 0,
-                child:  bottomWidget ?? const SizedBox.shrink(),
-              ),
-            ],
-          );
-        },
+      isScrollControlled: true,
+      builder: (context) => Padding(
+        padding: MediaQuery.of(context).viewInsets,
+        child: Stack(
+          children: [
+            SizedBox(
+                height: heightOfBottomSheet ?? _defaultBottomSheetHeight(context),
+                child: Column(
+                  children: [
+                    Expanded(child: buildBodyBottomSheet(assetPath, ScrollController())),
+                    expandedWidget ?? const SizedBox.shrink(),
+                  ],
+                )
+            ),
+            Positioned(
+              bottom: 0,
+              left: 0,
+              right: 0,
+              child: bottomWidget ?? const SizedBox.shrink(),
+            ),
+          ],
+        ),
       ),
     );
   }
