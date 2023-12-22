@@ -30,6 +30,8 @@ class ImagePickerGridWithCounter extends StatefulWidget {
 
   final AssetItemBuilder? assetItemBuilder;
 
+  final EdgeInsets? gridPadding;
+
   const ImagePickerGridWithCounter({
     super.key,
     required this.assetPath,
@@ -43,6 +45,7 @@ class ImagePickerGridWithCounter extends StatefulWidget {
     this.selectMoreImageWidget,
     this.onCameraPressed,
     this.assetItemBuilder,
+    this.gridPadding,
   });
 
   @override
@@ -106,6 +109,7 @@ class _ImagePickerGridWithCounterState extends State<ImagePickerGridWithCounter>
               scrollController: widget.scrollController,
               onCameraPressed: widget.onCameraPressed,
               assetItemBuilder: widget.assetItemBuilder,
+              gridPadding: widget.gridPadding,
             ),
           ),
         ),
