@@ -27,6 +27,7 @@ class ImagesPickerGrid extends StatefulWidget {
     this.isLimitSelectImage = false,
     this.selectMoreImageWidget,
     this.assetItemBuilder,
+    this.gridPadding = const EdgeInsets.only(bottom: 150),
   });
 
   static const maxImagesPerPage = 10;
@@ -57,6 +58,8 @@ class ImagesPickerGrid extends StatefulWidget {
   final bool? isLimitSelectImage;
 
   final AssetItemBuilder? assetItemBuilder;
+
+  final EdgeInsets? gridPadding;
 
   @override
   State<ImagesPickerGrid> createState() => _ImagesPickerGridState();
@@ -163,6 +166,7 @@ class _ImagesPickerGridState extends State<ImagesPickerGrid> {
 
     return GridView.custom(
       physics: const ClampingScrollPhysics(),
+      padding: widget.gridPadding,
       controller: widget.scrollController,
       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: widget.itemsPerWidth,

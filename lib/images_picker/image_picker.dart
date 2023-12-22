@@ -30,6 +30,7 @@ class ImagePicker {
     bool expandDraggableScrollableSheet = false,
     Widget? expandedWidget,
     AssetItemBuilder? assetItemBuilder,
+    EdgeInsets? gridPadding,
   }) async {
     AssetPathEntity? assetPath;
 
@@ -65,6 +66,7 @@ class ImagePicker {
                 isLimitSelectImage: permissionStatus == PermissionStatus.limited,
                 scrollController: scrollController,
                 assetItemBuilder: assetItemBuilder,
+                gridPadding: gridPadding,
               )
             : ImagesPickerGrid(
                 assetPath: assetPathEntity,
@@ -77,6 +79,7 @@ class ImagePicker {
                 cameraWidget: cameraWidget,
                 onCameraPressed: onCameraPressed,
                 assetItemBuilder: assetItemBuilder,
+                gridPadding: gridPadding,
               );
         } else {
           return Row(
