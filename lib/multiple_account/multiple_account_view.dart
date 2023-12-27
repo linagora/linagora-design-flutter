@@ -7,23 +7,31 @@ import 'package:linagora_design_flutter/multiple_account/multiple_account_picker
 class MultipleAccountView extends StatelessWidget {
   final List<TwakePresentationAccount> accounts;
   final ScrollController scrollController;
-  final TextStyle accountNameStyle;
-  final TextStyle accountIdStyle;
   final String titleAccountSettings;
-  final TextStyle titleAccountSettingsStyle;
+  final TextStyle? accountIdStyle;
+  final TextStyle? accountNameStyle;
+  final TextStyle? titleAccountSettingsStyle;
   final OnGoToAccountSettings onGoToAccountSettings;
   final OnSetAccountAsActive onSetAccountAsActive;
+  final Color? highlightColor;
+  final Color? splashColor;
+  final Color? hoverColor;
+  final Color? focusColor;
 
   const MultipleAccountView({
     super.key,
     required this.accounts,
     required this.scrollController,
-    required this.accountNameStyle,
-    required this.accountIdStyle,
+    this.accountNameStyle,
+    this.accountIdStyle,
+    this.titleAccountSettingsStyle,
     required this.titleAccountSettings,
-    required this.titleAccountSettingsStyle,
     required this.onGoToAccountSettings,
     required this.onSetAccountAsActive,
+    this.highlightColor,
+    this.splashColor,
+    this.hoverColor,
+    this.focusColor,
   });
 
   @override
@@ -35,10 +43,10 @@ class MultipleAccountView extends StatelessWidget {
       controller: scrollController,
       itemBuilder: (context, index) {
         return InkWell(
-          highlightColor: Colors.transparent,
-          splashColor: Colors.transparent,
-          hoverColor: Colors.transparent,
-          focusColor: Colors.transparent,
+          highlightColor: highlightColor,
+          splashColor: splashColor,
+          hoverColor: hoverColor,
+          focusColor: focusColor,
           onTap: () {
             Navigator.of(context).pop();
             onSetAccountAsActive(accounts[index]);
@@ -99,10 +107,10 @@ class MultipleAccountView extends StatelessWidget {
                             ),
                             if (accounts[index].isActive)
                               InkWell(
-                                highlightColor: Colors.transparent,
-                                splashColor: Colors.transparent,
-                                hoverColor: Colors.transparent,
-                                focusColor: Colors.transparent,
+                                highlightColor: highlightColor,
+                                splashColor: splashColor,
+                                hoverColor: hoverColor,
+                                focusColor: focusColor,
                                 onTap: () {
                                   Navigator.of(context).pop();
                                   onGoToAccountSettings();
