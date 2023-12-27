@@ -2,6 +2,7 @@ import 'package:example/demos/circle_avatar_example.dart';
 import 'package:example/demos/circle_avatar_load_from_memory_example.dart';
 import 'package:example/demos/image_picker_bottom_sheet_example.dart';
 import 'package:example/demos/image_picker_example.dart';
+import 'package:example/demos/multiple_account_picker_example.dart';
 import 'package:example/demos/permission_handler.dart';
 import 'package:flutter/material.dart';
 import 'package:linagora_design_flutter/linagora_design_flutter.dart';
@@ -39,9 +40,11 @@ class MyHomePage extends StatelessWidget {
             component: CircleAvatarExample(),
             title: 'Demo CircleAvatar component',
           ),
+          const SizedBox(height: 20),
           DemoTile(
               title: 'Demo CircleAvatar component with load image from bytes',
               component: CircleAvatarLoadFromMemoryExample()),
+          const SizedBox(height: 20),
           DemoTile(
               title: 'Demo Image picker',
               onPressed: () async {
@@ -56,6 +59,7 @@ class MyHomePage extends StatelessWidget {
                           )),
                 );
               }),
+          const SizedBox(height: 20),
           DemoTile(
               title: "Demo Image picker with bottom sheet",
               onPressed: () async {
@@ -70,6 +74,7 @@ class MyHomePage extends StatelessWidget {
                           )),
                 );
               }),
+          const SizedBox(height: 20),
           DemoTile(
               title: "Demo homeserver screen",
               onPressed: () {
@@ -83,6 +88,17 @@ class MyHomePage extends StatelessWidget {
                       description:
                           'To start, please create a TwakeID \nthat will allow you to use \nchat, mail and drive',
                     ),
+                  ),
+                );
+              }),
+          const SizedBox(height: 20),
+          DemoTile(
+              title: "Demo multiple account with bottom sheet",
+              onPressed: () async {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const MultipleAccountPickerExample(),
                   ),
                 );
               }),
