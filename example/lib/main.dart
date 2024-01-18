@@ -81,7 +81,7 @@ class MyHomePage extends StatelessWidget {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => const TwakeIdScreen(
+                    builder: (context) => const TwakeWelcomeScreen(
                       signInTitle: 'Sign in',
                       createTwakeIdTitle: 'Create a Twake ID',
                       useCompanyServerTitle: 'Use your company server',
