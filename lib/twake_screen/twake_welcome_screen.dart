@@ -8,8 +8,8 @@ class TwakeWelcomeScreen extends StatelessWidget {
   final TextStyle? createTwakeIdTextStyle;
   final TextStyle? useCompanyServerTextStyle;
   final TextStyle? descriptionTextStyle;
-  final String signInTitle;
-  final String createTwakeIdTitle;
+  final String? signInTitle;
+  final String? createTwakeIdTitle;
   final String useCompanyServerTitle;
   final String description;
   final VoidCallback? onSignInOnTap;
@@ -28,8 +28,8 @@ class TwakeWelcomeScreen extends StatelessWidget {
     this.signInTextStyle,
     this.createTwakeIdTextStyle,
     this.useCompanyServerTextStyle,
-    required this.signInTitle,
-    required this.createTwakeIdTitle,
+    this.signInTitle,
+    this.createTwakeIdTitle,
     required this.useCompanyServerTitle,
     required this.description,
     this.descriptionTextStyle,
@@ -85,42 +85,45 @@ class TwakeWelcomeScreen extends StatelessWidget {
                 padding: TwakeWelcomeScreenStyle.buttonPadding,
                 child: Column(
                   children: [
-                    HomeserverButtonWidget(
-                      focusColor: focusColor,
-                      hoverColor: hoverColor,
-                      highlightColor: highlightColor,
-                      overlayColor: overlayColor,
-                      splashColor: splashColor,
-                      onTap: onCreateTwakeIdOnTap,
-                      title: createTwakeIdTitle,
-                      textStyle: createTwakeIdTextStyle ??
-                          TextStyle(
-                            fontSize: 17,
-                            fontWeight: FontWeight.w500,
-                            fontFamily: 'Inter',
-                            color: LinagoraSysColors.material().onPrimary,
-                          ),
-                    ),
-                    const SizedBox(
-                      height: 12,
-                    ),
-                    HomeserverButtonWidget(
-                      focusColor: focusColor,
-                      hoverColor: hoverColor,
-                      highlightColor: highlightColor,
-                      overlayColor: overlayColor,
-                      splashColor: splashColor,
-                      onTap: onSignInOnTap,
-                      title: signInTitle,
-                      backgroundColor: LinagoraSysColors.material().surface,
-                      textStyle: createTwakeIdTextStyle ??
-                          TextStyle(
-                            fontSize: 17,
-                            fontWeight: FontWeight.w500,
-                            fontFamily: 'Inter',
-                            color: LinagoraSysColors.material().primary,
-                          ),
-                    ),
+                    if (createTwakeIdTitle != null) ...[
+                      HomeserverButtonWidget(
+                        focusColor: focusColor,
+                        hoverColor: hoverColor,
+                        highlightColor: highlightColor,
+                        overlayColor: overlayColor,
+                        splashColor: splashColor,
+                        onTap: onCreateTwakeIdOnTap,
+                        title: createTwakeIdTitle!,
+                        textStyle: createTwakeIdTextStyle ??
+                            TextStyle(
+                              fontSize: 17,
+                              fontWeight: FontWeight.w500,
+                              fontFamily: 'Inter',
+                              color: LinagoraSysColors.material().onPrimary,
+                            ),
+                      ),
+                      const SizedBox(
+                        height: 12,
+                      ),
+                    ],
+                    if (signInTitle != null)
+                      HomeserverButtonWidget(
+                        focusColor: focusColor,
+                        hoverColor: hoverColor,
+                        highlightColor: highlightColor,
+                        overlayColor: overlayColor,
+                        splashColor: splashColor,
+                        onTap: onSignInOnTap,
+                        title: signInTitle!,
+                        backgroundColor: LinagoraSysColors.material().surface,
+                        textStyle: createTwakeIdTextStyle ??
+                            TextStyle(
+                              fontSize: 17,
+                              fontWeight: FontWeight.w500,
+                              fontFamily: 'Inter',
+                              color: LinagoraSysColors.material().primary,
+                            ),
+                      ),
                     const SizedBox(
                       height: 12,
                     ),
@@ -132,8 +135,8 @@ class TwakeWelcomeScreen extends StatelessWidget {
                       splashColor: splashColor,
                       onTap: onUseCompanyServerOnTap,
                       child: Padding(
-                        padding:
-                            TwakeWelcomeScreenStyle.useCompanyServerTitlePadding,
+                        padding: TwakeWelcomeScreenStyle
+                            .useCompanyServerTitlePadding,
                         child: Text(
                           useCompanyServerTitle,
                           style: useCompanyServerTextStyle ??
