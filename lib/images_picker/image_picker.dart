@@ -31,19 +31,27 @@ class ImagePicker {
     Widget? expandedWidget,
     AssetItemBuilder? assetItemBuilder,
     EdgeInsets? gridPadding,
+    RequestType type = RequestType.common,
   }) async {
     AssetPathEntity? assetPath;
 
-    final permission = permissionStatus == PermissionStatus.granted || permissionStatus == PermissionStatus.limited;
+    final permission = permissionStatus == PermissionStatus.granted ||
+        permissionStatus == PermissionStatus.limited;
     if (permission) {
-      final assetsPath = await getAllAssetPaths(hasAll: true, onlyAll: false);
+      final assetsPath = await getAllAssetPaths(
+        hasAll: true,
+        onlyAll: false,
+        type: type,
+      );
       if (assetsPath.isNotEmpty) {
         assetPath = assetsPath.first;
       }
     }
 
-    Widget buildBodyBottomSheet(AssetPathEntity? assetPathEntity, ScrollController scrollController) {
-      if (permissionStatus == PermissionStatus.permanentlyDenied || permissionStatus == PermissionStatus.denied) {
+    Widget buildBodyBottomSheet(
+        AssetPathEntity? assetPathEntity, ScrollController scrollController) {
+      if (permissionStatus == PermissionStatus.permanentlyDenied ||
+          permissionStatus == PermissionStatus.denied) {
         return PermissionNotAuthorizedWidget(
           backgroundColor: backgroundColor,
           backgroundImageCamera: backgroundImageCamera,
@@ -54,33 +62,35 @@ class ImagePicker {
       } else {
         if (assetPathEntity != null) {
           return counterImageBuilder != null
-            ? ImagePickerGridWithCounter(
-                assetPath: assetPathEntity,
-                counterBuilder: counterImageBuilder,
-                controller: controller,
-                assetBackgroundColor: assetBackgroundColor,
-                backgroundImageCamera: backgroundImageCamera,
-                onCameraPressed: onCameraPressed,
-                cameraWidget: cameraWidget,
-                selectMoreImageWidget: selectMoreImageWidget,
-                isLimitSelectImage: permissionStatus == PermissionStatus.limited,
-                scrollController: scrollController,
-                assetItemBuilder: assetItemBuilder,
-                gridPadding: gridPadding,
-              )
-            : ImagesPickerGrid(
-                assetPath: assetPathEntity,
-                controller: controller,
-                scrollController: scrollController,
-                assetBackgroundColor: assetBackgroundColor,
-                backgroundImage: backgroundImageCamera,
-                selectMoreImageWidget: selectMoreImageWidget,
-                isLimitSelectImage: permissionStatus == PermissionStatus.limited,
-                cameraWidget: cameraWidget,
-                onCameraPressed: onCameraPressed,
-                assetItemBuilder: assetItemBuilder,
-                gridPadding: gridPadding,
-              );
+              ? ImagePickerGridWithCounter(
+                  assetPath: assetPathEntity,
+                  counterBuilder: counterImageBuilder,
+                  controller: controller,
+                  assetBackgroundColor: assetBackgroundColor,
+                  backgroundImageCamera: backgroundImageCamera,
+                  onCameraPressed: onCameraPressed,
+                  cameraWidget: cameraWidget,
+                  selectMoreImageWidget: selectMoreImageWidget,
+                  isLimitSelectImage:
+                      permissionStatus == PermissionStatus.limited,
+                  scrollController: scrollController,
+                  assetItemBuilder: assetItemBuilder,
+                  gridPadding: gridPadding,
+                )
+              : ImagesPickerGrid(
+                  assetPath: assetPathEntity,
+                  controller: controller,
+                  scrollController: scrollController,
+                  assetBackgroundColor: assetBackgroundColor,
+                  backgroundImage: backgroundImageCamera,
+                  selectMoreImageWidget: selectMoreImageWidget,
+                  isLimitSelectImage:
+                      permissionStatus == PermissionStatus.limited,
+                  cameraWidget: cameraWidget,
+                  onCameraPressed: onCameraPressed,
+                  assetItemBuilder: assetItemBuilder,
+                  gridPadding: gridPadding,
+                );
         } else {
           return Row(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -90,7 +100,10 @@ class ImagePicker {
                   padding: const EdgeInsets.only(left: 4.0, top: 12.0),
                   width: 100,
                   height: 100,
-                  child: cameraWidget ?? UseCameraWidget(backgroundImage: backgroundImageCamera, onPressed: onCameraPressed),
+                  child: cameraWidget ??
+                      UseCameraWidget(
+                          backgroundImage: backgroundImageCamera,
+                          onPressed: onCameraPressed),
                 ),
               )
             ],
@@ -102,7 +115,8 @@ class ImagePicker {
     // ignore: use_build_context_synchronously
     return showModalBottomSheet(
       context: context,
-      backgroundColor: backgroundColor ?? Theme.of(context).colorScheme.background,
+      backgroundColor:
+          backgroundColor ?? Theme.of(context).colorScheme.background,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16.0),
       ),
@@ -112,14 +126,16 @@ class ImagePicker {
         child: Stack(
           children: [
             SizedBox(
-                height: heightOfBottomSheet ?? _defaultBottomSheetHeight(context),
+                height:
+                    heightOfBottomSheet ?? _defaultBottomSheetHeight(context),
                 child: Column(
                   children: [
-                    Expanded(child: buildBodyBottomSheet(assetPath, ScrollController())),
+                    Expanded(
+                        child: buildBodyBottomSheet(
+                            assetPath, ScrollController())),
                     expandedWidget ?? const SizedBox.shrink(),
                   ],
-                )
-            ),
+                )),
             Positioned(
               bottom: 0,
               left: 0,
@@ -133,7 +149,8 @@ class ImagePicker {
   }
 
   static double _defaultBottomSheetHeight(BuildContext context) {
-    return MediaQuery.of(context).size.height * 0.9 - MediaQuery.of(context).viewInsets.bottom;
+    return MediaQuery.of(context).size.height * 0.9 -
+        MediaQuery.of(context).viewInsets.bottom;
   }
 
   static Future<List<AssetPathEntity>> getAllAssetPaths({
