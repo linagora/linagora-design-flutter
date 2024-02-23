@@ -95,8 +95,7 @@ class ImagePicker {
                   padding: const EdgeInsets.only(left: 4.0, top: 12.0),
                   width: 100,
                   height: 100,
-                  child: cameraWidget ??
-                      UseCameraWidget(backgroundImage: backgroundImageCamera, onPressed: onCameraPressed),
+                  child: cameraWidget ?? UseCameraWidget(backgroundImage: backgroundImageCamera, onPressed: onCameraPressed),
                 ),
               )
             ],
