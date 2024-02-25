@@ -113,7 +113,7 @@ class ImagePicker {
       ),
       isScrollControlled: true,
       builder: (context) => Padding(
-        padding: MediaQuery.of(context).viewInsets,
+        padding: MediaQuery.viewInsetsOf(context),
         child: Stack(
           children: [
             SizedBox(
@@ -137,7 +137,8 @@ class ImagePicker {
   }
 
   static double _defaultBottomSheetHeight(BuildContext context) {
-    return MediaQuery.of(context).size.height * 0.9 - MediaQuery.of(context).viewInsets.bottom;
+    
+    return MediaQuery.sizeOf(context).height * 0.9 - MediaQuery.viewInsetsOf(context).bottom;
   }
 
   static Future<List<AssetPathEntity>> getAllAssetPaths({
