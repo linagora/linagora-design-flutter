@@ -31,12 +31,17 @@ class ImagePicker {
     Widget? expandedWidget,
     AssetItemBuilder? assetItemBuilder,
     EdgeInsets? gridPadding,
+    RequestType type = RequestType.common,
   }) async {
     AssetPathEntity? assetPath;
 
     final permission = permissionStatus == PermissionStatus.granted || permissionStatus == PermissionStatus.limited;
     if (permission) {
-      final assetsPath = await getAllAssetPaths(hasAll: true, onlyAll: false);
+      final assetsPath = await getAllAssetPaths(
+        hasAll: true,
+        onlyAll: false,
+        type: type,
+      );
       if (assetsPath.isNotEmpty) {
         assetPath = assetsPath.first;
       }
@@ -54,33 +59,33 @@ class ImagePicker {
       } else {
         if (assetPathEntity != null) {
           return counterImageBuilder != null
-            ? ImagePickerGridWithCounter(
-                assetPath: assetPathEntity,
-                counterBuilder: counterImageBuilder,
-                controller: controller,
-                assetBackgroundColor: assetBackgroundColor,
-                backgroundImageCamera: backgroundImageCamera,
-                onCameraPressed: onCameraPressed,
-                cameraWidget: cameraWidget,
-                selectMoreImageWidget: selectMoreImageWidget,
-                isLimitSelectImage: permissionStatus == PermissionStatus.limited,
-                scrollController: scrollController,
-                assetItemBuilder: assetItemBuilder,
-                gridPadding: gridPadding,
-              )
-            : ImagesPickerGrid(
-                assetPath: assetPathEntity,
-                controller: controller,
-                scrollController: scrollController,
-                assetBackgroundColor: assetBackgroundColor,
-                backgroundImage: backgroundImageCamera,
-                selectMoreImageWidget: selectMoreImageWidget,
-                isLimitSelectImage: permissionStatus == PermissionStatus.limited,
-                cameraWidget: cameraWidget,
-                onCameraPressed: onCameraPressed,
-                assetItemBuilder: assetItemBuilder,
-                gridPadding: gridPadding,
-              );
+              ? ImagePickerGridWithCounter(
+                  assetPath: assetPathEntity,
+                  counterBuilder: counterImageBuilder,
+                  controller: controller,
+                  assetBackgroundColor: assetBackgroundColor,
+                  backgroundImageCamera: backgroundImageCamera,
+                  onCameraPressed: onCameraPressed,
+                  cameraWidget: cameraWidget,
+                  selectMoreImageWidget: selectMoreImageWidget,
+                  isLimitSelectImage: permissionStatus == PermissionStatus.limited,
+                  scrollController: scrollController,
+                  assetItemBuilder: assetItemBuilder,
+                  gridPadding: gridPadding,
+                )
+              : ImagesPickerGrid(
+                  assetPath: assetPathEntity,
+                  controller: controller,
+                  scrollController: scrollController,
+                  assetBackgroundColor: assetBackgroundColor,
+                  backgroundImage: backgroundImageCamera,
+                  selectMoreImageWidget: selectMoreImageWidget,
+                  isLimitSelectImage: permissionStatus == PermissionStatus.limited,
+                  cameraWidget: cameraWidget,
+                  onCameraPressed: onCameraPressed,
+                  assetItemBuilder: assetItemBuilder,
+                  gridPadding: gridPadding,
+                );
         } else {
           return Row(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -108,7 +113,7 @@ class ImagePicker {
       ),
       isScrollControlled: true,
       builder: (context) => Padding(
-        padding: MediaQuery.of(context).viewInsets,
+        padding: MediaQuery.viewInsetsOf(context),
         child: Stack(
           children: [
             SizedBox(
@@ -118,8 +123,7 @@ class ImagePicker {
                     Expanded(child: buildBodyBottomSheet(assetPath, ScrollController())),
                     expandedWidget ?? const SizedBox.shrink(),
                   ],
-                )
-            ),
+                )),
             Positioned(
               bottom: 0,
               left: 0,
@@ -133,7 +137,8 @@ class ImagePicker {
   }
 
   static double _defaultBottomSheetHeight(BuildContext context) {
-    return MediaQuery.of(context).size.height * 0.9 - MediaQuery.of(context).viewInsets.bottom;
+    
+    return MediaQuery.sizeOf(context).height * 0.9 - MediaQuery.viewInsetsOf(context).bottom;
   }
 
   static Future<List<AssetPathEntity>> getAllAssetPaths({
