@@ -22,6 +22,9 @@ class TwakeWelcomeScreen extends StatelessWidget {
   final Color? splashColor;
   final Widget? backButton;
   final Widget? logo;
+  final AppBar? appBar;
+  final bool extendBodyBehindAppBar;
+  final bool extendBody;
 
   const TwakeWelcomeScreen({
     super.key,
@@ -43,11 +46,17 @@ class TwakeWelcomeScreen extends StatelessWidget {
     this.splashColor,
     this.backButton,
     this.logo,
+    this.appBar,
+    this.extendBodyBehindAppBar = true,
+    this.extendBody = true,
   });
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: appBar,
+      extendBodyBehindAppBar: extendBodyBehindAppBar,
+      extendBody: extendBody,
       body: Container(
         width: double.infinity,
         decoration: BoxDecoration(
