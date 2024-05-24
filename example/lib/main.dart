@@ -87,6 +87,8 @@ class MyHomePage extends StatelessWidget {
                       useCompanyServerTitle: 'Use your company server',
                       description:
                           'To start, please create a TwakeID \nthat will allow you to use \nchat, mail and drive',
+                      privacyPolicy: 'Privacy Policy',
+                      descriptionPrivacyPolicy: 'By continuing, you\'r agreeing to our',
                     ),
                   ),
                 );

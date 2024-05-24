@@ -8,13 +8,18 @@ class TwakeWelcomeScreen extends StatelessWidget {
   final TextStyle? createTwakeIdTextStyle;
   final TextStyle? useCompanyServerTextStyle;
   final TextStyle? descriptionTextStyle;
+  final TextStyle? privacyPolicyTextStyle;
+  final TextStyle? descriptionPrivacyPolicyTextStyle;
   final String? signInTitle;
   final String? createTwakeIdTitle;
   final String useCompanyServerTitle;
   final String description;
+  final String? privacyPolicy;
+  final String? descriptionPrivacyPolicy;
   final VoidCallback? onSignInOnTap;
   final VoidCallback? onCreateTwakeIdOnTap;
   final VoidCallback? onUseCompanyServerOnTap;
+  final VoidCallback? onPrivacyPolicyOnTap;
   final Color? focusColor;
   final Color? hoverColor;
   final Color? highlightColor;
@@ -49,6 +54,11 @@ class TwakeWelcomeScreen extends StatelessWidget {
     this.appBar,
     this.extendBodyBehindAppBar = true,
     this.extendBody = true,
+    this.privacyPolicy,
+    this.onPrivacyPolicyOnTap,
+    this.privacyPolicyTextStyle,
+    this.descriptionPrivacyPolicy,
+    this.descriptionPrivacyPolicyTextStyle,
   });
 
   @override
@@ -161,7 +171,45 @@ class TwakeWelcomeScreen extends StatelessWidget {
                         ),
                       ),
                     ),
-                    const SizedBox(height: 28),
+                    if (privacyPolicy != null) ...[
+                      const SizedBox(
+                        height: 32,
+                      ),
+                      Column(
+                        children: [
+                          Text(
+                            descriptionPrivacyPolicy ?? '',
+                            style: descriptionPrivacyPolicyTextStyle ??
+                                TextStyle(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w500,
+                                  fontFamily: 'Inter',
+                                  color: LinagoraSysColors.material()
+                                      .outlineVariantDark,
+                                ),
+                          ),
+                          InkWell(
+                            focusColor: focusColor,
+                            hoverColor: hoverColor,
+                            highlightColor: highlightColor,
+                            overlayColor: overlayColor,
+                            splashColor: splashColor,
+                            onTap: onPrivacyPolicyOnTap,
+                            child: Text(
+                              privacyPolicy!,
+                              style: privacyPolicyTextStyle ??
+                                  TextStyle(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w500,
+                                    fontFamily: 'Inter',
+                                    color: LinagoraSysColors.material().primary,
+                                  ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                    const SizedBox(height: 16),
                   ],
                 ),
               ),
