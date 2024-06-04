@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:linagora_design_flutter/colors/linagora_sys_colors.dart';
 import 'package:linagora_design_flutter/images_picker/use_camera_widget.dart';
@@ -42,30 +41,38 @@ class PermissionNotAuthorizedWidget extends StatelessWidget {
             gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
               crossAxisCount: 3,
             ),
-            childrenDelegate: SliverChildBuilderDelegate((context, index) {
-              if (index == 0) {
-                return cameraWidget ?? UseCameraWidget(
-                     backgroundImage: backgroundImageCamera,
-                     onPressed: onCameraPressed,
-                  );
-              }
-              return GestureDetector(
-                onTap: () => PhotoManager.openSetting(),
-                child: goToSettingsWidget ?? SizedBox(
-                  height: 40,
-                  width: 40,
-                  child: Icon(
-                    Icons.photo,
-                    color: Theme.of(context).colorScheme.surfaceVariant,
-                  ),
-                ),
-              );
-            },
-            childCount: 2,
+            childrenDelegate: SliverChildBuilderDelegate(
+              (context, index) {
+                if (index == 0) {
+                  return cameraWidget ??
+                      UseCameraWidget(
+                        backgroundImage: backgroundImageCamera,
+                        onPressed: onCameraPressed,
+                      );
+                }
+                return GestureDetector(
+                  onTap: () => onGoToSettingsTapped(context),
+                  child: goToSettingsWidget ??
+                      SizedBox(
+                        height: 40,
+                        width: 40,
+                        child: Icon(
+                          Icons.photo,
+                          color: Theme.of(context).colorScheme.surfaceVariant,
+                        ),
+                      ),
+                );
+              },
+              childCount: 2,
             ),
           ),
         )
       ],
     );
+  }
+
+  void onGoToSettingsTapped(BuildContext context) {
+    Navigator.pop(context);
+    PhotoManager.openSetting();
   }
 }
