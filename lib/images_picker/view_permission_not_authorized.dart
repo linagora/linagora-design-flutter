@@ -11,6 +11,7 @@ class PermissionNotAuthorizedWidget extends StatelessWidget {
     this.onCameraPressed,
     this.backgroundImageCamera,
     this.cameraWidget,
+    this.onGoToSettings,
   });
 
   final Color? backgroundColor;
@@ -23,6 +24,8 @@ class PermissionNotAuthorizedWidget extends StatelessWidget {
 
   final Widget? cameraWidget;
 
+  final void Function(BuildContext context)? onGoToSettings;
+
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -33,7 +36,8 @@ class PermissionNotAuthorizedWidget extends StatelessWidget {
           margin: const EdgeInsets.symmetric(vertical: 16.0),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(100.0),
-            color: backgroundColor ?? LinagoraSysColors.material().outline.withOpacity(0.4),
+            color: backgroundColor ??
+                LinagoraSysColors.material().outline.withOpacity(0.4),
           ),
         ),
         Expanded(
@@ -51,7 +55,9 @@ class PermissionNotAuthorizedWidget extends StatelessWidget {
                       );
                 }
                 return GestureDetector(
-                  onTap: () => onGoToSettingsTapped(context),
+                  onTap: () => onGoToSettings == null
+                      ? onGoToSettingsTapped(context)
+                      : onGoToSettings!(context),
                   child: goToSettingsWidget ??
                       SizedBox(
                         height: 40,
