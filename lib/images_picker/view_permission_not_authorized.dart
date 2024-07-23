@@ -1,17 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:linagora_design_flutter/colors/linagora_sys_colors.dart';
 import 'package:linagora_design_flutter/images_picker/use_camera_widget.dart';
-import 'package:photo_manager/photo_manager.dart';
 
 class PermissionNotAuthorizedWidget extends StatelessWidget {
   const PermissionNotAuthorizedWidget({
+    required this.onGoToSettings,
     super.key,
     this.backgroundColor,
     this.goToSettingsWidget,
     this.onCameraPressed,
     this.backgroundImageCamera,
     this.cameraWidget,
-    this.onGoToSettings,
   });
 
   final Color? backgroundColor;
@@ -24,7 +23,7 @@ class PermissionNotAuthorizedWidget extends StatelessWidget {
 
   final Widget? cameraWidget;
 
-  final void Function(BuildContext context)? onGoToSettings;
+  final void Function(BuildContext context) onGoToSettings;
 
   @override
   Widget build(BuildContext context) {
@@ -55,9 +54,7 @@ class PermissionNotAuthorizedWidget extends StatelessWidget {
                       );
                 }
                 return GestureDetector(
-                  onTap: () => onGoToSettings == null
-                      ? onGoToSettingsTapped(context)
-                      : onGoToSettings!(context),
+                  onTap: () => onGoToSettings(context),
                   child: goToSettingsWidget ??
                       SizedBox(
                         height: 40,
@@ -75,10 +72,5 @@ class PermissionNotAuthorizedWidget extends StatelessWidget {
         )
       ],
     );
-  }
-
-  void onGoToSettingsTapped(BuildContext context) {
-    Navigator.pop(context);
-    PhotoManager.openSetting();
   }
 }

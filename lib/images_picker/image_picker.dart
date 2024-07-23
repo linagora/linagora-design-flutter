@@ -13,6 +13,7 @@ class ImagePicker {
     required BuildContext context,
     required ImagePickerGridController controller,
     required PermissionStatus permissionStatus,
+    required void Function(BuildContext context) onGoToSettings,
     double? heightOfBottomSheet,
     Widget? goToSettingsWidget,
     CounterImageBuilder? counterImageBuilder,
@@ -32,7 +33,6 @@ class ImagePicker {
     AssetItemBuilder? assetItemBuilder,
     EdgeInsets? gridPadding,
     RequestType type = RequestType.common,
-    void Function(BuildContext context)? onGoToSettings,
   }) async {
     AssetPathEntity? assetPath;
 
