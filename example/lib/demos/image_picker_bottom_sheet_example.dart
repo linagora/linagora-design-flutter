@@ -23,7 +23,7 @@ class ImagePickerBottomSheetExample extends StatelessWidget {
                 : Text('$counterImage'),
             controller: ImagePickerGridController(AssetCounter()),
             context: context,
-            onGoToSettings: (_){},
+            onGoToSettings: (_) {},
             goToSettingsWidget: null,
             initialChildSize: 0.6,
             backgroundImageCamera: const NetworkImage(
