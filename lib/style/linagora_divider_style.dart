@@ -20,6 +20,7 @@ class LinagoraDividerStyle {
         thickness = 1.0,
         dividerDecoration = Border(
             bottom: BorderSide(
+          width: 1.0,
           color: LinagoraStateLayer(LinagoraSysColors.material().surfaceTint)
               .opacityLayer3,
         ));

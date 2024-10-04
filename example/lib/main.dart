@@ -2,6 +2,7 @@ import 'package:example/demos/circle_avatar_example.dart';
 import 'package:example/demos/circle_avatar_load_from_memory_example.dart';
 import 'package:example/demos/image_picker_bottom_sheet_example.dart';
 import 'package:example/demos/image_picker_example.dart';
+import 'package:example/demos/list_item_demo.dart';
 import 'package:example/demos/multiple_account_picker_example.dart';
 import 'package:example/demos/permission_handler.dart';
 import 'package:flutter/material.dart';
@@ -101,6 +102,17 @@ class MyHomePage extends StatelessWidget {
                   context,
                   MaterialPageRoute(
                     builder: (context) => const MultipleAccountPickerExample(),
+                  ),
+                );
+              }),
+          const SizedBox(height: 20),
+          DemoTile(
+              title: "Demo ListView item",
+              onPressed: () async {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const ListItemExample(),
                   ),
                 );
               }),
