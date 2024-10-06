@@ -21,34 +21,37 @@ class ListItemExample extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(),
-        body: ListView(
-          children: [
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 8.0),
-              child: TwakeInkWell(
-                  child: TwakeListItem(
-                child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      titleWidget("User1"),
-                      subtitleWidget("sent you a message")
-                    ]),
-              )),
-            ),
-            TwakeInkWell(
+      appBar: AppBar(),
+      body: ListView(
+        children: [
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 8.0),
+            child: TwakeInkWell(
               child: TwakeListItem(
                 child: Column(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      titleWidget("User2"),
-                      subtitleWidget("sent you a message")
-                    ]),
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    titleWidget("User1"),
+                    subtitleWidget("sent you a message"),
+                  ],
+                ),
               ),
-            )
-          ],
-        ));
+            ),
+          ),
+          TwakeInkWell(
+            child: TwakeListItem(
+              child: Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    titleWidget("User2"),
+                    subtitleWidget("sent you a message")
+                  ]),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }

@@ -5,7 +5,7 @@ import 'package:linagora_design_flutter/colors/linagora_sys_colors.dart';
 class LinagoraDividerStyle {
   final Color color;
   final double thickness;
-  final BoxBorder dividerDecoration;
+  final BoxBorder borderDecoration;
 
   static final LinagoraDividerStyle _materialLinagoraHoverStyle =
       LinagoraDividerStyle._material();
@@ -18,7 +18,7 @@ class LinagoraDividerStyle {
       : color = LinagoraStateLayer(LinagoraSysColors.material().surfaceTint)
             .opacityLayer3,
         thickness = 1.0,
-        dividerDecoration = Border(
+        borderDecoration = Border(
             bottom: BorderSide(
           width: 1.0,
           color: LinagoraStateLayer(LinagoraSysColors.material().surfaceTint)

@@ -16,5 +16,5 @@ class LinagoraHoverStyle {
   LinagoraHoverStyle._material()
       : selectedColor = LinagoraSysColors.material().secondaryContainer,
         hoverColor = LinagoraSysColors.material().surface,
-        borderRadius = BorderRadius.circular(4);
+        borderRadius = const BorderRadius.all(Radius.circular(4));
 }
