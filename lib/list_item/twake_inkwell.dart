@@ -32,6 +32,7 @@ class TwakeInkWellState extends State<TwakeInkWell> {
           ? LinagoraHoverStyle.material().selectedColor
           : Colors.transparent,
       child: InkWell(
+        borderRadius: LinagoraHoverStyle.material().hoverBorderRadius,
         splashColor: LinagoraHoverStyle.material().hoverColor,
         onTap: widget.onTap,
         onSecondaryTapDown: widget.onSecondaryTapDown,

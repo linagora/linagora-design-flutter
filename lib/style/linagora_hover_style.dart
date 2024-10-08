@@ -5,6 +5,7 @@ class LinagoraHoverStyle {
   final Color hoverColor;
   final Color selectedColor;
   final BorderRadiusGeometry borderRadius;
+  final BorderRadius hoverBorderRadius;
 
   static final LinagoraHoverStyle _materialLinagoraHoverStyle =
       LinagoraHoverStyle._material();
@@ -16,5 +17,8 @@ class LinagoraHoverStyle {
   LinagoraHoverStyle._material()
       : selectedColor = LinagoraSysColors.material().secondaryContainer,
         hoverColor = LinagoraSysColors.material().surface,
-        borderRadius = const BorderRadius.all(Radius.circular(4));
+        borderRadius = const BorderRadius.all(
+          Radius.circular(4),
+        ),
+        hoverBorderRadius = BorderRadius.circular(4);
 }

@@ -19,9 +19,11 @@ class LinagoraDividerStyle {
             .opacityLayer3,
         thickness = 1.0,
         borderDecoration = Border(
-            bottom: BorderSide(
-          width: 1.0,
-          color: LinagoraStateLayer(LinagoraSysColors.material().surfaceTint)
-              .opacityLayer3,
-        ));
+          bottom: BorderSide(
+            width: 1.0,
+            color: LinagoraStateLayer(
+              LinagoraSysColors.material().surfaceTint,
+            ).opacityLayer3,
+          ),
+        );
 }
