@@ -6,6 +6,8 @@ class LinagoraTextStyle {
 
   final TextStyle bodyLarge2;
 
+  final TextStyle bodyMedium;
+
   final TextStyle bodyMedium1;
 
   final TextStyle bodyMedium2;
@@ -29,6 +31,11 @@ class LinagoraTextStyle {
           fontSize: 17,
           fontWeight: FontWeight.w400,
           letterSpacing: -0.15,
+        ),
+        bodyMedium = const TextStyle(
+          fontSize: 14,
+          fontWeight: FontWeight.w500,
+          letterSpacing: 0.25,
         ),
         bodyMedium1 = const TextStyle(
           fontSize: 16,
