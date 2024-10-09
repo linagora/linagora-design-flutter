@@ -20,7 +20,7 @@ class ListItemStyle {
     required String fontFamily,
   }) =>
       LinagoraTextStyle.material().bodyMedium.copyWith(
-            color: LinagoraSysColors.material().onSurface,
+            color: LinagoraRefColors.material().tertiary[30],
             fontFamily: fontFamily,
           );
 }
