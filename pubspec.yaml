@@ -11,9 +11,11 @@ dependencies:
   equatable: ^2.0.5
   flutter:
     sdk: flutter
-  photo_manager: ^3.0.0-dev.2
-  photo_manager_image_provider: ^2.1.0
+  photo_manager: 3.5.2
+  photo_manager_image_provider: 2.2.0
   permission_handler_platform_interface: ^3.10.0
+  google_fonts: 4.0.4
+  flutter_svg: 0.22.0
 
 dev_dependencies:
   flutter_test:

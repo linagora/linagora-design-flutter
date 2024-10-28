@@ -14,3 +14,4 @@ export 'package:linagora_design_flutter/style/list_item_style.dart';
 export 'package:linagora_design_flutter/style/linagora_divider_style.dart';
 export 'package:linagora_design_flutter/style/linagora_hover_style.dart';
 export 'package:linagora_design_flutter/list_item/twake_inkwell.dart';
+export 'package:linagora_design_flutter/chat_list_item/chat_list_item.dart';
