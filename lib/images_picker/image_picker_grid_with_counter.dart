@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:linagora_design_flutter/colors/linagora_sys_colors.dart';
 import 'package:linagora_design_flutter/images_picker/asset_counter.dart';
 import 'package:linagora_design_flutter/images_picker/image_item_widget.dart';
 import 'package:linagora_design_flutter/images_picker/images_picker.dart';
@@ -82,7 +83,7 @@ class _ImagePickerGridWithCounterState extends State<ImagePickerGridWithCounter>
                     width: 32,
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(100),
-                      color: Theme.of(context).colorScheme.outline,
+                          color: LinagoraSysColors.material().outline
                     ),
                   ),
                   const SizedBox(height: 20),
