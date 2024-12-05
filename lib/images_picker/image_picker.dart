@@ -127,17 +127,23 @@ class ImagePicker {
         padding: MediaQuery.viewInsetsOf(context),
         child: Stack(
           children: [
-            SizedBox(
-                height:
-                    heightOfBottomSheet ?? _defaultBottomSheetHeight(context),
-                child: Column(
-                  children: [
-                    Expanded(
-                        child: buildBodyBottomSheet(
-                            assetPath, ScrollController())),
-                    expandedWidget ?? const SizedBox.shrink(),
-                  ],
-                )),
+            DraggableScrollableSheet(
+                initialChildSize: initialChildSize,
+                minChildSize: minChildSize,
+                maxChildSize: maxChildSize,
+                expand: false,
+                builder:
+                    (BuildContext context, ScrollController scrollController) {
+                  return Column(
+                    children: [
+                      Expanded(
+                        child:
+                            buildBodyBottomSheet(assetPath, scrollController),
+                      ),
+                      expandedWidget ?? const SizedBox.shrink(),
+                    ],
+                  );
+                }),
             Positioned(
               bottom: 0,
               left: 0,
