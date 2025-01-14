@@ -6,7 +6,7 @@ import 'package:widgetbook_workspace/components/contact_component/phonebook_cont
 import 'package:widgetbook_workspace/custom/github_addon.dart';
 import 'package:widgetbook_workspace/theme/theme_data.dart';
 
-import 'custom/custom_addon.dart';
+import 'custom/alignment_addon.dart';
 
 void main() {
   runApp(const WidgetbookApp());
