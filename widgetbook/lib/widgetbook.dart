@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:linagora_design_flutter/linagora_design_flutter.dart';
 import 'package:widgetbook/widgetbook.dart' hide AlignmentAddon;
+import 'package:widgetbook_workspace/components/contact_component/matrix_contact_use_case.dart';
+import 'package:widgetbook_workspace/components/contact_component/phonebook_contact_use_case.dart';
 import 'package:widgetbook_workspace/custom/github_addon.dart';
 import 'package:widgetbook_workspace/theme/theme_data.dart';
-import 'package:widgetbook_workspace/widgets/matrix_contact_item.dart';
-import 'package:widgetbook_workspace/widgets/phonebook_contact_item.dart';
 
 import 'custom/custom_addon.dart';
 

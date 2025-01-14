@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:widgetbook/widgetbook.dart';
 import 'package:widgetbook_annotation/widgetbook_annotation.dart' as widgetbook;
-import 'package:linagora_design_flutter/linagora_design_flutter.dart';
+import 'package:widgetbook_workspace/utils/twake_chat_widget/contact/contact_item_widget.dart';
+import 'package:widgetbook_workspace/utils/twake_chat_widget/contact/contact_status.dart';
 
 @widgetbook.UseCase(name: 'Phonebook contact', type: ContactItem)
-Widget matrixContactUseCase(BuildContext context) {
+Widget phonebookContactUseCase(BuildContext context) {
   return Padding(
     padding: const EdgeInsets.symmetric(
       horizontal: 24.0,
@@ -28,13 +29,13 @@ Widget matrixContactUseCase(BuildContext context) {
         options: ContactStatus.values,
         labelBuilder: (status) => status?.label ?? '',
       ),
-      matrixId: context.knobs.string(
-        label: 'Matrix ID',
-        initialValue: '@john.doe:matrix.com',
-      ),
       email: context.knobs.string(
         label: 'Email',
         initialValue: 'john.doe@matrix.com',
+      ),
+      phoneNumber: context.knobs.string(
+        label: 'Phone Number',
+        initialValue: '+1234567890',
       ),
     ),
   );

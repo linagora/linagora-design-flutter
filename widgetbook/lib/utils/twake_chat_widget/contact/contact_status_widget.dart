@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:linagora_design_flutter/colors/linagora_ref_colors.dart';
-import 'package:linagora_design_flutter/twake_chat_widget/contact/contact_status.dart';
+import 'package:widgetbook_workspace/utils/twake_chat_widget/contact/contact_status.dart';
 
 class ContactStatusWidget extends StatelessWidget {
   final ContactStatus status;

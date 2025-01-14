@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:linagora_design_flutter/linagora_design_flutter.dart';
-import 'package:linagora_design_flutter/twake_chat_widget/contact/contact_status_widget.dart';
-import 'package:linagora_design_flutter/twake_chat_widget/widgets/twake_chip.dart';
+import 'package:widgetbook_workspace/utils/twake_chat_widget/contact/contact_status.dart';
+import 'package:widgetbook_workspace/utils/twake_chat_widget/contact/contact_status_widget.dart';
+import 'package:widgetbook_workspace/utils/twake_chat_widget/widgets/twake_chip.dart';
 
 typedef OnExpansionListTileTap = void Function();
 
