@@ -59,26 +59,29 @@ class _ReactionsDialogWidgetState extends State<ReactionsDialogWidget> {
         child: Padding(
           padding:
               widget.padding ?? const EdgeInsets.only(right: 20.0, left: 20.0),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Padding(
-                padding: widget.paddingReactionWidget ??
-                    const EdgeInsets.only(bottom: 8.0),
-                child: Align(
+          child: SingleChildScrollView(
+            physics: const NeverScrollableScrollPhysics(),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Padding(
+                  padding: widget.paddingReactionWidget ??
+                      const EdgeInsets.only(bottom: 8.0),
+                  child: Align(
+                    alignment: widget.widgetAlignment,
+                    child: widget.reactionWidget,
+                  ),
+                ),
+                Align(
                   alignment: widget.widgetAlignment,
-                  child: widget.reactionWidget,
+                  child: Hero(
+                    tag: widget.id,
+                    child: widget.messageWidget,
+                  ),
                 ),
-              ),
-              Align(
-                alignment: widget.widgetAlignment,
-                child: Hero(
-                  tag: widget.id,
-                  child: widget.messageWidget,
-                ),
-              ),
-              if (widget.contextMenuWidget != null) widget.contextMenuWidget!,
-            ],
+                if (widget.contextMenuWidget != null) widget.contextMenuWidget!,
+              ],
+            ),
           ),
         ),
       ),
