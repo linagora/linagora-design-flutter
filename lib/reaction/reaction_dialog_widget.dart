@@ -13,6 +13,7 @@ class ReactionsDialogWidget extends StatefulWidget {
     required this.reactionWidget,
     this.paddingReactionWidget,
     this.contextMenuWidget,
+    this.isOwnMessage = true,
   });
 
   // Id for the hero widget
@@ -42,6 +43,9 @@ class ReactionsDialogWidget extends StatefulWidget {
   // The padding to be applied to the reaction widget
   final EdgeInsets? paddingReactionWidget;
 
+  // The message widget to be displayed
+  final bool isOwnMessage;
+
   @override
   State<ReactionsDialogWidget> createState() => _ReactionsDialogWidgetState();
 }
@@ -61,6 +65,9 @@ class _ReactionsDialogWidgetState extends State<ReactionsDialogWidget> {
               widget.padding ?? const EdgeInsets.only(right: 20.0, left: 20.0),
           child: Column(
             mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: widget.isOwnMessage
+                ? CrossAxisAlignment.end
+                : CrossAxisAlignment.start,
             children: [
               Padding(
                 padding: widget.paddingReactionWidget ??
@@ -70,10 +77,11 @@ class _ReactionsDialogWidgetState extends State<ReactionsDialogWidget> {
                   child: widget.reactionWidget,
                 ),
               ),
-              SizedBox(
-                height: MediaQuery.sizeOf(context).height * 0.50,
-                child: Align(
-                  alignment: widget.widgetAlignment,
+              Flexible(
+                child: ConstrainedBox(
+                  constraints: BoxConstraints(
+                    maxHeight: MediaQuery.sizeOf(context).height * 0.5,
+                  ),
                   child: Hero(
                     tag: widget.id,
                     child: widget.messageWidget,

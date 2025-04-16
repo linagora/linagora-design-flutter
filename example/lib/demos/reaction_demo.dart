@@ -79,21 +79,13 @@ class MessageWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Align(
-      alignment: message.isMe ? Alignment.centerRight : Alignment.centerLeft,
-      child: ConstrainedBox(
-        constraints: BoxConstraints(
-          maxWidth: MediaQuery.of(context).size.width * 0.7,
-          minWidth: MediaQuery.of(context).size.width * 0.3,
-        ),
-        child: Stack(
-          children: [
-            // message
-            buildMessage(
-              context,
-            ),
-          ],
-        ),
+    return ConstrainedBox(
+      constraints: BoxConstraints(
+        maxWidth: MediaQuery.of(context).size.width * 0.7,
+        minWidth: MediaQuery.of(context).size.width * 0.3,
+      ),
+      child: buildMessage(
+        context,
       ),
     );
   }
@@ -207,8 +199,9 @@ class _ReactionScreenState extends State<ReactionScreen> {
                                     child: Container(
                                       padding: const EdgeInsets.all(5),
                                       decoration: BoxDecoration(
-                                        color:
-                                            Theme.of(context).colorScheme.surface,
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .surface,
                                         borderRadius: BorderRadius.circular(20),
                                         boxShadow: [
                                           BoxShadow(
@@ -255,12 +248,12 @@ class _ReactionScreenState extends State<ReactionScreen> {
                                     height: 200,
                                     width: 200,
                                     decoration: BoxDecoration(
-                                      color: Theme.of(context)
-                                          .colorScheme
-                                          .surface,
+                                      color:
+                                          Theme.of(context).colorScheme.surface,
                                       borderRadius: BorderRadius.circular(20),
                                     ),
                                   ),
+                                  isOwnMessage: message.isMe,
                                   widgetAlignment: message.isMe
                                       ? Alignment.centerRight
                                       : Alignment.centerLeft,
