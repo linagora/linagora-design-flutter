@@ -201,7 +201,6 @@ class _ReactionScreenState extends State<ReactionScreen> {
                               return SafeArea(
                                 child: ReactionsDialogWidget(
                                   id: message.id,
-                                  // unique id for message
                                   messageWidget: MessageWidget(message: message),
                                   reactionWidget: Material(
                                     color: Colors.transparent,
@@ -252,7 +251,16 @@ class _ReactionScreenState extends State<ReactionScreen> {
                                       ),
                                     ),
                                   ),
-                                
+                                  contextMenuWidget: Container(
+                                    height: 200,
+                                    width: 200,
+                                    decoration: BoxDecoration(
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .surface,
+                                      borderRadius: BorderRadius.circular(20),
+                                    ),
+                                  ),
                                   widgetAlignment: message.isMe
                                       ? Alignment.centerRight
                                       : Alignment.centerLeft,
