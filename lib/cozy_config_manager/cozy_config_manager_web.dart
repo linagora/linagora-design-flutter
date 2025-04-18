@@ -7,7 +7,7 @@ import 'package:linagora_design_flutter/cozy_config_manager/cozy_js_interop.dart
 
 class CozyConfigManager {
   static final CozyConfigManager _instance = CozyConfigManager._internal();
-  static const _cozyBridgeVersion = '0.7.0';
+  static const _cozyBridgeVersion = '0.8.0';
 
   bool _isCozyScriptInjected = false;
   String? _targetOrigin;
