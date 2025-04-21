@@ -18,6 +18,7 @@ class ReactionsPicker extends StatelessWidget {
   final double borderRadius;
   final TextStyle? emojiTextStyle;
   final List<BoxShadow>? boxShadow;
+  final Widget? moreEmojiWidget;
 
   const ReactionsPicker({
     super.key,
@@ -31,6 +32,7 @@ class ReactionsPicker extends StatelessWidget {
     this.borderRadius = 32,
     this.emojiTextStyle,
     this.boxShadow,
+    this.moreEmojiWidget,
   });
 
   @override
@@ -104,25 +106,32 @@ class ReactionsPicker extends StatelessWidget {
                           ),
                         ),
                       );
-                    }).toList(),
+                    }).toList()
+                      ..add(
+                        InkWell(
+                          highlightColor: Colors.transparent,
+                          hoverColor: Colors.transparent,
+                          splashColor: Colors.transparent,
+                          focusColor: Colors.transparent,
+                          child: moreEmojiWidget ??
+                              Container(
+                                margin: const EdgeInsets.only(
+                                  top: 4,
+                                  right: 12,
+                                  bottom: 4,
+                                ),
+                                child: Icon(
+                                  Icons.expand_circle_down,
+                                  size: 32,
+                                  color:
+                                      LinagoraRefColors.material().neutral[80],
+                                ),
+                              ),
+                          onTap: () {},
+                        ),
+                      ),
                   ),
                 ),
-
-                /// TODO: Implement the emoji picker later
-                // InkWell(
-                //   borderRadius: BorderRadius.circular(8),
-                //   child: Container(
-                //     margin: const EdgeInsets.symmetric(horizontal: 8),
-                //     width: 56,
-                //     height: 56,
-                //     decoration: BoxDecoration(
-                //       color: LinagoraSysColors.material().onPrimary,
-                //       shape: BoxShape.circle,
-                //     ),
-                //     child: const Icon(Icons.add_outlined),
-                //   ),
-                //   onTap: () => onPickEmojiReaction?.call(),
-                // ),
               ],
             );
           },
