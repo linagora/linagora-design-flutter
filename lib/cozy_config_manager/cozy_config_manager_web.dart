@@ -3,6 +3,7 @@ import 'dart:html';
 import 'dart:js_interop';
 import 'dart:js_util';
 
+import 'package:flutter/foundation.dart';
 import 'package:linagora_design_flutter/cozy_config_manager/cozy_js_interop.dart';
 
 class CozyConfigManager {
@@ -39,11 +40,11 @@ class CozyConfigManager {
 
   Future<bool> get isInsideCozy async {
     _targetOrigin ??= await _getTargetOrigin();
-    print('targetOrigin: $_targetOrigin');
+    debugPrint('targetOrigin: $_targetOrigin');
     final isInsideCozy = _targetOrigin != null
         ? (isInsideCozyJs(_targetOrigin!) ?? false)
         : false;
-    print('isInsideCozy: $isInsideCozy');
+    debugPrint('isInsideCozy: $isInsideCozy');
     return isInsideCozy;
   }
 
@@ -56,7 +57,7 @@ class CozyConfigManager {
       startHistorySyncingJs();
       _isInitialized = true;
     } catch (e) {
-      print('Error initializing Cozy bridge: $e');
+      debugPrint('Error initializing Cozy bridge: $e');
     }
   }
 
