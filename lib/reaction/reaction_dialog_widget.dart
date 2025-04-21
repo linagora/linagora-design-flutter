@@ -1,5 +1,6 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:linagora_design_flutter/reaction/reaction_picker.dart';
 
 class ReactionsDialogWidget extends StatefulWidget {
   const ReactionsDialogWidget({
@@ -10,10 +11,21 @@ class ReactionsDialogWidget extends StatefulWidget {
     this.menuItemsWidth = 0.45,
     this.filter,
     this.padding,
-    required this.reactionWidget,
+    this.reactionWidget,
     this.paddingReactionWidget,
     this.contextMenuWidget,
     this.isOwnMessage = true,
+    this.reactionsPicker,
+    this.onClickEmojiReactionAction,
+    this.backgroundColor,
+    this.animationDuration,
+    this.animationCurve,
+    this.height,
+    this.emojis,
+    this.myEmojiReacted,
+    this.borderRadius,
+    this.emojiTextStyle,
+    this.boxShadow,
   });
 
   // Id for the hero widget
@@ -23,7 +35,7 @@ class ReactionsDialogWidget extends StatefulWidget {
   final Widget messageWidget;
 
   // The widget to be displayed for the reaction
-  final Widget reactionWidget;
+  final Widget? reactionWidget;
 
   // The context menu widget to be displayed
   final Widget? contextMenuWidget;
@@ -45,6 +57,29 @@ class ReactionsDialogWidget extends StatefulWidget {
 
   // The message widget to be displayed
   final bool isOwnMessage;
+
+  // The reactions picker widget
+  final ReactionsPicker? reactionsPicker;
+
+  final OnClickEmojiReactionAction? onClickEmojiReactionAction;
+
+  final Color? backgroundColor;
+
+  final Duration? animationDuration;
+
+  final Curve? animationCurve;
+
+  final double? height;
+
+  final List<String>? emojis;
+
+  final String? myEmojiReacted;
+
+  final double? borderRadius;
+
+  final TextStyle? emojiTextStyle;
+
+  final List<BoxShadow>? boxShadow;
 
   @override
   State<ReactionsDialogWidget> createState() => _ReactionsDialogWidgetState();
@@ -74,7 +109,23 @@ class _ReactionsDialogWidgetState extends State<ReactionsDialogWidget> {
                     const EdgeInsets.only(bottom: 8.0),
                 child: Align(
                   alignment: widget.widgetAlignment,
-                  child: widget.reactionWidget,
+                  child: Material(
+                    color: Colors.transparent,
+                    child: widget.reactionWidget ??
+                        ReactionsPicker(
+                          onClickEmojiReactionAction:
+                              widget.onClickEmojiReactionAction,
+                          backgroundColor: widget.backgroundColor,
+                          animationDuration: widget.animationDuration,
+                          animationCurve: widget.animationCurve,
+                          height: widget.height,
+                          emojis: widget.emojis,
+                          myEmojiReacted: widget.myEmojiReacted,
+                          borderRadius: widget.borderRadius ?? 32,
+                          emojiTextStyle: widget.emojiTextStyle,
+                          boxShadow: widget.boxShadow,
+                        ),
+                  ),
                 ),
               ),
               Flexible(

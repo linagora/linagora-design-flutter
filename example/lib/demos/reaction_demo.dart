@@ -194,56 +194,6 @@ class _ReactionScreenState extends State<ReactionScreen> {
                                 child: ReactionsDialogWidget(
                                   id: message.id,
                                   messageWidget: MessageWidget(message: message),
-                                  reactionWidget: Material(
-                                    color: Colors.transparent,
-                                    child: Container(
-                                      padding: const EdgeInsets.all(5),
-                                      decoration: BoxDecoration(
-                                        color: Theme.of(context)
-                                            .colorScheme
-                                            .surface,
-                                        borderRadius: BorderRadius.circular(20),
-                                        boxShadow: [
-                                          BoxShadow(
-                                            color: Colors.grey.shade500,
-                                            spreadRadius: 1,
-                                            blurRadius: 2,
-                                            offset: const Offset(0,
-                                                1), // changes position of shadow
-                                          ),
-                                        ],
-                                      ),
-                                      child: Row(
-                                        mainAxisSize: MainAxisSize.min,
-                                        children: [
-                                          for (var reaction in reactions)
-                                            InkWell(
-                                              onTap: () {
-                                                debugPrint(
-                                                  'Reaction tapped: $reaction',
-                                                );
-                                                Navigator.pop(context);
-                                              },
-                                              child: Padding(
-                                                padding:
-                                                    const EdgeInsets.fromLTRB(
-                                                  4.0,
-                                                  2.0,
-                                                  4.0,
-                                                  2,
-                                                ),
-                                                child: Text(
-                                                  reaction,
-                                                  style: const TextStyle(
-                                                    fontSize: 22,
-                                                  ),
-                                                ),
-                                              ),
-                                            ),
-                                        ],
-                                      ),
-                                    ),
-                                  ),
                                   contextMenuWidget: Container(
                                     height: 200,
                                     width: 200,
