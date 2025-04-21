@@ -26,6 +26,7 @@ class ReactionsDialogWidget extends StatefulWidget {
     this.borderRadius,
     this.emojiTextStyle,
     this.boxShadow,
+    this.moreEmojiWidget,
   });
 
   // Id for the hero widget
@@ -81,6 +82,8 @@ class ReactionsDialogWidget extends StatefulWidget {
 
   final List<BoxShadow>? boxShadow;
 
+  final Widget? moreEmojiWidget;
+
   @override
   State<ReactionsDialogWidget> createState() => _ReactionsDialogWidgetState();
 }
@@ -124,6 +127,7 @@ class _ReactionsDialogWidgetState extends State<ReactionsDialogWidget> {
                           borderRadius: widget.borderRadius ?? 32,
                           emojiTextStyle: widget.emojiTextStyle,
                           boxShadow: widget.boxShadow,
+                          moreEmojiWidget: widget.moreEmojiWidget,
                         ),
                   ),
                 ),
