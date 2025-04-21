@@ -7,8 +7,11 @@ typedef OnClickEmojiReactionAction = void Function(
   String emoji,
 );
 
+typedef OnPickEmojiReactionAction = void Function();
+
 class ReactionsPicker extends StatelessWidget {
   final OnClickEmojiReactionAction? onClickEmojiReactionAction;
+  final OnPickEmojiReactionAction? onPickEmojiReactionAction;
   final Color? backgroundColor;
   final Duration? animationDuration;
   final Curve? animationCurve;
@@ -19,10 +22,12 @@ class ReactionsPicker extends StatelessWidget {
   final TextStyle? emojiTextStyle;
   final List<BoxShadow>? boxShadow;
   final Widget? moreEmojiWidget;
+  final bool? enableMoreEmojiWidget;
 
   const ReactionsPicker({
     super.key,
     this.onClickEmojiReactionAction,
+    this.onPickEmojiReactionAction,
     this.backgroundColor,
     this.animationDuration,
     this.animationCurve,
@@ -33,6 +38,7 @@ class ReactionsPicker extends StatelessWidget {
     this.emojiTextStyle,
     this.boxShadow,
     this.moreEmojiWidget,
+    this.enableMoreEmojiWidget,
   });
 
   @override
@@ -107,28 +113,33 @@ class ReactionsPicker extends StatelessWidget {
                         ),
                       );
                     }).toList()
-                      ..add(
-                        InkWell(
-                          highlightColor: Colors.transparent,
-                          hoverColor: Colors.transparent,
-                          splashColor: Colors.transparent,
-                          focusColor: Colors.transparent,
-                          child: moreEmojiWidget ??
-                              Container(
-                                margin: const EdgeInsets.only(
-                                  top: 4,
-                                  right: 12,
-                                  bottom: 4,
-                                ),
-                                child: Icon(
-                                  Icons.expand_circle_down,
-                                  size: 32,
-                                  color:
-                                      LinagoraRefColors.material().neutral[80],
-                                ),
-                              ),
-                          onTap: () {},
-                        ),
+                      ..addAll(
+                        [
+                          if (enableMoreEmojiWidget ?? false)
+                            InkWell(
+                              highlightColor: Colors.transparent,
+                              hoverColor: Colors.transparent,
+                              splashColor: Colors.transparent,
+                              focusColor: Colors.transparent,
+                              child: moreEmojiWidget ??
+                                  Container(
+                                    margin: const EdgeInsets.only(
+                                      top: 4,
+                                      right: 12,
+                                      bottom: 4,
+                                    ),
+                                    child: Icon(
+                                      Icons.expand_circle_down,
+                                      size: 32,
+                                      color: LinagoraRefColors.material()
+                                          .neutral[80],
+                                    ),
+                                  ),
+                              onTap: () {
+                                onPickEmojiReactionAction?.call();
+                              },
+                            ),
+                        ],
                       ),
                   ),
                 ),
