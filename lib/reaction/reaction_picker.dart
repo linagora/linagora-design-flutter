@@ -93,7 +93,8 @@ class ReactionsPicker extends StatelessWidget {
                           height: height ?? 56,
                           width: height ?? 56,
                           alignment: Alignment.center,
-                          decoration: myEmojiReacted != null
+                          decoration: myEmojiReacted != null &&
+                                  myEmojiReacted == emoji
                               ? BoxDecoration(
                                   color: LinagoraSysColors.material()
                                       .onSurface
