@@ -51,7 +51,6 @@ class ReactionsPicker extends StatelessWidget {
         color: Colors.transparent,
         child: Builder(
           builder: (context) {
-            final emojis = List<String>.from(AppEmojis.emojisDefault);
             return Row(
               mainAxisSize: MainAxisSize.min,
               children: [
@@ -79,7 +78,7 @@ class ReactionsPicker extends StatelessWidget {
                         ],
                   ),
                   child: Row(
-                    children: emojis.map((emoji) {
+                    children: (emojis ?? AppEmojis.emojisDefault).map((emoji) {
                       return InkWell(
                         onTap: () async {
                           Navigator.of(context).pop();
@@ -93,15 +92,15 @@ class ReactionsPicker extends StatelessWidget {
                           height: height ?? 56,
                           width: height ?? 56,
                           alignment: Alignment.center,
-                          decoration: myEmojiReacted != null &&
-                                  myEmojiReacted == emoji
-                              ? BoxDecoration(
-                                  color: LinagoraSysColors.material()
-                                      .onSurface
-                                      .withOpacity(0.1),
-                                  shape: BoxShape.circle,
-                                )
-                              : null,
+                          decoration:
+                              myEmojiReacted != null && myEmojiReacted == emoji
+                                  ? BoxDecoration(
+                                      color: LinagoraSysColors.material()
+                                          .onSurface
+                                          .withOpacity(0.1),
+                                      shape: BoxShape.circle,
+                                    )
+                                  : null,
                           margin: const EdgeInsets.symmetric(
                             vertical: 4,
                           ),
