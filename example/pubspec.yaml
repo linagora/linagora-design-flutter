@@ -38,10 +38,10 @@ dependencies:
 
   linagora_design_flutter:
     path: ../
-  file_picker: ^5.2.9
-  image_picker: ^0.8.7+2
+  file_picker: ^8.0.5
+  image_picker: ^1.0.4
   image: ^4.0.15
-  photo_manager: ^3.0.0-dev.2
+  photo_manager: ^3.0.0-dev.5
   photo_manager_image_provider: ^2.1.0
   auto_size_text: ^3.0.0
   permission_handler: ^10.2.0

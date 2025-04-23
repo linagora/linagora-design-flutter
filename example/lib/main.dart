@@ -5,6 +5,7 @@ import 'package:example/demos/image_picker_example.dart';
 import 'package:example/demos/list_item_demo.dart';
 import 'package:example/demos/multiple_account_picker_example.dart';
 import 'package:example/demos/permission_handler.dart';
+import 'package:example/demos/reaction_demo.dart';
 import 'package:flutter/material.dart';
 import 'package:linagora_design_flutter/linagora_design_flutter.dart';
 
@@ -89,7 +90,8 @@ class MyHomePage extends StatelessWidget {
                       description:
                           'To start, please create a TwakeID \nthat will allow you to use \nchat, mail and drive',
                       privacyPolicy: 'Privacy Policy',
-                      descriptionPrivacyPolicy: 'By continuing, you\'r agreeing to our',
+                      descriptionPrivacyPolicy:
+                          'By continuing, you\'r agreeing to our',
                     ),
                   ),
                 );
@@ -113,6 +115,17 @@ class MyHomePage extends StatelessWidget {
                   context,
                   MaterialPageRoute(
                     builder: (context) => const ListItemExample(),
+                  ),
+                );
+              }),
+          const SizedBox(height: 20),
+          DemoTile(
+              title: "Demo reaction",
+              onPressed: () async {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const ReactionScreen(),
                   ),
                 );
               }),
@@ -147,8 +160,9 @@ class DemoTile extends StatelessWidget {
                   builder: (context) => component ?? const SizedBox()),
             );
           },
-      style: ButtonStyle(minimumSize: MaterialStateProperty.all(Size(100, 50))),
-      child: Text('$title'),
+      style: ButtonStyle(
+          minimumSize: WidgetStateProperty.all(const Size(100, 50))),
+      child: Text(title),
     );
   }
 }
