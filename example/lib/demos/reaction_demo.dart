@@ -206,7 +206,7 @@ class _ReactionScreenState extends State<ReactionScreen> {
                                     ),
                                   ),
                                   isOwnMessage: message.isMe,
-                                  myEmojiReacted: '🥲',
+                                  myEmojiReacted: '🧡',
                                   widgetAlignment: message.isMe
                                       ? Alignment.centerRight
                                       : Alignment.centerLeft,

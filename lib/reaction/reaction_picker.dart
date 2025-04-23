@@ -105,6 +105,7 @@ class ReactionsPicker extends StatelessWidget {
                                   : null,
                           margin: const EdgeInsets.symmetric(
                             vertical: 4,
+                            horizontal: 3,
                           ),
                           child: Text(
                             emoji,
