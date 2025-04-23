@@ -16,6 +16,7 @@ class ReactionsPicker extends StatelessWidget {
   final Duration? animationDuration;
   final Curve? animationCurve;
   final double? height;
+  final double? emojiSize;
   final List<String>? emojis;
   final String? myEmojiReacted;
   final double borderRadius;
@@ -38,7 +39,8 @@ class ReactionsPicker extends StatelessWidget {
     this.emojiTextStyle,
     this.boxShadow,
     this.moreEmojiWidget,
-    this.enableMoreEmojiWidget,
+    this.enableMoreEmojiWidget = true,
+    this.emojiSize = 28,
   });
 
   @override
@@ -89,8 +91,8 @@ class ReactionsPicker extends StatelessWidget {
                         splashColor: Colors.transparent,
                         focusColor: Colors.transparent,
                         child: Container(
-                          height: height ?? 56,
-                          width: height ?? 56,
+                          height: emojiSize ?? 40,
+                          width: emojiSize ?? 40,
                           alignment: Alignment.center,
                           decoration:
                               myEmojiReacted != null && myEmojiReacted == emoji
@@ -107,7 +109,7 @@ class ReactionsPicker extends StatelessWidget {
                           child: Text(
                             emoji,
                             style:
-                                emojiTextStyle ?? const TextStyle(fontSize: 30),
+                                emojiTextStyle ?? const TextStyle(fontSize: 28),
                             textAlign: TextAlign.center,
                           ),
                         ),
@@ -125,7 +127,7 @@ class ReactionsPicker extends StatelessWidget {
                                   Container(
                                     margin: const EdgeInsets.only(
                                       top: 4,
-                                      right: 12,
+                                      right: 4,
                                       bottom: 4,
                                     ),
                                     child: Icon(

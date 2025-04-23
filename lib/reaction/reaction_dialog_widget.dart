@@ -29,6 +29,7 @@ class ReactionsDialogWidget extends StatefulWidget {
     this.moreEmojiWidget,
     this.onPickEmojiReactionAction,
     this.enableMoreEmojiWidget,
+    this.emojiSize,
   });
 
   // Id for the hero widget
@@ -90,6 +91,8 @@ class ReactionsDialogWidget extends StatefulWidget {
 
   final bool? enableMoreEmojiWidget;
 
+  final double? emojiSize;
+
   @override
   State<ReactionsDialogWidget> createState() => _ReactionsDialogWidgetState();
 }
@@ -137,6 +140,7 @@ class _ReactionsDialogWidgetState extends State<ReactionsDialogWidget> {
                           enableMoreEmojiWidget: widget.enableMoreEmojiWidget,
                           onPickEmojiReactionAction:
                               widget.onPickEmojiReactionAction,
+                          emojiSize: widget.emojiSize,
                         ),
                   ),
                 ),

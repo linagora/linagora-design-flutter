@@ -192,8 +192,10 @@ class _ReactionScreenState extends State<ReactionScreen> {
                             builder: (context) {
                               return SafeArea(
                                 child: ReactionsDialogWidget(
+                                  enableMoreEmojiWidget: true,
                                   id: message.id,
-                                  messageWidget: MessageWidget(message: message),
+                                  messageWidget:
+                                      MessageWidget(message: message),
                                   contextMenuWidget: Container(
                                     height: 200,
                                     width: 200,
@@ -204,6 +206,7 @@ class _ReactionScreenState extends State<ReactionScreen> {
                                     ),
                                   ),
                                   isOwnMessage: message.isMe,
+                                  myEmojiReacted: '🥲',
                                   widgetAlignment: message.isMe
                                       ? Alignment.centerRight
                                       : Alignment.centerLeft,
