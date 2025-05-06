@@ -14,6 +14,7 @@ dependencies:
   photo_manager: ^3.0.0-dev.2
   photo_manager_image_provider: ^2.1.0
   permission_handler_platform_interface: ^3.10.0
+  flutter_keyboard_visibility: ^6.0.0
 
 dev_dependencies:
   flutter_test:
