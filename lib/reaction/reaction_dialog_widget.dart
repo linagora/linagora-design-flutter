@@ -1,5 +1,6 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 import 'package:linagora_design_flutter/reaction/reaction_picker.dart';
 
 class ReactionsDialogWidget extends StatefulWidget {
@@ -98,6 +99,9 @@ class ReactionsDialogWidget extends StatefulWidget {
 }
 
 class _ReactionsDialogWidgetState extends State<ReactionsDialogWidget> {
+  final KeyboardVisibilityController keyboardVisibilityController =
+      KeyboardVisibilityController();
+
   @override
   Widget build(BuildContext context) {
     return BackdropFilter(
@@ -110,58 +114,64 @@ class _ReactionsDialogWidgetState extends State<ReactionsDialogWidget> {
         child: Padding(
           padding:
               widget.padding ?? const EdgeInsets.only(right: 20.0, left: 20.0),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: widget.isOwnMessage
-                ? CrossAxisAlignment.end
-                : CrossAxisAlignment.start,
-            children: [
-              Padding(
-                padding: widget.paddingReactionWidget ??
-                    const EdgeInsets.only(bottom: 8.0),
-                child: Align(
-                  alignment: widget.widgetAlignment,
-                  child: Material(
-                    color: Colors.transparent,
-                    child: widget.reactionWidget ??
-                        ReactionsPicker(
-                          onClickEmojiReactionAction:
-                              widget.onClickEmojiReactionAction,
-                          backgroundColor: widget.backgroundColor,
-                          animationDuration: widget.animationDuration,
-                          animationCurve: widget.animationCurve,
-                          height: widget.height,
-                          emojis: widget.emojis,
-                          myEmojiReacted: widget.myEmojiReacted,
-                          borderRadius: widget.borderRadius ?? 32,
-                          emojiTextStyle: widget.emojiTextStyle,
-                          boxShadow: widget.boxShadow,
-                          moreEmojiWidget: widget.moreEmojiWidget,
-                          enableMoreEmojiWidget: widget.enableMoreEmojiWidget,
-                          onPickEmojiReactionAction:
-                              widget.onPickEmojiReactionAction,
-                          emojiSize: widget.emojiSize,
-                        ),
+          child: KeyboardVisibilityBuilder(
+            builder: (context, isKeyboardVisible) {
+              return Column(
+                mainAxisSize:
+                    isKeyboardVisible ? MainAxisSize.max : MainAxisSize.min,
+                crossAxisAlignment: widget.isOwnMessage
+                    ? CrossAxisAlignment.end
+                    : CrossAxisAlignment.start,
+                children: [
+                  Padding(
+                    padding: widget.paddingReactionWidget ??
+                        const EdgeInsets.only(bottom: 8.0),
+                    child: Align(
+                      alignment: widget.widgetAlignment,
+                      child: Material(
+                        color: Colors.transparent,
+                        child: widget.reactionWidget ??
+                            ReactionsPicker(
+                              onClickEmojiReactionAction:
+                                  widget.onClickEmojiReactionAction,
+                              backgroundColor: widget.backgroundColor,
+                              animationDuration: widget.animationDuration,
+                              animationCurve: widget.animationCurve,
+                              height: widget.height,
+                              emojis: widget.emojis,
+                              myEmojiReacted: widget.myEmojiReacted,
+                              borderRadius: widget.borderRadius ?? 32,
+                              emojiTextStyle: widget.emojiTextStyle,
+                              boxShadow: widget.boxShadow,
+                              moreEmojiWidget: widget.moreEmojiWidget,
+                              enableMoreEmojiWidget:
+                                  widget.enableMoreEmojiWidget,
+                              onPickEmojiReactionAction:
+                                  widget.onPickEmojiReactionAction,
+                              emojiSize: widget.emojiSize,
+                            ),
+                      ),
+                    ),
                   ),
-                ),
-              ),
-              Flexible(
-                child: ConstrainedBox(
-                  constraints: BoxConstraints(
-                    maxHeight: MediaQuery.sizeOf(context).height * 0.5,
+                  Flexible(
+                    child: ConstrainedBox(
+                      constraints: BoxConstraints(
+                        maxHeight: MediaQuery.sizeOf(context).height * 0.5,
+                      ),
+                      child: Hero(
+                        tag: widget.id,
+                        child: widget.messageWidget,
+                      ),
+                    ),
                   ),
-                  child: Hero(
-                    tag: widget.id,
-                    child: widget.messageWidget,
-                  ),
-                ),
-              ),
-              if (widget.contextMenuWidget != null)
-                Align(
-                  alignment: widget.widgetAlignment,
-                  child: widget.contextMenuWidget!,
-                ),
-            ],
+                  if (widget.contextMenuWidget != null)
+                    Align(
+                      alignment: widget.widgetAlignment,
+                      child: widget.contextMenuWidget!,
+                    ),
+                ],
+              );
+            },
           ),
         ),
       ),
