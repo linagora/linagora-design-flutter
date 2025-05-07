@@ -29,7 +29,7 @@ class HeroDialogRoute<T> extends PageRoute<T> {
 
   // The color of the barrier (the area outside the dialog) is semi-transparent black.
   @override
-  Color get barrierColor => Colors.transparent.withOpacity(0.3);
+  Color get barrierColor => const Color(0xFF636363).withOpacity(0.5);
 
   // This method builds the transition animation for the route.
   // In this case, it simply returns the child widget as is, without any transition.
