@@ -6,7 +6,6 @@ import 'package:linagora_design_flutter/reaction/reaction_picker.dart';
 class ReactionsDialogWidget extends StatefulWidget {
   const ReactionsDialogWidget({
     super.key,
-    required this.id,
     required this.messageWidget,
     this.widgetAlignment = Alignment.centerRight,
     this.menuItemsWidth = 0.45,
@@ -32,9 +31,6 @@ class ReactionsDialogWidget extends StatefulWidget {
     this.enableMoreEmojiWidget,
     this.emojiSize,
   });
-
-  // Id for the hero widget
-  final String id;
 
   // The message widget to be displayed in the dialog
   final Widget messageWidget;
@@ -158,10 +154,7 @@ class _ReactionsDialogWidgetState extends State<ReactionsDialogWidget> {
                       constraints: BoxConstraints(
                         maxHeight: MediaQuery.sizeOf(context).height * 0.5,
                       ),
-                      child: Hero(
-                        tag: widget.id,
-                        child: widget.messageWidget,
-                      ),
+                      child: widget.messageWidget,
                     ),
                   ),
                   if (widget.contextMenuWidget != null)
