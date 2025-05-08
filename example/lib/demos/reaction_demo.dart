@@ -193,7 +193,6 @@ class _ReactionScreenState extends State<ReactionScreen> {
                               return SafeArea(
                                 child: ReactionsDialogWidget(
                                   enableMoreEmojiWidget: true,
-                                  id: message.id,
                                   messageWidget:
                                       MessageWidget(message: message),
                                   contextMenuWidget: Container(
@@ -216,10 +215,7 @@ class _ReactionScreenState extends State<ReactionScreen> {
                           ),
                         );
                       },
-                      child: Hero(
-                        tag: message.id,
-                        child: MessageWidget(message: message),
-                      ),
+                      child: MessageWidget(message: message),
                     );
                   },
                 ),
