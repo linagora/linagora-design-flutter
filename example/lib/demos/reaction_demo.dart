@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:linagora_design_flutter/reaction/hero_dialog_route.dart';
 import 'package:linagora_design_flutter/reaction/reaction_dialog_widget.dart';
@@ -190,30 +192,52 @@ class _ReactionScreenState extends State<ReactionScreen> {
                         Navigator.of(context).push(
                           HeroDialogRoute(
                             builder: (context) {
-                              return SafeArea(
-                                child: ReactionsDialogWidget(
-                                  enableMoreEmojiWidget: true,
-                                  messageWidget:
-                                      MessageWidget(message: message),
-                                  contextMenuWidget: Container(
-                                    height: 200,
-                                    width: 200,
-                                    decoration: BoxDecoration(
-                                      color:
-                                          Theme.of(context).colorScheme.surface,
-                                      borderRadius: BorderRadius.circular(20),
+                              return GestureDetector(
+                                behavior: HitTestBehavior.opaque,
+                                onTap: () {
+                                  Navigator.of(context).pop();
+                                },
+                                child: Stack(
+                                  children: [
+                                    // Background blur + semi-transparent overlay
+                                    Positioned.fill(
+                                      child: BackdropFilter(
+                                        filter: ImageFilter.blur(sigmaX: 80, sigmaY: 80),
+                                        child: Container(
+                                          color: const Color(0x80636363), // 50% opacity scrim
+                                        ),
+                                      ),
                                     ),
-                                  ),
-                                  isOwnMessage: message.isMe,
-                                  myEmojiReacted: '🧡',
-                                  widgetAlignment: message.isMe
-                                      ? Alignment.centerRight
-                                      : Alignment.centerLeft,
+                                    // Your actual dialog content
+                                    Align(
+                                      alignment: message.isMe
+                                          ? Alignment.centerRight
+                                          : Alignment.centerLeft,
+                                      child: ReactionsDialogWidget(
+                                        enableMoreEmojiWidget: true,
+                                        messageWidget: MessageWidget(message: message),
+                                        contextMenuWidget: Container(
+                                          height: 200,
+                                          width: 200,
+                                          decoration: BoxDecoration(
+                                            color: Theme.of(context).colorScheme.surface,
+                                            borderRadius: BorderRadius.circular(20),
+                                          ),
+                                        ),
+                                        isOwnMessage: message.isMe,
+                                        myEmojiReacted: '🧡',
+                                        widgetAlignment: message.isMe
+                                            ? Alignment.centerRight
+                                            : Alignment.centerLeft,
+                                      ),
+                                    ),
+                                  ],
                                 ),
                               );
                             },
                           ),
                         );
+
                       },
                       child: MessageWidget(message: message),
                     );
