@@ -7,6 +7,8 @@ import 'package:example/demos/multiple_account_picker_example.dart';
 import 'package:example/demos/permission_handler.dart';
 import 'package:example/demos/reaction_demo.dart';
 import 'package:flutter/material.dart';
+import 'package:linagora_design_flutter/dialog/properties/dialog_button_properties.dart';
+import 'package:linagora_design_flutter/dialog/show_confirmation_dialog.dart';
 import 'package:linagora_design_flutter/linagora_design_flutter.dart';
 
 void main() {
@@ -52,8 +54,8 @@ class MyHomePage extends StatelessWidget {
               onPressed: () async {
                 final permission = await PermissionHandlerService()
                     .getCurrentPermission(PermissionType.photos);
-                // ignore: use_build_context_synchronously
                 Navigator.push(
+                  // ignore: use_build_context_synchronously
                   context,
                   MaterialPageRoute(
                       builder: (context) => ImagesPickerExample(
@@ -67,8 +69,8 @@ class MyHomePage extends StatelessWidget {
               onPressed: () async {
                 final permission = await PermissionHandlerService()
                     .getCurrentPermission(PermissionType.photos);
-                // ignore: use_build_context_synchronously
                 Navigator.push(
+                  // ignore: use_build_context_synchronously
                   context,
                   MaterialPageRoute(
                       builder: (context) => ImagePickerBottomSheetExample(
@@ -129,6 +131,32 @@ class MyHomePage extends StatelessWidget {
                   ),
                 );
               }),
+          DemoTile(
+            title: "Confirmation dialog reaction",
+            onPressed: () {
+              showConfirmationDialog(
+                context,
+                title: 'Title',
+                description: 'Description',
+                confirmProperties: DialogButtonProperties(
+                  label: 'Confirm',
+                  labelColor: LinagoraRefColors.material().primary[100],
+                  backgroundColor: LinagoraRefColors.material().primary,
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                ),
+                cancelProperties: DialogButtonProperties(
+                  label: 'Cancel',
+                  labelColor: LinagoraRefColors.material().primary,
+                  backgroundColor: LinagoraRefColors.material().primary[100],
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                ),
+              );
+            },
+          ),
         ],
       ),
     );
