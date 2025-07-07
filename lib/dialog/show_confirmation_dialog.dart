@@ -43,12 +43,14 @@ class ConfirmationDialog extends StatelessWidget {
     required this.description,
     required this.confirmProperties,
     required this.cancelProperties,
+    this.showCloseButton = true,
   });
 
   final String title;
   final String? description;
   final DialogButtonProperties confirmProperties;
   final DialogButtonProperties cancelProperties;
+  final bool showCloseButton;
 
   @override
   Widget build(BuildContext context) {
@@ -67,23 +69,26 @@ class ConfirmationDialog extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            Align(
-              alignment: Alignment.centerRight,
-              child: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: IconButton(
-                  onPressed: () {
-                    if (Navigator.canPop(context)) {
-                      Navigator.pop(context);
-                    }
-                  },
-                  icon: const SvgPicture(
-                    AssetBytesLoader(LinagoraDesignImages.svgBytesClose),
+            if (showCloseButton)
+              Align(
+                alignment: Alignment.centerRight,
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: IconButton(
+                    onPressed: () {
+                      if (Navigator.canPop(context)) {
+                        Navigator.pop(context);
+                      }
+                    },
+                    icon: const SvgPicture(
+                      AssetBytesLoader(LinagoraDesignImages.svgBytesClose),
+                    ),
+                    padding: const EdgeInsets.all(9),
                   ),
-                  padding: const EdgeInsets.all(9),
                 ),
-              ),
-            ),
+              )
+            else
+              const SizedBox(height: 24),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 32),
               child: Column(
