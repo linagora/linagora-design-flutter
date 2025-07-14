@@ -7,6 +7,7 @@ import 'package:example/demos/multiple_account_picker_example.dart';
 import 'package:example/demos/permission_handler.dart';
 import 'package:example/demos/reaction_demo.dart';
 import 'package:flutter/material.dart';
+import 'package:linagora_design_flutter/dialog/confirmation_dialog_builder.dart';
 import 'package:linagora_design_flutter/linagora_design_flutter.dart';
 
 void main() {
@@ -52,8 +53,8 @@ class MyHomePage extends StatelessWidget {
               onPressed: () async {
                 final permission = await PermissionHandlerService()
                     .getCurrentPermission(PermissionType.photos);
-                // ignore: use_build_context_synchronously
                 Navigator.push(
+                  // ignore: use_build_context_synchronously
                   context,
                   MaterialPageRoute(
                       builder: (context) => ImagesPickerExample(
@@ -67,8 +68,8 @@ class MyHomePage extends StatelessWidget {
               onPressed: () async {
                 final permission = await PermissionHandlerService()
                     .getCurrentPermission(PermissionType.photos);
-                // ignore: use_build_context_synchronously
                 Navigator.push(
+                  // ignore: use_build_context_synchronously
                   context,
                   MaterialPageRoute(
                       builder: (context) => ImagePickerBottomSheetExample(
@@ -129,6 +130,31 @@ class MyHomePage extends StatelessWidget {
                   ),
                 );
               }),
+          DemoTile(
+            title: "Confirmation dialog reaction",
+            onPressed: () {
+              showDialog(
+                context: context,
+                builder: (context) {
+                  return ConfirmationDialogBuilder(
+                    title: 'Title',
+                    textContent: 'Description',
+                    confirmText: 'Confirm',
+                    cancelText: 'Cancel',
+                    onConfirmButtonAction: () {
+                      Navigator.pop(context);
+                    },
+                    onCancelButtonAction: () {
+                      Navigator.pop(context);
+                    },
+                    onCloseButtonAction: () {
+                      Navigator.pop(context);
+                    },
+                  );
+                },
+              );
+            },
+          ),
         ],
       ),
     );
