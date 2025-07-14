@@ -224,6 +224,7 @@ class _BodyContent extends StatelessWidget {
         ? Center(
             child: Text(
               title,
+              textAlign: TextAlign.center,
               style: textTheme.headlineSmall?.copyWith(
                 color: const Color(0xFF424244),
               ),
