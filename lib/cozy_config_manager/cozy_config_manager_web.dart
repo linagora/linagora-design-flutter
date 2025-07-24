@@ -1,3 +1,5 @@
+// ignore_for_file: avoid_web_libraries_in_flutter
+
 import 'dart:async';
 import 'dart:html';
 import 'dart:js_interop';
@@ -5,6 +7,7 @@ import 'dart:js_util';
 
 import 'package:flutter/foundation.dart';
 import 'package:linagora_design_flutter/cozy_config_manager/cozy_js_interop.dart';
+import 'package:linagora_design_flutter/cozy_config_manager/cozy_notification_status.dart';
 
 class CozyConfigManager {
   static final CozyConfigManager _instance = CozyConfigManager._internal();
@@ -63,5 +66,19 @@ class CozyConfigManager {
   Future<String?> _getTargetOrigin() async {
     final targetOrigin = await promiseToFuture(requestParentOriginJs());
     return targetOrigin is JSString ? targetOrigin.toDart : null;
+  }
+
+  Future<CozyNotificationStatus> requestNotificationPermission() async {
+    final status = await promiseToFuture(requestNotificationPermissionJs());
+    return status is JSString
+        ? CozyNotificationStatus.fromJs(status.toDart)
+        : CozyNotificationStatus.isUndefined;
+  }
+
+  void sendNotification(String title, String body) {
+    sendNotificationJs(CozyNotificationData.create(
+      title: title.toJS,
+      body: body.toJS,
+    ));
   }
 }
