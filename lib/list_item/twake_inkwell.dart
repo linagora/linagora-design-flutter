@@ -7,6 +7,7 @@ class TwakeInkWell extends StatefulWidget {
   final Function()? onLongPress;
   final Widget child;
   final bool isSelected;
+  final Function(bool)? onHover;
 
   const TwakeInkWell({
     super.key,
@@ -15,6 +16,7 @@ class TwakeInkWell extends StatefulWidget {
     this.isSelected = false,
     this.onSecondaryTapDown,
     this.onLongPress,
+    this.onHover,
   });
 
   @override
@@ -36,6 +38,7 @@ class TwakeInkWellState extends State<TwakeInkWell> {
         splashColor: LinagoraHoverStyle.material().hoverColor,
         onTap: widget.onTap,
         onSecondaryTapDown: widget.onSecondaryTapDown,
+        onHover: widget.onHover,
         onLongPress: widget.onLongPress,
         child: widget.child,
       ),
