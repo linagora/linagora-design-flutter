@@ -19,7 +19,7 @@ class CozyConfigManager {
 
   CozyConfigManager._internal();
 
-  Future<void> injectCozyScript(String cozyBridgeVersion) async {
+  Future<void> injectCozyScript([String cozyBridgeVersion = '0.16.1']) async {
     if (_isCozyScriptInjected) {
       return;
     }
