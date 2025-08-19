@@ -8,7 +8,6 @@ import 'package:linagora_design_flutter/cozy_config_manager/cozy_js_interop.dart
 
 class CozyConfigManager {
   static final CozyConfigManager _instance = CozyConfigManager._internal();
-  static const _cozyBridgeVersion = '0.8.0';
 
   bool _isCozyScriptInjected = false;
   String? _targetOrigin;
@@ -20,7 +19,7 @@ class CozyConfigManager {
 
   CozyConfigManager._internal();
 
-  Future<void> injectCozyScript() async {
+  Future<void> injectCozyScript([String cozyBridgeVersion = '0.16.1']) async {
     if (_isCozyScriptInjected) {
       return;
     }
@@ -29,7 +28,7 @@ class CozyConfigManager {
 
     final ScriptElement script = ScriptElement();
     script.src =
-        'https://cdn.jsdelivr.net/npm/cozy-external-bridge@$_cozyBridgeVersion/dist/embedded/bundle.js';
+        'https://cdn.jsdelivr.net/npm/cozy-external-bridge@$cozyBridgeVersion/dist/embedded/bundle.js';
     final onloadListener = script.onLoad.listen((_) => completer.complete());
     document.head?.append(script);
     _isCozyScriptInjected = true;
