@@ -114,11 +114,12 @@ class ImagePicker {
       }
     }
 
+    if (!context.mounted) return null;
+
     // ignore: use_build_context_synchronously
     return showModalBottomSheet(
       context: context,
-      backgroundColor:
-          backgroundColor ?? Theme.of(context).colorScheme.background,
+      backgroundColor: backgroundColor ?? Theme.of(context).colorScheme.surface,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16.0),
       ),
@@ -154,11 +155,6 @@ class ImagePicker {
         ),
       ),
     );
-  }
-
-  static double _defaultBottomSheetHeight(BuildContext context) {
-    return MediaQuery.sizeOf(context).height * 0.9 -
-        MediaQuery.viewInsetsOf(context).bottom;
   }
 
   static Future<List<AssetPathEntity>> getAllAssetPaths({
