@@ -8,6 +8,7 @@ import 'package:example/demos/permission_handler.dart';
 import 'package:example/demos/reaction_demo.dart';
 import 'package:flutter/material.dart';
 import 'package:linagora_design_flutter/dialog/confirmation_dialog_builder.dart';
+import 'package:linagora_design_flutter/dialog/options_dialog.dart';
 import 'package:linagora_design_flutter/linagora_design_flutter.dart';
 
 void main() {
@@ -150,6 +151,34 @@ class MyHomePage extends StatelessWidget {
                     onCloseButtonAction: () {
                       Navigator.pop(context);
                     },
+                  );
+                },
+              );
+            },
+          ),
+          DemoTile(
+            title: "Options dialog",
+            onPressed: () {
+              showDialog<LinagoraDialogOption<int>>(
+                context: context,
+                builder: (context) {
+                  return OptionsDialog(
+                    title: 'Title of the dialog',
+                    description: 'Description of the dialog',
+                    isBottomSheet: MediaQuery.sizeOf(context).width < 600,
+                    availableOptions: List.generate(
+                      7,
+                      (index) {
+                        return LinagoraDialogOption<int>(
+                          name: 'Option $index',
+                          value: index,
+                          trailingIcon: index != 6
+                              ? null
+                              : const Icon(Icons.arrow_forward_ios_rounded),
+                        );
+                      },
+                    ),
+                    onSelected: (selected) => Navigator.pop(context, selected),
                   );
                 },
               );
