@@ -154,7 +154,7 @@ abstract class TwakeThemes {
             ),
           ),
         ),
-        dialogTheme: DialogTheme(
+        dialogTheme: DialogThemeData(
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(borderRadius / 2),
           ),
