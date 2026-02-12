@@ -1,13 +1,12 @@
 // ignore_for_file: avoid_web_libraries_in_flutter
 
 import 'dart:async';
-import 'dart:html';
 import 'dart:js_interop';
-import 'dart:js_util';
 
 import 'package:flutter/foundation.dart';
 import 'package:linagora_design_flutter/cozy_config_manager/cozy_js_interop.dart';
 import 'package:linagora_design_flutter/cozy_config_manager/cozy_notification_status.dart';
+import 'package:web/web.dart';
 
 class CozyConfigManager {
   static final CozyConfigManager _instance = CozyConfigManager._internal();
@@ -29,7 +28,7 @@ class CozyConfigManager {
 
     final completer = Completer<void>();
 
-    final ScriptElement script = ScriptElement();
+    final HTMLScriptElement script = HTMLScriptElement();
     script.src =
         'https://cdn.jsdelivr.net/npm/cozy-external-bridge@$cozyBridgeVersion/dist/embedded/bundle.js';
     final onloadListener = script.onLoad.listen((_) => completer.complete());
@@ -64,13 +63,13 @@ class CozyConfigManager {
   }
 
   Future<String?> _getTargetOrigin() async {
-    final targetOrigin = await promiseToFuture(requestParentOriginJs());
-    return targetOrigin is JSString ? targetOrigin.toDart : null;
+    final targetOrigin = await requestParentOriginJs().toDart;
+    return targetOrigin?.toDart;
   }
 
   Future<CozyNotificationStatus> requestNotificationPermission() async {
-    final status = await promiseToFuture(requestNotificationPermissionJs());
-    return status is JSString
+    final status = await requestNotificationPermissionJs().toDart;
+    return status != null
         ? CozyNotificationStatus.fromJs(status.toDart)
         : CozyNotificationStatus.isUndefined;
   }
