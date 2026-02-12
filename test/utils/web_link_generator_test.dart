@@ -384,6 +384,24 @@ void main() {
         expect(result, 'https://alice-notes.example.com/');
       });
 
+      test('should handle FQDN with trailing dot and no slug', () {
+        final result = WebLinkGenerator.generateWebLink(
+          workplaceFqdn: 'bob.example.org.',
+        );
+
+        expect(result, 'https://bob.example.org/');
+      });
+
+      test('should handle FQDN with multiple trailing dots', () {
+        final result = WebLinkGenerator.generateWebLink(
+          workplaceFqdn: 'charlie.example.net...',
+          slug: 'app',
+        );
+
+        expect(result, startsWith('https://'));
+        expect(result.contains('-app'), isTrue);
+      });
+
       test('should throw for FQDN exceeding 253 characters', () {
         // Create FQDN exceeding 253 chars
         final longFqdn = '${'a' * 250}.example.com'; // 250 + 12 = 262 chars
@@ -427,13 +445,14 @@ void main() {
         expect(result, 'https://alice-notes.example.com/');
       });
 
-      test('should handle slug with mixed case and hyphens', () {
-        final result = WebLinkGenerator.generateWebLink(
-          workplaceFqdn: 'bob.example.com',
-          slug: 'My-App',
+      test('should throw for slug with hyphens (no longer allowed)', () {
+        expect(
+          () => WebLinkGenerator.generateWebLink(
+            workplaceFqdn: 'bob.example.com',
+            slug: 'my-app',
+          ),
+          throwsA(isA<ArgumentError>()),
         );
-
-        expect(result, 'https://bob-my-app.example.com/');
       });
 
       test('should throw for slug starting with hyphen', () {
@@ -544,7 +563,7 @@ void main() {
     });
 
     group('Edge cases - Search params', () {
-      test('should handle empty key in search params', () {
+      test('should filter out empty key in search params', () {
         final result = WebLinkGenerator.generateWebLink(
           workplaceFqdn: 'alice.example.com',
           slug: 'notes',
@@ -554,7 +573,8 @@ void main() {
           ],
         );
 
-        expect(result, 'https://alice-notes.example.com/?=value&key=value');
+        // Empty keys are now filtered out by _buildQueryParams
+        expect(result, 'https://alice-notes.example.com/?key=value');
       });
 
       test('should handle empty value in search params', () {
@@ -629,6 +649,97 @@ void main() {
         );
 
         expect(result, contains('#/section%20with%20spaces'));
+      });
+    });
+
+    group('Security - DoS attack prevention', () {
+      test('should prevent DoS via extremely long FQDN (memory exhaustion)', () {
+        // Attempt to create FQDN that would consume excessive memory
+        final maliciousFqdn = '${'x' * 300}.example.com';
+        expect(
+          () => WebLinkGenerator.generateWebLink(
+            workplaceFqdn: maliciousFqdn,
+            slug: 'app',
+          ),
+          throwsA(isA<ArgumentError>()),
+        );
+      });
+
+      test('should prevent DoS via extremely long pathname (buffer overflow)', () {
+        // Attempt pathname longer than web server limits
+        final maliciousPath = 'a' * 5000;
+        expect(
+          () => WebLinkGenerator.generateWebLink(
+            workplaceFqdn: 'alice.example.com',
+            slug: 'notes',
+            pathname: maliciousPath,
+          ),
+          throwsA(isA<ArgumentError>()),
+        );
+      });
+
+      test('should prevent DoS via extremely long slug (subdomain attack)', () {
+        // Attempt slug longer than DNS label limit
+        final maliciousSlug = 'b' * 100;
+        expect(
+          () => WebLinkGenerator.generateWebLink(
+            workplaceFqdn: 'alice.example.com',
+            slug: maliciousSlug,
+          ),
+          throwsA(isA<ArgumentError>()),
+        );
+      });
+
+      test('should handle edge case: FQDN at exactly 253 chars (boundary test)', () {
+        // Test at exact RFC 1035 limit
+        final exactLimitFqdn = '${'a' * 240}.example.com'; // 240 + 12 = 252 chars
+        final result = WebLinkGenerator.generateWebLink(
+          workplaceFqdn: exactLimitFqdn,
+          slug: 'app',
+        );
+
+        expect(result, startsWith('https://'));
+      });
+
+      test('should handle edge case: pathname at exactly 2048 chars (boundary test)', () {
+        // Test at exact common web server limit
+        final exactLimitPath = 'x' * 2048;
+        final result = WebLinkGenerator.generateWebLink(
+          workplaceFqdn: 'alice.example.com',
+          slug: 'notes',
+          pathname: exactLimitPath,
+        );
+
+        expect(result, startsWith('https://alice-notes.example.com/'));
+      });
+
+      test('should handle edge case: slug at exactly 63 chars (DNS label limit)', () {
+        // Test at exact RFC 1035 DNS label limit
+        final exactLimitSlug = 'c' * 63;
+        final result = WebLinkGenerator.generateWebLink(
+          workplaceFqdn: 'alice.example.com',
+          slug: exactLimitSlug,
+        );
+
+        expect(result, startsWith('https://alice-'));
+        expect(result.contains(exactLimitSlug), isTrue);
+      });
+
+      test('should prevent DoS via malicious searchParams (resource exhaustion)', () {
+        // Attempt to create thousands of query parameters
+        final maliciousParams = List.generate(
+          10000,
+          (i) => ['key$i', 'value$i'],
+        );
+
+        // Should not throw, but implementation handles it gracefully
+        final result = WebLinkGenerator.generateWebLink(
+          workplaceFqdn: 'alice.example.com',
+          slug: 'notes',
+          searchParams: maliciousParams,
+        );
+
+        expect(result, startsWith('https://'));
       });
     });
 

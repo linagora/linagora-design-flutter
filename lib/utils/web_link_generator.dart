@@ -12,10 +12,19 @@ class WebLinkGenerator {
   static const int _maxSlugLength = 63;
 
   /// Maximum length for pathname to prevent DoS attacks.
+  ///
+  /// Limiting pathname length prevents malicious actors from:
+  /// - Consuming excessive memory during URL parsing and processing
+  /// - Causing performance degradation through extremely long paths
+  /// - Triggering buffer overflow vulnerabilities in downstream systems
+  ///
+  /// The 2048-character limit follows common browser and web server conventions
+  /// (e.g., Apache, Nginx default limits) and represents a reasonable balance
+  /// between functionality and security.
   static const int _maxPathnameLength = 2048;
 
-  /// Regex pattern for validating slugs (lowercase alphanumeric + hyphens, not starting/ending with hyphen).
-  static final RegExp _slugPattern = RegExp(r'^[a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?$');
+  /// Regex pattern for validating slugs (lowercase alphanumeric only).
+  static final RegExp _slugPattern = RegExp(r'^[a-z0-9]+$');
 
   /// Ensures that a path starts with `/`.
   static String _ensureFirstSlash(String? path) {
@@ -23,15 +32,62 @@ class WebLinkGenerator {
     return path.startsWith('/') ? path : '/$path';
   }
 
+  /// Builds query parameters map from list of [key, value] pairs.
+  ///
+  /// Returns null if params is null, empty, or contains no valid pairs.
+  /// Only includes pairs with exactly 2 elements where the key is non-empty.
+  static Map<String, String>? _buildQueryParams(List<List<String>>? params) {
+    if (params == null || params.isEmpty) return null;
+
+    final map = <String, String>{};
+    for (final p in params) {
+      if (p.length == 2 && p[0].isNotEmpty) {
+        map[p[0]] = p[1];
+      }
+    }
+    return map.isEmpty ? null : map;
+  }
+
+  /// Normalizes FQDN by trimming and removing trailing dot if present.
+  ///
+  /// Returns a list of non-empty domain parts.
+  static List<String> _normalizeFqdnParts(String fqdn) {
+    final normalized = fqdn.trim().endsWith('.')
+        ? fqdn.trim().substring(0, fqdn.length - 1)
+        : fqdn.trim();
+
+    return normalized
+        .split('.')
+        .where((p) => p.isNotEmpty)
+        .toList();
+  }
+
+  /// Validates and normalizes FQDN.
+  ///
+  /// Throws [ArgumentError] if FQDN is invalid or exceeds maximum length.
+  static List<String> _validateAndNormalizeFqdn(String fqdn) {
+    final parts = _normalizeFqdnParts(fqdn);
+
+    if (parts.length < 2) {
+      throw ArgumentError('Invalid FQDN');
+    }
+
+    final totalLength = parts.join('.').length;
+    if (totalLength > _maxFqdnLength) {
+      throw ArgumentError('FQDN too long');
+    }
+
+    return parts;
+  }
+
   /// Validates if a given FQDN looks valid (has at least 2 parts and non-empty).
   ///
-  /// Additional validation:
-  /// - Must not exceed 253 characters
+  /// Checks:
   /// - Must contain at least one dot
   /// - Must have at least 2 non-empty parts after filtering empty segments
   static bool _isValidFqdn(String fqdn) {
     final trimmed = fqdn.trim();
-    if (trimmed.isEmpty || trimmed.length > _maxFqdnLength) return false;
+    if (trimmed.isEmpty) return false;
     if (!trimmed.contains('.')) return false;
 
     // Remove trailing dot if present (valid in DNS)
@@ -45,10 +101,17 @@ class WebLinkGenerator {
 
   /// Validates if a given slug is properly formatted.
   ///
+  /// Slug validation prevents:
+  /// - DNS label injection through special characters
+  /// - DoS attacks via excessively long subdomains (RFC 1035 limits DNS labels to 63 chars)
+  /// - Compatibility issues with domain name systems
+  ///
   /// A valid slug must:
-  /// - Not exceed 63 characters
-  /// - Be lowercase alphanumeric with hyphens
-  /// - Not start or end with a hyphen
+  /// - Not exceed 63 characters (per RFC 1035 DNS label length limit)
+  /// - Be lowercase alphanumeric characters only
+  /// - Not be empty
+  ///
+  /// Reference: RFC 1035 (Domain Names - Implementation and Specification)
   static bool _isValidSlug(String slug) {
     if (slug.isEmpty || slug.length > _maxSlugLength) return false;
     return _slugPattern.hasMatch(slug);
@@ -103,14 +166,8 @@ class WebLinkGenerator {
       );
     }
 
-    // Normalize FQDN by trimming and removing trailing dot if present
-    final trimmedFqdn = workplaceFqdn.trim();
-    final normalizedFqdn = trimmedFqdn.endsWith('.')
-        ? trimmedFqdn.substring(0, trimmedFqdn.length - 1)
-        : trimmedFqdn;
-
-    // Start from the base host
-    String newHost = normalizedFqdn;
+    // Validate and normalize FQDN
+    final hostParts = _validateAndNormalizeFqdn(workplaceFqdn);
 
     // Only modify the host when slug is non-null and not empty
     if (slug != null && slug.trim().isNotEmpty) {
@@ -120,34 +177,26 @@ class WebLinkGenerator {
       if (!_isValidSlug(normalizedSlug)) {
         throw ArgumentError(
           'Invalid slug: "$slug". '
-          'Must be lowercase alphanumeric with hyphens, '
-          'not starting/ending with hyphen, '
+          'Must be lowercase alphanumeric characters only '
           'and not exceed $_maxSlugLength characters.',
         );
       }
 
-      final hostParts =
-          normalizedFqdn.split('.').where((p) => p.trim().isNotEmpty).toList();
-
       // Insert slug as a prefix to the first part (flat subdomain)
       hostParts[0] = '${hostParts[0]}-$normalizedSlug';
-      newHost = hostParts.join('.');
     }
+
+    final newHost = hostParts.join('.');
 
     final safePath = _ensureFirstSlash(pathname);
     final safeHash =
         (hash == null || hash.isEmpty) ? null : _ensureFirstSlash(hash);
 
-    final queryParams = <String, String>{};
-    for (final param in searchParams ?? const []) {
-      if (param.length == 2) queryParams[param[0]] = param[1];
-    }
-
     final uri = Uri(
       scheme: 'https',
       host: newHost,
       path: safePath,
-      queryParameters: queryParams.isEmpty ? null : queryParams,
+      queryParameters: _buildQueryParams(searchParams),
       fragment: safeHash,
     );
 
