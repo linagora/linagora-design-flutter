@@ -22,7 +22,7 @@ class CozyConfigManager {
 
   CozyConfigManager._internal();
 
-  Future<void> injectCozyScript([String cozyBridgeVersion = '0.16.1']) async {
+  Future<void> injectCozyScript([String cozyBridgeVersion = '1.2.1']) async {
     if (_isCozyScriptInjected) {
       return;
     }
@@ -31,7 +31,7 @@ class CozyConfigManager {
 
     final ScriptElement script = ScriptElement();
     script.src =
-        'https://cdn.jsdelivr.net/npm/cozy-external-bridge@$cozyBridgeVersion/dist/embedded/bundle.js';
+        'https://cdn.jsdelivr.net/npm/cozy-external-bridge@$cozyBridgeVersion/dist/bundle.js';
     final onloadListener = script.onLoad.listen((_) => completer.complete());
     document.head?.append(script);
     _isCozyScriptInjected = true;
