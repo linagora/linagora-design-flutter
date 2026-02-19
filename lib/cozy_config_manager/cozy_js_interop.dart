@@ -6,6 +6,9 @@ external JSPromise<JSString?> requestParentOriginJs();
 @JS('window._cozyBridge.isInsideCozy')
 external bool? isInsideCozyJs(String targetOrigin);
 
+@JS('window._cozyBridge.isInIframe')
+external bool isInIframeJs();
+
 @JS('window._cozyBridge.setupBridge')
 external bool? setupBridgeJs(String targetOrigin);
 

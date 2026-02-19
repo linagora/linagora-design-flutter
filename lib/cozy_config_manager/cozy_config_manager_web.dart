@@ -39,6 +39,12 @@ class CozyConfigManager {
     await completer.future;
     onloadListener.cancel();
   }
+  
+  bool get isInIframe {
+    final isInIframe = isInIframeJs();
+    debugPrint('isInIframe: $isInIframe');
+    return isInIframe;
+  }
 
   Future<bool> get isInsideCozy async {
     _targetOrigin ??= await _getTargetOrigin();
