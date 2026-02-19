@@ -56,17 +56,26 @@ class CozyConfigManager {
     return isInsideCozy;
   }
 
-  Future<void> initialize() async {
+  Future<void> initialize({required List<String> validUrlSuffixes}) async {
     if (_isInitialized) return;
     try {
       _targetOrigin ??= await _getTargetOrigin();
       if (_targetOrigin == null) throw Exception('Could not get target origin');
-      setupBridgeJs(_targetOrigin!);
-      startHistorySyncingJs();
-      _isInitialized = true;
+      
+      if(_validateTargetOrigin(validUrlSuffixes)) {
+        setupBridgeJs(_targetOrigin!);
+        startHistorySyncingJs();
+        _isInitialized = true;
+      } else {
+        debugPrint('Error initializing Cozy bridge: invalid target origin $_targetOrigin');
+      }
     } catch (e) {
       debugPrint('Error initializing Cozy bridge: $e');
     }
+  }
+  
+  bool _validateTargetOrigin(List<String> validUrlSuffixes) {
+    return validUrlSuffixes.any((suffix) => _targetOrigin!.endsWith(suffix));
   }
 
   Future<String?> _getTargetOrigin() async {

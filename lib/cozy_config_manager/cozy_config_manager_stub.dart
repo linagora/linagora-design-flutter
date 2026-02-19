@@ -9,7 +9,7 @@ class CozyConfigManager {
       throw UnimplementedError();
   bool get isInIframe => throw UnimplementedError();
   Future<bool> get isInsideCozy => throw UnimplementedError();
-  Future<void> initialize() => throw UnimplementedError();
+  Future<void> initialize({required List<String> validUrlSuffixes}) => throw UnimplementedError();
   Future<CozyNotificationStatus> requestNotificationPermission() =>
       throw UnimplementedError();
   Future<void> sendNotification(String title, String body) =>
