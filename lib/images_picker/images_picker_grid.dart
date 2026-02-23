@@ -86,6 +86,12 @@ class _ImagesPickerGridState extends State<ImagesPickerGrid> {
     _loadAssets(_currentPage);
   }
 
+  @override
+  void dispose() {
+    PhotoManager.removeChangeCallback(changeNotify);
+    super.dispose();
+  }
+
   void changeNotify(MethodCall call) async {
     log("ImagesPickerGrid::changeNotify(): MethodCall = $call");
     final newCount = call.arguments['newCount'];
