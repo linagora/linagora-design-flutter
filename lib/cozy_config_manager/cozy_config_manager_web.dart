@@ -46,14 +46,8 @@ class CozyConfigManager {
     return isInIframe;
   }
 
-  Future<bool> get isInsideCozy async {
-    _targetOrigin ??= await _getTargetOrigin();
-    debugPrint('targetOrigin: $_targetOrigin');
-    final isInsideCozy = _targetOrigin != null
-        ? (isInsideCozyJs(_targetOrigin!) ?? false)
-        : false;
-    debugPrint('isInsideCozy: $isInsideCozy');
-    return isInsideCozy;
+  bool get isInContainer {
+    return _isInitialized;
   }
 
   Future<void> initialize({required List<String> validUrlSuffixes}) async {

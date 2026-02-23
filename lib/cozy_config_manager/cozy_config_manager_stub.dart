@@ -8,7 +8,7 @@ class CozyConfigManager {
   Future<void> injectCozyScript([String cozyBridgeVersion = '']) =>
       throw UnimplementedError();
   bool get isInIframe => throw UnimplementedError();
-  Future<bool> get isInsideCozy => throw UnimplementedError();
+  bool get isInContainer => throw UnimplementedError();
   Future<void> initialize({required List<String> validUrlSuffixes}) => throw UnimplementedError();
   Future<CozyNotificationStatus> requestNotificationPermission() =>
       throw UnimplementedError();
