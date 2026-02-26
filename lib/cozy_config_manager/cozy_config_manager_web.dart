@@ -56,7 +56,7 @@ class CozyConfigManager {
       _targetOrigin ??= await _getTargetOrigin();
       if (_targetOrigin == null) throw Exception('Could not get target origin');
       
-      if(_validateTargetOrigin(validUrlSuffixes)) {
+      if (_validateTargetOrigin(validUrlSuffixes)) {
         setupBridgeJs(_targetOrigin!);
         startHistorySyncingJs();
         _isInitialized = true;
