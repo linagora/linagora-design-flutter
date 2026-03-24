@@ -1,11 +1,11 @@
 // ignore_for_file: avoid_web_libraries_in_flutter
 
-import 'dart:async';
 import 'dart:html';
 import 'dart:js_interop';
 import 'dart:js_util';
 
 import 'package:flutter/foundation.dart';
+import 'package:flutter/services.dart' show rootBundle;
 import 'package:linagora_design_flutter/cozy_config_manager/cozy_js_interop.dart';
 import 'package:linagora_design_flutter/cozy_config_manager/cozy_notification_status.dart';
 
@@ -22,22 +22,18 @@ class CozyConfigManager {
 
   CozyConfigManager._internal();
 
-  Future<void> injectCozyScript([String cozyBridgeVersion = '1.2.1']) async {
+  Future<void> injectCozyScript() async {
     if (_isCozyScriptInjected) {
       return;
     }
 
-    final completer = Completer<void>();
-
+    final jsContent = await rootBundle.loadString(
+      'packages/linagora_design_flutter/lib/cozy_config_manager/assets/bundle.js',
+    );
     final ScriptElement script = ScriptElement();
-    script.src =
-        'https://cdn.jsdelivr.net/npm/cozy-external-bridge@$cozyBridgeVersion/dist/bundle.js';
-    final onloadListener = script.onLoad.listen((_) => completer.complete());
+    script.text = jsContent;
     document.head?.append(script);
     _isCozyScriptInjected = true;
-
-    await completer.future;
-    onloadListener.cancel();
   }
   
   bool get isInIframe {

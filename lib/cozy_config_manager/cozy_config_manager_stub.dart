@@ -5,7 +5,7 @@ class CozyConfigManager {
   factory CozyConfigManager() => _instance;
   CozyConfigManager._internal();
 
-  Future<void> injectCozyScript([String cozyBridgeVersion = '']) =>
+  Future<void> injectCozyScript() =>
       throw UnimplementedError();
   bool get isInIframe => throw UnimplementedError();
   bool get isInContainer => throw UnimplementedError();
