@@ -24,7 +24,7 @@ Widget matrixContactUseCase(BuildContext context) {
         label: 'Is Current Matrix ID',
         initialValue: false,
       ),
-      contactStatus: context.knobs.list(
+      contactStatus: context.knobs.object.dropdown(
         label: 'Contact Status',
         options: ContactStatus.values,
         labelBuilder: (status) => status?.label ?? '',
