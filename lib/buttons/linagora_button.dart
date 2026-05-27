@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:linagora_design_flutter/buttons/linagora_button_size.dart';
 import 'package:linagora_design_flutter/buttons/linagora_button_variant.dart';
-import 'package:linagora_design_flutter/spacings/linagora_spacings.dart';
+import 'package:linagora_design_flutter/spacings/linagora_spacing.dart';
 
 class LinagoraButton extends StatelessWidget {
   final String label;
@@ -46,7 +46,7 @@ class LinagoraButton extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       children: [
         Icon(icon),
-        const SizedBox(width: LinagoraSpacings.s8),
+        const SizedBox(width: LinagoraSpacing.base),
         Text(label),
       ],
     );
@@ -68,8 +68,8 @@ class LinagoraButton extends StatelessWidget {
         tapTargetSize: MaterialTapTargetSize.shrinkWrap,
         padding: const WidgetStatePropertyAll(
           EdgeInsets.symmetric(
-            horizontal: LinagoraSpacings.s12,
-            vertical: LinagoraSpacings.s6,
+            horizontal: LinagoraSpacing.base * 1.5,
+            vertical: 6,
           ),
         ),
       );

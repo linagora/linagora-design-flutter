@@ -22,7 +22,7 @@ Widget linagoraButtonUseCase(BuildContext context) {
     initialValue: true,
   );
   return Padding(
-    padding: const EdgeInsets.all(LinagoraSpacings.s16),
+    padding: const EdgeInsets.all(LinagoraSpacing.base * 2),
     child: LinagoraButton(
       label: context.knobs.string(
         label: 'Label',
