@@ -75,6 +75,19 @@ class LinagoraButton extends StatelessWidget {
       );
     }
 
+    if (size == LinagoraButtonSize.m) {
+      style = style.copyWith(
+        minimumSize: const WidgetStatePropertyAll(Size(0, 48)),
+        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+        padding: const WidgetStatePropertyAll(
+          EdgeInsets.symmetric(
+            horizontal: LinagoraSpacing.base * 3,
+            vertical: LinagoraSpacing.base * 1.5,
+          ),
+        ),
+      );
+    }
+
     return style;
   }
 }
