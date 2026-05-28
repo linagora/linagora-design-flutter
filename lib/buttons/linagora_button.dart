@@ -39,15 +39,20 @@ class LinagoraButton extends StatelessWidget {
   }
 
   Widget _buildChild() {
+    final text = Text(
+      label,
+      maxLines: 1,
+      overflow: TextOverflow.ellipsis,
+    );
     if (icon == null) {
-      return Text(label);
+      return text;
     }
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
         Icon(icon),
         const SizedBox(width: LinagoraSpacing.base),
-        Text(label),
+        Flexible(child: text),
       ],
     );
   }
