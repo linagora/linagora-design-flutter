@@ -15,7 +15,7 @@ class LinagoraButton extends StatelessWidget {
     required this.label,
     required this.onPressed,
     this.icon,
-    this.size = LinagoraButtonSize.s,
+    this.size = LinagoraButtonSize.m,
     this.variant = LinagoraButtonVariant.filled,
   });
 
@@ -54,40 +54,31 @@ class LinagoraButton extends StatelessWidget {
 
   ButtonStyle _buildStyle(BuildContext context) {
     final primary = Theme.of(context).colorScheme.primary;
-    var style = ButtonStyle(
+    return ButtonStyle(
       shape: const WidgetStatePropertyAll(StadiumBorder()),
       iconSize: const WidgetStatePropertyAll(20),
       side: variant == LinagoraButtonVariant.outlined
           ? WidgetStatePropertyAll(BorderSide(color: primary))
           : null,
+      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+      minimumSize: WidgetStatePropertyAll(
+        switch (size) {
+          LinagoraButtonSize.xs => const Size(0, 32),
+          LinagoraButtonSize.m => const Size(0, 48),
+        },
+      ),
+      padding: WidgetStatePropertyAll(
+        switch (size) {
+          LinagoraButtonSize.xs => const EdgeInsets.symmetric(
+              horizontal: LinagoraSpacing.base * 1.5,
+              vertical: 6,
+            ),
+          LinagoraButtonSize.m => const EdgeInsets.symmetric(
+              horizontal: LinagoraSpacing.base * 3,
+              vertical: LinagoraSpacing.base * 1.5,
+            ),
+        },
+      ),
     );
-
-    if (size == LinagoraButtonSize.xs) {
-      style = style.copyWith(
-        minimumSize: const WidgetStatePropertyAll(Size(0, 32)),
-        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-        padding: const WidgetStatePropertyAll(
-          EdgeInsets.symmetric(
-            horizontal: LinagoraSpacing.base * 1.5,
-            vertical: 6,
-          ),
-        ),
-      );
-    }
-
-    if (size == LinagoraButtonSize.m) {
-      style = style.copyWith(
-        minimumSize: const WidgetStatePropertyAll(Size(0, 48)),
-        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-        padding: const WidgetStatePropertyAll(
-          EdgeInsets.symmetric(
-            horizontal: LinagoraSpacing.base * 3,
-            vertical: LinagoraSpacing.base * 1.5,
-          ),
-        ),
-      );
-    }
-
-    return style;
   }
 }

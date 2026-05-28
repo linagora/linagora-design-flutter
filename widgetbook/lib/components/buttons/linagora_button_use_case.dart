@@ -14,7 +14,7 @@ Widget linagoraButtonUseCase(BuildContext context) {
   final size = context.knobs.object.dropdown<LinagoraButtonSize>(
     label: 'Size',
     options: LinagoraButtonSize.values,
-    initialOption: LinagoraButtonSize.s,
+    initialOption: LinagoraButtonSize.m,
     labelBuilder: (s) => s.name.toUpperCase(),
   );
   final withIcon = context.knobs.boolean(
