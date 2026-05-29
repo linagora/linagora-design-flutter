@@ -1,0 +1,4 @@
+enum LinagoraButtonSize {
+  xs,
+  m,
+}

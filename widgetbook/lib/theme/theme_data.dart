@@ -4,27 +4,6 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:linagora_design_flutter/colors/linagora_ref_colors.dart';
 import 'package:linagora_design_flutter/colors/linagora_sys_colors.dart';
 
-class AppTheme extends InheritedWidget {
-  const AppTheme({
-    super.key,
-    required this.data,
-    required super.child,
-  });
-
-  final ThemeData data;
-
-  static ThemeData of(BuildContext context) {
-    final widget = context.dependOnInheritedWidgetOfExactType<AppTheme>();
-    return widget!.data;
-  }
-
-  @override
-  bool updateShouldNotify(covariant AppTheme oldWidget) {
-    return data != oldWidget.data;
-  }
-}
-
-
 abstract class TwakeThemes {
   static const double iconSize = 24.0;
 

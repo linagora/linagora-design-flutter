@@ -1,0 +1,4 @@
+enum LinagoraButtonVariant {
+  filled,
+  outlined,
+}
