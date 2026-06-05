@@ -27,6 +27,12 @@ const EdgeInsets kBubbleContentPadding = EdgeInsets.only(
   top: LinagoraSpacing.base,
 );
 
+/// Inner padding for a bubble whose sole content is a media element
+/// (image/video): 4px on every side.
+const EdgeInsets kBubbleMediaContentPadding = EdgeInsets.all(
+  LinagoraSpacing.base * 0.5,
+);
+
 /// Vertical space reserved below a bubble for the reactions overlay.
 const double kMessageReactionsOverlayHeight = LinagoraSpacing.base * 3;
 

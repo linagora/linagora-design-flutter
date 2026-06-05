@@ -3,12 +3,21 @@ import 'package:linagora_design_flutter/chat/bubble_shape.dart';
 import 'package:linagora_design_flutter/colors/linagora_ref_colors.dart';
 import 'package:linagora_design_flutter/colors/linagora_sys_colors.dart';
 
+/// The kind of content a [MessageBubble] holds, used to pick its inner padding.
+enum BubbleContentType {
+  /// The bubble's sole content is a media element (image/video).
+  mediaOnly,
+
+  /// Default: any other content (text, file, caption, reply…).
+  other,
+}
+
 /// A rounded, filled chat message bubble with an optional tail, holding [child].
 ///
-/// When [color] / [padding] are null they fall back to the design-system
-/// defaults (own vs received color from [isOwnMessage], [kBubbleContentPadding]).
-/// [hasReactions] reserves [kMessageReactionsOverlayHeight] below the bubble for
-/// the reactions overlay.
+/// When [color] is null it falls back to the design-system default (own vs
+/// received color from [isOwnMessage]). When [padding] is null the inner
+/// padding is resolved from [contentType]. [hasReactions] reserves
+/// [kMessageReactionsOverlayHeight] below the bubble for the reactions overlay.
 class MessageBubble extends StatelessWidget {
   final Widget child;
 
@@ -20,7 +29,11 @@ class MessageBubble extends StatelessWidget {
 
   final BorderRadius borderRadius;
 
+  /// Explicit inner padding override. When null, the padding is derived from
+  /// [contentType].
   final EdgeInsetsGeometry? padding;
+
+  final BubbleContentType contentType;
 
   final List<BoxShadow> shadows;
 
@@ -36,10 +49,18 @@ class MessageBubble extends StatelessWidget {
     this.tailDirection = BubbleTailDirection.none,
     this.borderRadius = BubbleRadius.all,
     this.padding,
+    this.contentType = BubbleContentType.other,
     this.shadows = kBubbleShadow,
     this.constraints,
     this.hasReactions = false,
   });
+
+  EdgeInsetsGeometry get _resolvedPadding =>
+      padding ??
+      switch (contentType) {
+        BubbleContentType.mediaOnly => kBubbleMediaContentPadding,
+        BubbleContentType.other => kBubbleContentPadding,
+      };
 
   Color get _resolvedColor =>
       color ??
@@ -54,7 +75,7 @@ class MessageBubble extends StatelessWidget {
       margin: hasReactions
           ? const EdgeInsets.only(bottom: kMessageReactionsOverlayHeight)
           : null,
-      padding: padding ?? kBubbleContentPadding,
+      padding: _resolvedPadding,
       decoration: ShapeDecoration(
         color: _resolvedColor,
         shadows: shadows,
