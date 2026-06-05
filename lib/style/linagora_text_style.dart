@@ -24,31 +24,37 @@ class LinagoraTextStyle {
   LinagoraTextStyle._material()
       : bodyLarge1 = const TextStyle(
           fontSize: 17,
+          height: 24 / 17,
           fontWeight: FontWeight.w600,
           letterSpacing: -0.15,
         ),
         bodyLarge2 = const TextStyle(
           fontSize: 17,
+          height: 24 / 17,
           fontWeight: FontWeight.w400,
           letterSpacing: -0.15,
         ),
         bodyMedium = const TextStyle(
           fontSize: 14,
+          height: 20 / 14,
           fontWeight: FontWeight.w500,
           letterSpacing: 0.25,
         ),
         bodyMedium1 = const TextStyle(
           fontSize: 16,
+          height: 24 / 16,
           fontWeight: FontWeight.w400,
           letterSpacing: -0.15,
         ),
         bodyMedium2 = const TextStyle(
           fontSize: 14,
+          height: 20 / 14,
           fontWeight: FontWeight.w600,
           letterSpacing: 0.25,
         ),
         bodyMedium3 = const TextStyle(
           fontSize: 14,
+          height: 20 / 14,
           fontWeight: FontWeight.w400,
           letterSpacing: 0.25,
         );
