@@ -20,3 +20,5 @@ export 'package:linagora_design_flutter/spacings/linagora_spacing.dart';
 export 'package:linagora_design_flutter/buttons/linagora_button.dart';
 export 'package:linagora_design_flutter/buttons/linagora_button_size.dart';
 export 'package:linagora_design_flutter/buttons/linagora_button_variant.dart';
+export 'package:linagora_design_flutter/chat/bubble_shape.dart';
+export 'package:linagora_design_flutter/chat/message_bubble.dart';
