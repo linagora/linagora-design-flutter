@@ -75,6 +75,16 @@ class BubbleShape extends ShapeBorder {
     ).shift(rect.topLeft);
   }
 
+  /// Builds the tail as the raw Bézier path exported from Figma, anchored to a
+  /// bottom corner of the bubble.
+  ///
+  /// The `cubicTo`/`lineTo` literals below are the tail's coordinates in
+  /// Figma's own coordinate space (a ~14×19 viewBox). The [x]/[y] helpers map
+  /// that space onto the bubble: the tail's attachment point — design
+  /// coordinate (9, 19), i.e. the bottom corner where the tail meets the
+  /// bubble — is translated onto ([anchorX], [anchorY]). Hence the `- 9` /
+  /// `- 19` offsets. [mirrored] flips the tail horizontally (left vs right
+  /// direction) via the sign [s].
   static Path _tailPath({
     required double anchorX,
     required double anchorY,
