@@ -23,7 +23,7 @@ class BubbleShape extends ShapeBorder {
   });
 
   @override
-  EdgeInsetsGeometry get dimensions => EdgeInsets.zero;
+  EdgeInsetsGeometry get dimensions => EdgeInsets.all(side.width);
 
   @override
   ShapeBorder scale(double t) => BubbleShape(
