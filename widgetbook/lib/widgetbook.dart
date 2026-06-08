@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:linagora_design_flutter/linagora_design_flutter.dart';
 import 'package:widgetbook/widgetbook.dart' hide AlignmentAddon;
 import 'package:widgetbook_workspace/components/buttons/linagora_button_use_case.dart';
+import 'package:widgetbook_workspace/components/chat/message_bubble_use_case.dart';
 import 'package:widgetbook_workspace/components/contact_component/matrix_contact_use_case.dart';
 import 'package:widgetbook_workspace/components/contact_component/phonebook_contact_use_case.dart';
 import 'package:widgetbook_workspace/custom/github_addon.dart';
@@ -79,6 +80,20 @@ class WidgetbookApp extends StatelessWidget {
                 WidgetbookUseCase(
                   name: 'Default',
                   builder: (context) => linagoraButtonUseCase(context),
+                ),
+              ],
+            ),
+          ],
+        ),
+        WidgetbookFolder(
+          name: 'Chat',
+          children: [
+            WidgetbookComponent(
+              name: 'Message bubble',
+              useCases: [
+                WidgetbookUseCase(
+                  name: 'Default',
+                  builder: (context) => messageBubbleUseCase(context),
                 ),
               ],
             ),
