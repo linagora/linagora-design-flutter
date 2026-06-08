@@ -3,52 +3,80 @@ import 'package:flutter/painting.dart';
 
 class LinagoraTextStyle {
   // Display
+
+  /// 57px · Bold (w700).
   final TextStyle displayLarge;
 
+  /// 45px · SemiBold (w600).
   final TextStyle displayMedium;
 
+  /// 36px · SemiBold (w600).
   final TextStyle displaySmall;
 
   // Headline
+
+  /// 32px · SemiBold (w600).
   final TextStyle headlineLarge;
 
+  /// 28px · SemiBold (w600).
   final TextStyle headlineMedium;
 
+  /// 24px · SemiBold (w600).
   final TextStyle headlineSmall;
 
   // Title
+
+  /// 22px · SemiBold (w600).
   final TextStyle titleLarge;
 
+  /// 16px · Medium (w500).
   final TextStyle titleMedium;
 
+  /// 16px · SemiBold (w600). Same size as [titleMedium], heavier weight.
   final TextStyle titleSemibold;
 
+  /// 14px · Medium (w500).
   final TextStyle titleSmall;
 
   // Label
+
+  /// 14px · Medium (w500).
   final TextStyle labelLarge;
 
+  /// 12px · Medium (w500).
   final TextStyle labelMedium;
 
+  /// 11px · Medium (w500).
   final TextStyle labelSmall;
 
-  // Body
+  // Body — the numeric suffixes are a Figma import legacy and only vary the
+  // weight at a shared font size as of now
+
+  /// 17px · Medium (w500). Default body large (Figma token `M3/body/large`).
   final TextStyle bodyLarge;
 
+  /// 17px · Bold (w700).
   final TextStyle bodyLargeBold;
 
+  /// 17px · SemiBold (w600).
   final TextStyle bodyLarge1;
 
+  /// 17px · Regular (w400).
   final TextStyle bodyLarge2;
 
+  /// 16px · Regular (w400).
   final TextStyle bodyMedium1;
 
+  /// 14px · SemiBold (w600).
   final TextStyle bodyMedium2;
 
+  /// 14px · Medium (w500). Default body medium (Figma token `M3/body/medium`).
   final TextStyle bodyMedium;
 
+  /// 14px · Regular (w400).
   final TextStyle bodyMedium3;
 
+  /// 12px · Medium (w500).
   final TextStyle bodySmall;
 
   static final LinagoraTextStyle _materialLinagoraTextStyle =
