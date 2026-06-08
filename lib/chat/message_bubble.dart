@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:linagora_design_flutter/chat/bubble_shape.dart';
 import 'package:linagora_design_flutter/colors/linagora_ref_colors.dart';
 import 'package:linagora_design_flutter/colors/linagora_sys_colors.dart';
+import 'package:linagora_design_flutter/spacings/linagora_spacing.dart';
 
 /// The kind of content a [MessageBubble] holds, used to pick its inner padding.
 enum BubbleContentType {
@@ -11,6 +12,31 @@ enum BubbleContentType {
   /// Default: any other content (text, file, caption, reply…).
   other,
 }
+
+/// Figma bubble body inner padding: 12 horizontal, 8 top, 0 bottom.
+const EdgeInsets kBubbleContentPadding = EdgeInsets.only(
+  left: LinagoraSpacing.base * 1.5,
+  right: LinagoraSpacing.base * 1.5,
+  top: LinagoraSpacing.base,
+);
+
+/// Inner padding for a bubble whose sole content is a media element
+/// (image/video): 4px on every side.
+const EdgeInsets kBubbleMediaContentPadding = EdgeInsets.all(
+  LinagoraSpacing.base * 0.5,
+);
+
+/// Figma "Body" drop shadow: y1.22, blur0.61, black at 10%.
+const List<BoxShadow> kBubbleShadow = [
+  BoxShadow(
+    color: Color(0x1A000000),
+    offset: Offset(0, 1.22),
+    blurRadius: 0.61,
+  ),
+];
+
+/// Vertical space reserved below a bubble for the reactions overlay.
+const double kMessageReactionsOverlayHeight = LinagoraSpacing.base * 3;
 
 /// A rounded, filled chat message bubble with an optional tail, holding [child].
 ///

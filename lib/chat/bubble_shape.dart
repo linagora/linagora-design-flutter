@@ -1,7 +1,6 @@
 import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
-import 'package:linagora_design_flutter/spacings/linagora_spacing.dart';
 
 enum BubbleTailDirection { none, left, right }
 
@@ -10,31 +9,6 @@ abstract class BubbleRadius {
 
   static const BorderRadius all = BorderRadius.all(regular);
 }
-
-/// Figma "Body" drop shadow: y1.22, blur0.61, black at 10%.
-const List<BoxShadow> kBubbleShadow = [
-  BoxShadow(
-    color: Color(0x1A000000),
-    offset: Offset(0, 1.22),
-    blurRadius: 0.61,
-  ),
-];
-
-/// Figma bubble body inner padding: 12 horizontal, 8 top, 0 bottom.
-const EdgeInsets kBubbleContentPadding = EdgeInsets.only(
-  left: LinagoraSpacing.base * 1.5,
-  right: LinagoraSpacing.base * 1.5,
-  top: LinagoraSpacing.base,
-);
-
-/// Inner padding for a bubble whose sole content is a media element
-/// (image/video): 4px on every side.
-const EdgeInsets kBubbleMediaContentPadding = EdgeInsets.all(
-  LinagoraSpacing.base * 0.5,
-);
-
-/// Vertical space reserved below a bubble for the reactions overlay.
-const double kMessageReactionsOverlayHeight = LinagoraSpacing.base * 3;
 
 /// A [ShapeBorder] for a rounded chat bubble with an optional bottom tail.
 class BubbleShape extends ShapeBorder {
