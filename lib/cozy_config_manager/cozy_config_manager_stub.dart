@@ -5,10 +5,11 @@ class CozyConfigManager {
   factory CozyConfigManager() => _instance;
   CozyConfigManager._internal();
 
-  Future<void> injectCozyScript([String cozyBridgeVersion = '']) =>
+  Future<void> injectCozyScript() =>
       throw UnimplementedError();
-  Future<bool> get isInsideCozy => throw UnimplementedError();
-  Future<void> initialize() => throw UnimplementedError();
+  bool get isInIframe => throw UnimplementedError();
+  bool get isInContainer => throw UnimplementedError();
+  Future<void> initialize({required List<String> validUrlSuffixes}) => throw UnimplementedError();
   Future<CozyNotificationStatus> requestNotificationPermission() =>
       throw UnimplementedError();
   Future<void> sendNotification(String title, String body) =>
