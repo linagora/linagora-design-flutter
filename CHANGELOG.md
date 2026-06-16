@@ -1,3 +1,9 @@
+## 0.1.1 - 2026-06-16
+
+### Added
+
+* `RightClickFocus`: Gives [focusNode] focus when its subtree receives a secondary (right) mouse button press, web only.
+
 ## 0.1.0 - 2026-06-08
 
 ### Added
