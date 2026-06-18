@@ -70,7 +70,9 @@ class TwakeWelcomeScreen extends StatelessWidget {
       body: Container(
         width: double.infinity,
         decoration: BoxDecoration(
-          gradient: LinagoraSysColors.material().linearGradientStartingPage,
+          gradient: LinagoraSysColors
+              .material()
+              .linearGradientStartingPage,
         ),
         child: Stack(
           alignment: Alignment.center,
@@ -85,7 +87,6 @@ class TwakeWelcomeScreen extends StatelessWidget {
                   style: descriptionTextStyle ??
                       const TextStyle(
                         fontSize: 17,
-                        fontFamily: 'Inter',
                         fontWeight: FontWeight.w500,
                         color: Colors.black,
                       ),
@@ -117,8 +118,9 @@ class TwakeWelcomeScreen extends StatelessWidget {
                             TextStyle(
                               fontSize: 17,
                               fontWeight: FontWeight.w500,
-                              fontFamily: 'Inter',
-                              color: LinagoraSysColors.material().onPrimary,
+                              color: LinagoraSysColors
+                                  .material()
+                                  .onPrimary,
                             ),
                       ),
                       const SizedBox(
@@ -134,13 +136,16 @@ class TwakeWelcomeScreen extends StatelessWidget {
                         splashColor: splashColor,
                         onTap: onSignInOnTap,
                         title: signInTitle!,
-                        backgroundColor: LinagoraSysColors.material().surface,
+                        backgroundColor: LinagoraSysColors
+                            .material()
+                            .surface,
                         textStyle: createTwakeIdTextStyle ??
                             TextStyle(
                               fontSize: 17,
                               fontWeight: FontWeight.w500,
-                              fontFamily: 'Inter',
-                              color: LinagoraSysColors.material().primary,
+                              color: LinagoraSysColors
+                                  .material()
+                                  .primary,
                             ),
                       ),
                     const SizedBox(
@@ -162,11 +167,14 @@ class TwakeWelcomeScreen extends StatelessWidget {
                               TextStyle(
                                 fontSize: 17,
                                 fontWeight: FontWeight.w500,
-                                fontFamily: 'Inter',
-                                color: LinagoraSysColors.material().primary,
+                                color: LinagoraSysColors
+                                    .material()
+                                    .primary,
                                 decoration: TextDecoration.underline,
                                 decorationColor:
-                                    LinagoraSysColors.material().primary,
+                                LinagoraSysColors
+                                    .material()
+                                    .primary,
                               ),
                         ),
                       ),
@@ -183,8 +191,8 @@ class TwakeWelcomeScreen extends StatelessWidget {
                                 TextStyle(
                                   fontSize: 12,
                                   fontWeight: FontWeight.w500,
-                                  fontFamily: 'Inter',
-                                  color: LinagoraSysColors.material()
+                                  color: LinagoraSysColors
+                                      .material()
                                       .outlineVariantDark,
                                 ),
                           ),
@@ -201,8 +209,9 @@ class TwakeWelcomeScreen extends StatelessWidget {
                                   TextStyle(
                                     fontSize: 14,
                                     fontWeight: FontWeight.w500,
-                                    fontFamily: 'Inter',
-                                    color: LinagoraSysColors.material().primary,
+                                    color: LinagoraSysColors
+                                        .material()
+                                        .primary,
                                   ),
                             ),
                           ),
