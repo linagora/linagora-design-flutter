@@ -11,5 +11,5 @@ class LinagoraFonts {
   /// Map this to the `TwakeInter` family registered in pubspec.yaml, which is
   /// a patched build of Inter with emoji glyphs stripped to avoid overriding
   /// platform color-emoji on Flutter web.
-  static const String inter = 'TwakeInter';
+  static const String twakeInter = 'TwakeInter';
 }
