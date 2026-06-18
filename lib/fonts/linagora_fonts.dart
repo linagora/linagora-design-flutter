@@ -1,7 +1,7 @@
 /// Design system font family constants.
 ///
 /// Register fonts via pubspec.yaml pointing to `assets/fonts/`.
-/// Consumers can use [LinagoraFonts.inter] as the `fontFamily` in their
+/// Consumers can use [LinagoraFonts.twakeInter] as the `fontFamily` in their
 /// [ThemeData] so that all text widgets inherit it without per-widget overrides.
 class LinagoraFonts {
   LinagoraFonts._();
