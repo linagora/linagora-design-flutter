@@ -23,3 +23,4 @@ export 'package:linagora_design_flutter/buttons/linagora_button_variant.dart';
 export 'package:linagora_design_flutter/chat/bubble_shape.dart';
 export 'package:linagora_design_flutter/chat/message_bubble.dart';
 export 'package:linagora_design_flutter/behaviors/right_click_focus.dart';
+export 'package:linagora_design_flutter/fonts/linagora_fonts.dart';
