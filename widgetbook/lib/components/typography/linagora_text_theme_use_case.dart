@@ -48,7 +48,7 @@ Widget linagoraTextThemeUseCase(BuildContext context) {
               '${entry.key} · ${style?.fontSize?.toStringAsFixed(0)}px · $weight',
               style: captionStyle,
             ),
-            Text('The quick brown fox jumps over the lazy dog', style: style),
+            Text('The quick brown fox 🦊♥︎❤️♥️ jumps over the lazy dog 🐶😎', style: style),
           ],
         ),
       );
