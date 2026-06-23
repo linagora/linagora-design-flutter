@@ -1,70 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:linagora_design_flutter/colors/linagora_ref_colors.dart';
 import 'package:linagora_design_flutter/colors/linagora_sys_colors.dart';
+import 'package:linagora_design_flutter/style/linagora_text_theme.dart';
 
 abstract class TwakeThemes {
   static const double iconSize = 24.0;
 
   static const double borderRadius = 20.0;
-
-  static var fallbackTextTheme = TextTheme(
-    bodyLarge: GoogleFonts.inter(
-      fontWeight: FontWeight.w500,
-      letterSpacing: -0.15,
-    ),
-    bodyMedium: GoogleFonts.inter(
-      fontWeight: FontWeight.w500,
-      letterSpacing: 0.25,
-    ),
-    bodySmall: GoogleFonts.inter(
-      fontWeight: FontWeight.w500,
-      letterSpacing: 0.4,
-    ),
-    labelLarge: GoogleFonts.inter(
-      fontWeight: FontWeight.w500,
-      letterSpacing: 0.1,
-    ),
-    labelSmall: GoogleFonts.inter(
-      fontWeight: FontWeight.w500,
-      letterSpacing: 0.5,
-    ),
-    displayLarge: GoogleFonts.inter(
-      fontWeight: FontWeight.w700,
-    ),
-    displayMedium: GoogleFonts.inter(
-      fontWeight: FontWeight.w600,
-      letterSpacing: 0.4,
-    ),
-    displaySmall: GoogleFonts.inter(
-      fontWeight: FontWeight.w600,
-      letterSpacing: 0.4,
-    ),
-    headlineMedium: GoogleFonts.inter(
-      fontWeight: FontWeight.w600,
-    ),
-    headlineSmall: GoogleFonts.inter(
-      fontWeight: FontWeight.w600,
-      letterSpacing: 0.4,
-    ),
-    headlineLarge: GoogleFonts.inter(
-      fontWeight: FontWeight.w600,
-      fontSize: 32,
-    ),
-    titleLarge: GoogleFonts.inter(
-      fontWeight: FontWeight.w600,
-      letterSpacing: -0.15,
-    ),
-    titleMedium: GoogleFonts.inter(
-      fontWeight: FontWeight.w500,
-      letterSpacing: 0.15,
-    ),
-    titleSmall: GoogleFonts.inter(
-      fontWeight: FontWeight.w500,
-      letterSpacing: 0.1,
-    ),
-  );
 
   static const Duration animationDuration = Duration(milliseconds: 250);
   static const Curve animationCurve = Curves.easeInOut;
@@ -73,14 +16,13 @@ abstract class TwakeThemes {
     BuildContext context,
     Brightness brightness, [
     Color? seed,
-  ]) =>
-      ThemeData(
+  ]) {
+    final textTheme = LinagoraTextTheme.material();
+    return ThemeData(
         visualDensity: VisualDensity.standard,
         useMaterial3: true,
-        fontFamily: 'Inter',
-        textTheme: brightness == Brightness.light
-            ? Typography.material2021().black.merge(fallbackTextTheme)
-            : Typography.material2021().white.merge(fallbackTextTheme),
+        textTheme: textTheme,
+        extensions: [LinagoraTextThemeExtension.material()],
         snackBarTheme: const SnackBarThemeData(
           behavior: SnackBarBehavior.floating,
         ),
@@ -98,7 +40,7 @@ abstract class TwakeThemes {
             borderSide: BorderSide.none,
             borderRadius: BorderRadius.circular(borderRadius / 2),
           ),
-          hintStyle: fallbackTextTheme.bodyLarge?.merge(
+          hintStyle: textTheme.bodyLarge?.merge(
             TextStyle(
               fontSize: 17,
               color: LinagoraRefColors.material().neutralVariant[60],
@@ -308,12 +250,12 @@ abstract class TwakeThemes {
           labelTextStyle: WidgetStateProperty.resolveWith(
             (states) {
               if (states.contains(WidgetState.selected)) {
-                return fallbackTextTheme.labelSmall?.copyWith(
+                return textTheme.labelSmall?.copyWith(
                   fontSize: 11,
                   color: LinagoraSysColors.material().primary,
                 );
               }
-              return fallbackTextTheme.labelSmall?.copyWith(
+              return textTheme.labelSmall?.copyWith(
                 fontSize: 11,
                 color: LinagoraSysColors.material().tertiary,
               );
@@ -347,18 +289,19 @@ abstract class TwakeThemes {
         ),
         bottomNavigationBarTheme: BottomNavigationBarThemeData(
           backgroundColor: LinagoraSysColors.material().surface,
-          selectedLabelStyle: fallbackTextTheme.labelSmall?.copyWith(
+          selectedLabelStyle: textTheme.labelSmall?.copyWith(
             fontSize: 11,
             color: LinagoraSysColors.material().primary,
           ),
-          unselectedLabelStyle: fallbackTextTheme.labelSmall?.copyWith(
+          unselectedLabelStyle: textTheme.labelSmall?.copyWith(
             fontSize: 11,
             color: LinagoraSysColors.material().tertiary,
           ),
           selectedItemColor: LinagoraSysColors.material().primary,
           unselectedItemColor: LinagoraSysColors.material().tertiary,
         ),
-      );
+    );
+  }
 }
 
 extension on Brightness {
