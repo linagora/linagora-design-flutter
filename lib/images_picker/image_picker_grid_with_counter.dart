@@ -58,14 +58,23 @@ class _ImagePickerGridWithCounterState extends State<ImagePickerGridWithCounter>
 
   final imageCounterNotifier = ValueNotifier(0);
 
+  void _listener() {
+    imageCounterNotifier.value = controller.selectedAssets.length;
+  }
+
   @override
   void initState() {
     super.initState();
-    controller.addListener(() {
-      imageCounterNotifier.value = controller.selectedAssets.length;
-    });
+    controller.addListener(_listener);
   }
 
+  @override
+  void dispose() {
+    controller.removeListener(_listener);
+    controller.dispose();
+    imageCounterNotifier.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
