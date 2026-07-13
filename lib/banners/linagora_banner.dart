@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:linagora_design_flutter/buttons/linagora_button.dart';
 import 'package:linagora_design_flutter/buttons/linagora_button_size.dart';
+import 'package:linagora_design_flutter/buttons/linagora_icon_button.dart';
 import 'package:linagora_design_flutter/colors/linagora_sys_colors.dart';
 import 'package:linagora_design_flutter/spacings/linagora_spacing.dart';
 import 'package:linagora_design_flutter/style/linagora_divider_style.dart';
@@ -17,6 +18,11 @@ class LinagoraBanner extends StatelessWidget {
   final String message;
   final IconData icon;
 
+  /// Overrides the leading [icon] with any widget (e.g. `SvgPicture.asset`,
+  /// `Image.asset`) instead of the Material glyph. When set, [icon] is
+  /// ignored for rendering; sized to match the default 16px glyph.
+  final Widget? iconWidget;
+
   /// Label for the trailing action button. Must be provided together with
   /// [onActionPressed] to show the button.
   final String? actionLabel;
@@ -24,6 +30,9 @@ class LinagoraBanner extends StatelessWidget {
 
   /// Shown as a trailing close (X) icon next to the action button.
   final VoidCallback? onDismiss;
+
+  /// Overrides the dismiss icon with any widget, same rules as [iconWidget].
+  final Widget? dismissIconWidget;
 
   /// Minimum banner height. Defaults to `null`, letting the banner size
   /// itself to its content. When set, the banner is at least this tall but
@@ -35,9 +44,11 @@ class LinagoraBanner extends StatelessWidget {
     super.key,
     required this.message,
     this.icon = Icons.error,
+    this.iconWidget,
     this.actionLabel,
     this.onActionPressed,
     this.onDismiss,
+    this.dismissIconWidget,
     this.height,
   });
 
@@ -77,7 +88,7 @@ class LinagoraBanner extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.center,
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        Icon(icon, size: 16, color: colors.error),
+        iconWidget ?? Icon(icon, size: 16, color: colors.error),
         const SizedBox(width: LinagoraSpacing.base),
         Flexible(
           child: Text(
@@ -89,10 +100,19 @@ class LinagoraBanner extends StatelessWidget {
         ),
         const SizedBox(width: LinagoraSpacing.base),
         if (_hasAction)
-          LinagoraButton(
-            label: actionLabel!,
-            onPressed: onActionPressed,
-            size: LinagoraButtonSize.xs,
+          // Not Flexible: as a non-flex Row child, the button is measured
+          // at its own intrinsic (short-label) width first, and the
+          // message's Flexible above claims whatever room is left —
+          // instead of splitting space evenly with the message up front.
+          // maxWidth still bounds pathologically long action labels so
+          // the button can't force a Row overflow on its own.
+          ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 120),
+            child: LinagoraButton(
+              label: actionLabel!,
+              onPressed: onActionPressed,
+              size: LinagoraButtonSize.xs,
+            ),
           ),
       ],
     );
@@ -103,15 +123,12 @@ class LinagoraBanner extends StatelessWidget {
       padding: const EdgeInsets.only(
         left: LinagoraSpacing.base,
       ),
-      child: IconButton(
-        icon: const Icon(Icons.close),
-        iconSize: 24,
+      child: LinagoraIconButton(
+        icon: Icons.close,
         color: colors.tertiary,
         tooltip: 'Dismiss',
         onPressed: onDismiss,
-        padding: EdgeInsets.zero,
-        constraints: const BoxConstraints(),
-        visualDensity: VisualDensity.compact,
+        iconWidget: dismissIconWidget,
       ),
     );
   }

@@ -182,6 +182,30 @@ class LinagoraSysColors {
 
   Color get outlineVariantDark => _outlineVariantDark ?? outlineVariant;
 
+  final Color warning;
+
+  final Color? _warningDark;
+
+  Color get warningDark => _warningDark ?? warning;
+
+  final Color onWarning;
+
+  final Color? _onWarningDark;
+
+  Color get onWarningDark => _onWarningDark ?? onWarning;
+
+  final Color success;
+
+  final Color? _successDark;
+
+  Color get successDark => _successDark ?? success;
+
+  final Color onSuccess;
+
+  final Color? _onSuccessDark;
+
+  Color get onSuccessDark => _onSuccessDark ?? onSuccess;
+
   LinearGradient get linearGradientStartingPage => const LinearGradient(
         begin: Alignment.bottomLeft,
         end: Alignment.bottomRight,
@@ -223,6 +247,10 @@ class LinagoraSysColors {
     required this.onSurfaceVariant,
     required this.outline,
     required this.outlineVariant,
+    required this.warning,
+    required this.onWarning,
+    required this.success,
+    required this.onSuccess,
     primaryDark,
     onPrimaryDark,
     primaryContainerDark,
@@ -252,6 +280,10 @@ class LinagoraSysColors {
     onSurfaceVariantDark,
     outlineDark,
     outlineVariantDark,
+    warningDark,
+    onWarningDark,
+    successDark,
+    onSuccessDark,
   })  : _primaryDark = primaryDark,
         _onPrimaryDark = onPrimaryDark,
         _primaryContainerDark = primaryContainerDark,
@@ -280,7 +312,11 @@ class LinagoraSysColors {
         _surfaceVariantDark = surfaceVariantDark,
         _onSurfaceVariantDark = onSurfaceVariantDark,
         _outlineDark = outlineDark,
-        _outlineVariantDark = outlineVariantDark;
+        _outlineVariantDark = outlineVariantDark,
+        _warningDark = warningDark,
+        _onWarningDark = onWarningDark,
+        _successDark = successDark,
+        _onSuccessDark = onSuccessDark;
 
   static final LinagoraSysColors _materialLinagoraColors =
       LinagoraSysColors._material();
@@ -347,5 +383,13 @@ class LinagoraSysColors {
         _surfaceVariantDark = const Color(0xFF3F3F3F),
         _onSurfaceVariantDark = const Color(0xFFCAC4D0),
         _outlineDark = const Color(0xFF525256),
-        _outlineVariantDark = const Color(0xFF49454F);
+        _outlineVariantDark = const Color(0xFF49454F),
+        warning = const Color(0xFFFFB300),
+        onWarning = const Color(0xFFFF6F00),
+        _warningDark = const Color(0xFFFFB300),
+        _onWarningDark = const Color(0xFFFF6F00),
+        success = const Color(0xFF00AD48),
+        onSuccess = const Color(0xFFFFFFFF),
+        _successDark = const Color(0xFF00AD48),
+        _onSuccessDark = const Color(0xFFFFFFFF);
 }

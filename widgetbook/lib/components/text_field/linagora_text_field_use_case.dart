@@ -1,0 +1,55 @@
+import 'package:flutter/material.dart';
+import 'package:linagora_design_flutter/linagora_design_flutter.dart';
+import 'package:widgetbook/widgetbook.dart';
+import 'package:widgetbook_annotation/widgetbook_annotation.dart' as widgetbook;
+
+@widgetbook.UseCase(name: 'Default', type: LinagoraTextField)
+Widget linagoraTextFieldUseCase(BuildContext context) {
+  final variant = context.knobs.object.dropdown<LinagoraTextFieldVariant>(
+    label: 'Variant',
+    options: LinagoraTextFieldVariant.values,
+    initialOption: LinagoraTextFieldVariant.outline,
+    labelBuilder: (v) => v.name,
+  );
+  final showError = context.knobs.boolean(
+    label: 'Show error',
+    initialValue: false,
+  );
+  final withTrailingIcon = context.knobs.boolean(
+    label: 'With trailing icon',
+    initialValue: true,
+  );
+  final withHeading = context.knobs.boolean(
+    label: 'With title/description',
+    initialValue: false,
+  );
+  return Padding(
+    padding: const EdgeInsets.all(LinagoraSpacing.base * 2),
+    child: LinagoraTextField(
+      title: withHeading
+          ? context.knobs.string(
+              label: 'Title',
+              initialValue: 'Enter recovery key',
+            )
+          : null,
+      description: withHeading
+          ? context.knobs.string(
+              label: 'Description',
+              initialValue:
+                  'Paste the key you saved when setting up secure backup.',
+            )
+          : null,
+      label: context.knobs.string(label: 'Label', initialValue: 'Label'),
+      supportingText: context.knobs.string(
+        label: 'Supporting text',
+        initialValue: 'Supporting text',
+      ),
+      errorText: showError ? 'Something went wrong' : null,
+      trailingIcon: withTrailingIcon ? Icons.error : null,
+      onTrailingIconPressed: withTrailingIcon ? () {} : null,
+      enabled: context.knobs.boolean(label: 'Enabled', initialValue: true),
+      variant: variant,
+      onChanged: (_) {},
+    ),
+  );
+}

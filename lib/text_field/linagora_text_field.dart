@@ -12,6 +12,11 @@ class LinagoraTextField extends StatelessWidget {
   final String? errorText;
   final IconData? trailingIcon;
   final VoidCallback? onTrailingIconPressed;
+
+  /// Overrides [trailingIcon] with any widget (e.g. `SvgPicture.asset`,
+  /// `Image.asset`) instead of the Material glyph. When set, [trailingIcon]
+  /// is ignored for rendering.
+  final Widget? trailingIconWidget;
   final bool obscureText;
   final bool enabled;
   final LinagoraTextFieldVariant variant;
@@ -31,6 +36,7 @@ class LinagoraTextField extends StatelessWidget {
     this.errorText,
     this.trailingIcon,
     this.onTrailingIconPressed,
+    this.trailingIconWidget,
     this.obscureText = false,
     this.enabled = true,
     this.variant = LinagoraTextFieldVariant.outline,
@@ -57,10 +63,10 @@ class LinagoraTextField extends StatelessWidget {
         errorText: errorText,
         filled: variant == LinagoraTextFieldVariant.filled,
         fillColor: colors.surface,
-        suffixIcon: trailingIcon == null
+        suffixIcon: trailingIcon == null && trailingIconWidget == null
             ? null
             : IconButton(
-                icon: Icon(trailingIcon),
+                icon: trailingIconWidget ?? Icon(trailingIcon),
                 onPressed: onTrailingIconPressed,
               ),
         border: variant == LinagoraTextFieldVariant.outline
