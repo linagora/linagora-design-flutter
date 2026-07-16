@@ -1,4 +1,3 @@
-
 import 'package:flutter/painting.dart';
 
 class LinagoraTextStyle {
@@ -38,6 +37,9 @@ class LinagoraTextStyle {
   /// 14px · Medium (w500).
   final TextStyle titleSmall;
 
+  /// 15px · Medium (w500). Figma token `M3/title/small2`.
+  final TextStyle titleSmall2;
+
   // Label
 
   /// 14px · Medium (w500).
@@ -49,8 +51,8 @@ class LinagoraTextStyle {
   /// 11px · Medium (w500).
   final TextStyle labelSmall;
 
-  // Body — the numeric suffixes are a Figma import legacy and only vary the
-  // weight at a shared font size as of now
+  // Body — the numeric suffixes are a Figma import legacy and vary the
+  // weight (and sometimes the size) around the default body styles
 
   /// 17px · Medium (w500). Default body large (Figma token `M3/body/large`).
   final TextStyle bodyLarge;
@@ -75,6 +77,9 @@ class LinagoraTextStyle {
 
   /// 14px · Regular (w400).
   final TextStyle bodyMedium3;
+
+  /// 15px · Regular (w400). Figma token `M3/body/Medium4`.
+  final TextStyle bodyMedium4;
 
   /// 12px · Medium (w500).
   final TextStyle bodySmall;
@@ -147,6 +152,12 @@ class LinagoraTextStyle {
           fontWeight: FontWeight.w500,
           letterSpacing: 0.1,
         ),
+        titleSmall2 = const TextStyle(
+          fontSize: 15,
+          height: 20 / 15,
+          fontWeight: FontWeight.w500,
+          letterSpacing: 0.1,
+        ),
         labelLarge = const TextStyle(
           fontSize: 14,
           height: 20 / 14,
@@ -212,6 +223,12 @@ class LinagoraTextStyle {
           height: 20 / 14,
           fontWeight: FontWeight.w400,
           letterSpacing: 0.25,
+        ),
+        bodyMedium4 = const TextStyle(
+          fontSize: 15,
+          height: 20 / 15,
+          fontWeight: FontWeight.w400,
+          letterSpacing: -0.15,
         ),
         bodySmall = const TextStyle(
           fontSize: 12,

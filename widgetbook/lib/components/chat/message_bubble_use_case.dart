@@ -29,7 +29,7 @@ Widget messageBubbleUseCase(BuildContext context) {
     // Bubble body has no bottom padding; the content owns the space below it.
     child: Padding(
       padding: const EdgeInsets.only(bottom: 8),
-      child: Text(text, style: LinagoraTextStyle.material().bodyMedium3),
+      child: Text(text, style: LinagoraTextStyle.material().bodyMedium4),
     ),
   );
 
@@ -38,8 +38,7 @@ Widget messageBubbleUseCase(BuildContext context) {
     child: Padding(
       padding: const EdgeInsets.all(LinagoraSpacing.base * 3),
       child: Align(
-        alignment:
-            isOwnMessage ? Alignment.centerRight : Alignment.centerLeft,
+        alignment: isOwnMessage ? Alignment.centerRight : Alignment.centerLeft,
         child: bubble,
       ),
     ),

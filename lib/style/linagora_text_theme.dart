@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:linagora_design_flutter/style/linagora_text_style.dart';
 
 /// [TextTheme] mapping the 15 Material slots onto the [LinagoraTextStyle]
-/// 7 tokens with no Material slot live in [LinagoraTextThemeExtension].
+/// 9 tokens with no Material slot live in [LinagoraTextThemeExtension].
 class LinagoraTextTheme {
   LinagoraTextTheme._();
 
@@ -37,21 +37,25 @@ class LinagoraTextTheme {
 class LinagoraTextThemeExtension
     extends ThemeExtension<LinagoraTextThemeExtension> {
   final TextStyle titleSemibold;
+  final TextStyle titleSmall2;
   final TextStyle bodyLargeBold;
   final TextStyle bodyLarge1;
   final TextStyle bodyLarge2;
   final TextStyle bodyMedium1;
   final TextStyle bodyMedium2;
   final TextStyle bodyMedium3;
+  final TextStyle bodyMedium4;
 
   const LinagoraTextThemeExtension({
     required this.titleSemibold,
+    required this.titleSmall2,
     required this.bodyLargeBold,
     required this.bodyLarge1,
     required this.bodyLarge2,
     required this.bodyMedium1,
     required this.bodyMedium2,
     required this.bodyMedium3,
+    required this.bodyMedium4,
   });
 
   static final LinagoraTextThemeExtension _material =
@@ -66,33 +70,39 @@ class LinagoraTextThemeExtension
         );
     return LinagoraTextThemeExtension(
       titleSemibold: withFont(tokens.titleSemibold),
+      titleSmall2: withFont(tokens.titleSmall2),
       bodyLargeBold: withFont(tokens.bodyLargeBold),
       bodyLarge1: withFont(tokens.bodyLarge1),
       bodyLarge2: withFont(tokens.bodyLarge2),
       bodyMedium1: withFont(tokens.bodyMedium1),
       bodyMedium2: withFont(tokens.bodyMedium2),
       bodyMedium3: withFont(tokens.bodyMedium3),
+      bodyMedium4: withFont(tokens.bodyMedium4),
     );
   }
 
   @override
   LinagoraTextThemeExtension copyWith({
     TextStyle? titleSemibold,
+    TextStyle? titleSmall2,
     TextStyle? bodyLargeBold,
     TextStyle? bodyLarge1,
     TextStyle? bodyLarge2,
     TextStyle? bodyMedium1,
     TextStyle? bodyMedium2,
     TextStyle? bodyMedium3,
+    TextStyle? bodyMedium4,
   }) {
     return LinagoraTextThemeExtension(
       titleSemibold: titleSemibold ?? this.titleSemibold,
+      titleSmall2: titleSmall2 ?? this.titleSmall2,
       bodyLargeBold: bodyLargeBold ?? this.bodyLargeBold,
       bodyLarge1: bodyLarge1 ?? this.bodyLarge1,
       bodyLarge2: bodyLarge2 ?? this.bodyLarge2,
       bodyMedium1: bodyMedium1 ?? this.bodyMedium1,
       bodyMedium2: bodyMedium2 ?? this.bodyMedium2,
       bodyMedium3: bodyMedium3 ?? this.bodyMedium3,
+      bodyMedium4: bodyMedium4 ?? this.bodyMedium4,
     );
   }
 
@@ -104,12 +114,14 @@ class LinagoraTextThemeExtension
     if (other is! LinagoraTextThemeExtension) return this;
     return LinagoraTextThemeExtension(
       titleSemibold: TextStyle.lerp(titleSemibold, other.titleSemibold, t)!,
+      titleSmall2: TextStyle.lerp(titleSmall2, other.titleSmall2, t)!,
       bodyLargeBold: TextStyle.lerp(bodyLargeBold, other.bodyLargeBold, t)!,
       bodyLarge1: TextStyle.lerp(bodyLarge1, other.bodyLarge1, t)!,
       bodyLarge2: TextStyle.lerp(bodyLarge2, other.bodyLarge2, t)!,
       bodyMedium1: TextStyle.lerp(bodyMedium1, other.bodyMedium1, t)!,
       bodyMedium2: TextStyle.lerp(bodyMedium2, other.bodyMedium2, t)!,
       bodyMedium3: TextStyle.lerp(bodyMedium3, other.bodyMedium3, t)!,
+      bodyMedium4: TextStyle.lerp(bodyMedium4, other.bodyMedium4, t)!,
     );
   }
 }
