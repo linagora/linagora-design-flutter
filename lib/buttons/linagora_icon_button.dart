@@ -1,14 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:linagora_design_flutter/spacings/linagora_spacing.dart';
 
 /// A compact, borderless icon button used for row-trailing actions (dismiss,
-/// delete, etc.) — no hover/highlight color override, shrink-wrapped tap
-/// target sized to the icon itself.
+/// delete, etc.) — hover overlay derives from [color], shrink-wrapped tap
+/// target sized to the icon plus a small padding.
 class LinagoraIconButton extends StatelessWidget {
   final IconData icon;
   final Color color;
   final VoidCallback? onPressed;
   final String? tooltip;
   final double iconSize;
+  final Color? overlayColor;
 
   /// Overrides the rendered icon with any widget (e.g. `SvgPicture.asset`,
   /// `Image.asset`) instead of the Material glyph from [icon]. When set,
@@ -25,6 +27,7 @@ class LinagoraIconButton extends StatelessWidget {
     this.tooltip,
     this.iconSize = 24,
     this.iconWidget,
+    this.overlayColor,
   });
 
   @override
@@ -37,9 +40,12 @@ class LinagoraIconButton extends StatelessWidget {
       color: iconWidget == null ? color : null,
       tooltip: tooltip,
       onPressed: onPressed,
-      padding: EdgeInsets.zero,
+      padding: const EdgeInsets.all(LinagoraSpacing.base / 2),
       constraints: const BoxConstraints(),
       visualDensity: VisualDensity.compact,
+      style: IconButton.styleFrom(
+        overlayColor: overlayColor ?? Colors.transparent,
+      ),
     );
   }
 }

@@ -71,7 +71,7 @@ class SessionDeviceListItem extends StatelessWidget {
           padding: EdgeInsets.symmetric(
             horizontal: LinagoraSpacing.base,
             vertical:
-                isMobile ? LinagoraSpacing.base * 2 : LinagoraSpacing.base,
+            isMobile ? LinagoraSpacing.base * 2 : LinagoraSpacing.base,
           ),
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.center,
@@ -103,12 +103,14 @@ class SessionDeviceListItem extends StatelessWidget {
                     label: verifyLabel,
                     onPressed: onVerifyPressed,
                     size:
-                        isMobile ? LinagoraButtonSize.xs : LinagoraButtonSize.m,
+                    isMobile ? LinagoraButtonSize.xs : LinagoraButtonSize.m,
                   ),
                 ),
               ],
-              const SizedBox(width: LinagoraSpacing.base),
-              _DeleteButton(onDelete: onDelete, iconWidget: deleteIconWidget),
+              if (onDelete != null) ... [
+                const SizedBox(width: LinagoraSpacing.base),
+                _DeleteButton(onDelete: onDelete, iconWidget: deleteIconWidget),
+              ],
             ],
           ),
         );
@@ -129,9 +131,15 @@ class SessionDeviceListItem extends StatelessWidget {
                 left: LinagoraSpacing.base * 5,
               ),
               child: Divider(
-                height: LinagoraDividerStyle.material().thickness,
-                thickness: LinagoraDividerStyle.material().thickness,
-                color: LinagoraDividerStyle.material().color,
+                height: LinagoraDividerStyle
+                    .material()
+                    .thickness,
+                thickness: LinagoraDividerStyle
+                    .material()
+                    .thickness,
+                color: LinagoraDividerStyle
+                    .material()
+                    .color,
               ),
             ),
           ],
@@ -180,10 +188,10 @@ class _Avatar extends StatelessWidget {
               child: iconWidget != null
                   ? SizedBox.square(dimension: glyphSize, child: iconWidget)
                   : Icon(
-                      icon,
-                      size: glyphSize,
-                      color: colors.onSuccess,
-                    ),
+                icon,
+                size: glyphSize,
+                color: colors.onSuccess,
+              ),
             ),
           ),
           if (!verified)
@@ -229,10 +237,12 @@ class _Content extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = LinagoraSysColors.material();
-    final textTheme = Theme.of(context).textTheme;
+    final textTheme = Theme
+        .of(context)
+        .textTheme;
     final titleStyle = (isMobile && !verified
-            ? textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w600)
-            : textTheme.bodyMedium)
+        ? textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w600)
+        : textTheme.bodyMedium)
         ?.copyWith(color: colors.onSurface);
 
     return Column(
