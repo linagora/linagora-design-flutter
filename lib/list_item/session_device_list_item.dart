@@ -284,7 +284,7 @@ class _DeleteButton extends StatelessWidget {
     final colors = LinagoraSysColors.material();
     return LinagoraIconButton(
       icon: Icons.delete_outline,
-      color: colors.tertiary,
+      color: colors.onTertiaryContainer,
       tooltip: 'Delete',
       onPressed: onDelete,
       iconWidget: iconWidget,
