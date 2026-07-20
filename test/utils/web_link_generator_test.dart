@@ -402,6 +402,26 @@ void main() {
         expect(result.contains('-app'), isTrue);
       });
 
+      test('should handle FQDN with surrounding whitespace and trailing dot', () {
+        // Regression: normalization must index the trimmed string, not the
+        // original. Using the untrimmed length here overflows and throws
+        // RangeError once leading/trailing whitespace is present.
+        final result = WebLinkGenerator.generateWebLink(
+          workplaceFqdn: '  alice.example.com.  ',
+          slug: 'notes',
+        );
+
+        expect(result, 'https://alice-notes.example.com/');
+      });
+
+      test('should handle FQDN with surrounding whitespace and no trailing dot', () {
+        final result = WebLinkGenerator.generateWebLink(
+          workplaceFqdn: '  bob.example.org  ',
+        );
+
+        expect(result, 'https://bob.example.org/');
+      });
+
       test('should throw for FQDN exceeding 253 characters', () {
         // Create FQDN exceeding 253 chars
         final longFqdn = '${'a' * 250}.example.com'; // 250 + 12 = 262 chars

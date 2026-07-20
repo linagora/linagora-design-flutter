@@ -52,9 +52,10 @@ class WebLinkGenerator {
   ///
   /// Returns a list of non-empty domain parts.
   static List<String> _normalizeFqdnParts(String fqdn) {
-    final normalized = fqdn.trim().endsWith('.')
-        ? fqdn.trim().substring(0, fqdn.length - 1)
-        : fqdn.trim();
+    final trimmed = fqdn.trim();
+    final normalized = trimmed.endsWith('.')
+        ? trimmed.substring(0, trimmed.length - 1)
+        : trimmed;
 
     return normalized
         .split('.')
