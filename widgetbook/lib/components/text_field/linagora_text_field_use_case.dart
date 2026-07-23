@@ -39,12 +39,16 @@ Widget linagoraTextFieldUseCase(BuildContext context) {
                   'Paste the key you saved when setting up secure backup.',
             )
           : null,
-      label: context.knobs.string(label: 'Label', initialValue: 'Label'),
+      label: context.knobs.string(label: 'Label', initialValue: 'Recovery key'),
+      hintText: context.knobs.string(
+        label: 'Hint text',
+        initialValue: 'XXX-XXX-XXX',
+      ),
       supportingText: context.knobs.string(
         label: 'Supporting text',
         initialValue: 'Supporting text',
       ),
-      errorText: showError ? 'Something went wrong' : null,
+      errorText: showError ? "recovery key doesn't match" : null,
       trailingIcon: withTrailingIcon ? Icons.error : null,
       onTrailingIconPressed: withTrailingIcon ? () {} : null,
       enabled: context.knobs.boolean(label: 'Enabled', initialValue: true),

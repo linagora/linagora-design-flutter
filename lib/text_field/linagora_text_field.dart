@@ -1,10 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:linagora_design_flutter/colors/linagora_sys_colors.dart';
 import 'package:linagora_design_flutter/spacings/linagora_spacing.dart';
+import 'package:linagora_design_flutter/style/linagora_text_theme.dart';
+import 'package:linagora_design_flutter/text_field/input_decoration_merge_extension.dart';
 import 'package:linagora_design_flutter/text_field/linagora_text_field_variant.dart';
 
 /// A Material 3 floating-label text field with the design system's
 /// filled/outline configurations and error/supporting-text states.
+///
+/// Defaults come from the DS M3 tokens: [LinagoraSysColors.outline] border
+/// (1px) and [LinagoraSysColors.error] border (2px) with a 4px radius, plus
+/// [LinagoraTextTheme] typography for the label, input and hint. Every color,
+/// style, width and radius is overridable for other contexts.
 class LinagoraTextField extends StatelessWidget {
   final TextEditingController? controller;
   final String label;
@@ -22,11 +29,50 @@ class LinagoraTextField extends StatelessWidget {
   final LinagoraTextFieldVariant variant;
   final ValueChanged<String>? onChanged;
 
+  /// Placeholder text shown when the field is empty.
+  final String? hintText;
+
+  /// Style for [hintText]. Defaults to [LinagoraTextTheme] `bodyLarge`
+  /// colored with [LinagoraSysColors.tertiary].
+  final TextStyle? hintStyle;
+
+  /// Style for the floating label in the default (non-error) state.
+  /// Defaults to [LinagoraTextTheme] `bodySmall` colored with
+  /// [LinagoraSysColors.onSurface].
+  final TextStyle? labelStyle;
+
+  /// Style for the typed input text. Defaults to [LinagoraTextTheme]
+  /// `bodyMedium` colored with [LinagoraSysColors.onSurface].
+  final TextStyle? inputStyle;
+
+  /// Border color for the default (non-error) state.
+  /// Defaults to [LinagoraSysColors.outline].
+  final Color? borderColor;
+
+  /// Border, label and helper color applied when [errorText] is non-null.
+  /// The error label/helper use [LinagoraTextTheme] `labelSmall`.
+  /// Defaults to [LinagoraSysColors.error].
+  final Color? errorBorderColor;
+
+  /// Border width for the default (non-error) state.
+  final double borderWidth;
+
+  /// Border width applied when [errorText] is non-null.
+  final double errorBorderWidth;
+
+  /// Corner radius of the outline border.
+  final double borderRadius;
+
   /// Optional heading shown above the field (e.g. a dialog/screen title).
   final String? title;
 
   /// Optional description shown below [title], above the field.
   final String? description;
+
+  /// Overrides applied on top of the DS-built [InputDecoration]. Any non-null
+  /// field here wins over the DS default (e.g. `contentPadding`, `prefixIcon`,
+  /// `isDense`); unset fields keep the design-system styling.
+  final InputDecoration? decoration;
 
   const LinagoraTextField({
     super.key,
@@ -43,41 +89,93 @@ class LinagoraTextField extends StatelessWidget {
     this.onChanged,
     this.title,
     this.description,
+    this.hintText,
+    this.hintStyle,
+    this.labelStyle,
+    this.inputStyle,
+    this.borderColor,
+    this.errorBorderColor,
+    this.borderWidth = 1,
+    this.errorBorderWidth = 2,
+    this.borderRadius = 4,
+    this.decoration,
   });
 
   @override
   Widget build(BuildContext context) {
     final colors = LinagoraSysColors.material();
 
+    // DS M3 color defaults; each is overridable.
+    final effectiveBorderColor = borderColor ?? colors.outline;
+    final effectiveErrorColor = errorBorderColor ?? colors.error;
+
+    final defaultBorder = _border(effectiveBorderColor, borderWidth);
+    final errorBorder = _border(effectiveErrorColor, errorBorderWidth);
+
+    final textTheme = LinagoraTextTheme.material();
+
+    // DS-built decoration from the design tokens; caller [decoration] can
+    // override any field on top of it (see [_mergeDecoration]).
+    final dsDecoration = InputDecoration(
+      labelText: label,
+      hintText: hintText,
+      // Hint: M3 bodyLarge colored with the DS tertiary.
+      hintStyle:
+          hintStyle ?? textTheme.bodyLarge?.copyWith(color: colors.tertiary),
+      // Label: M3 bodySmall; error state recolors it below.
+      labelStyle:
+          labelStyle ?? textTheme.bodySmall?.copyWith(color: colors.onSurface),
+      // On error the label/helper follow M3 labelSmall in the error color.
+      errorStyle: textTheme.labelSmall?.copyWith(color: effectiveErrorColor),
+      helperText: errorText == null ? supportingText : null,
+      errorText: errorText,
+      filled: variant == LinagoraTextFieldVariant.filled,
+      fillColor: colors.surface,
+      suffixIcon: trailingIcon == null && trailingIconWidget == null
+          ? null
+          : IconButton(
+              icon: trailingIconWidget ?? Icon(trailingIcon),
+              onPressed: onTrailingIconPressed,
+            ),
+      border: defaultBorder,
+      enabledBorder: defaultBorder,
+      focusedBorder: defaultBorder,
+      errorBorder: errorBorder,
+      focusedErrorBorder: errorBorder,
+    );
+
     final field = TextFormField(
       controller: controller,
       obscureText: obscureText,
       enabled: enabled,
       onChanged: onChanged,
-      style: Theme.of(context).textTheme.labelLarge?.copyWith(
-            color: colors.onSurface,
-          ),
-      decoration: InputDecoration(
-        labelText: label,
-        helperText: errorText == null ? supportingText : null,
-        errorText: errorText,
-        filled: variant == LinagoraTextFieldVariant.filled,
-        fillColor: colors.surface,
-        suffixIcon: trailingIcon == null && trailingIconWidget == null
-            ? null
-            : IconButton(
-                icon: trailingIconWidget ?? Icon(trailingIcon),
-                onPressed: onTrailingIconPressed,
-              ),
-        border: variant == LinagoraTextFieldVariant.outline
-            ? const OutlineInputBorder()
-            : const UnderlineInputBorder(),
-      ),
+      // Input: M3 bodyMedium colored onSurface.
+      style: inputStyle ??
+          textTheme.bodyMedium?.copyWith(color: colors.onSurface),
+      decoration: dsDecoration.mergeWith(decoration),
     );
 
+    return _maybeWrapWithHeader(field, colors);
+  }
+
+  /// Builds the variant-appropriate border with the given color and width.
+  /// Outline borders honor [borderRadius]; underline borders ignore it.
+  InputBorder _border(Color color, double width) {
+    final side = BorderSide(color: color, width: width);
+    return variant == LinagoraTextFieldVariant.outline
+        ? OutlineInputBorder(
+            borderSide: side,
+            borderRadius: BorderRadius.circular(borderRadius),
+          )
+        : UnderlineInputBorder(borderSide: side);
+  }
+
+  /// Wraps [field] with the optional [title]/[description] header when set.
+  Widget _maybeWrapWithHeader(Widget field, LinagoraSysColors colors) {
     if (title == null && description == null) return field;
 
-    final textTheme = Theme.of(context).textTheme;
+    // DS M3 theme: titleLarge for the heading, bodyMedium for the body.
+    final textTheme = LinagoraTextTheme.material();
     return Column(
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -92,7 +190,7 @@ class LinagoraTextField extends StatelessWidget {
           Text(
             description!,
             style:
-                textTheme.labelLarge?.copyWith(color: colors.onSurfaceVariant),
+                textTheme.bodyMedium?.copyWith(color: colors.onSurfaceVariant),
           ),
         ],
         const SizedBox(height: LinagoraSpacing.base * 2),
