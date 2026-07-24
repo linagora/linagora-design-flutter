@@ -23,12 +23,14 @@ Widget linagoraTextThemeUseCase(BuildContext context) {
     'bodyMedium': textTheme.bodyMedium,
     'bodySmall': textTheme.bodySmall,
     'titleSemibold': extras?.titleSemibold,
+    'titleSmall2': extras?.titleSmall2,
     'bodyLargeBold': extras?.bodyLargeBold,
     'bodyLarge1': extras?.bodyLarge1,
     'bodyLarge2': extras?.bodyLarge2,
     'bodyMedium1': extras?.bodyMedium1,
     'bodyMedium2': extras?.bodyMedium2,
     'bodyMedium3': extras?.bodyMedium3,
+    'bodyMedium4': extras?.bodyMedium4,
   };
   final captionStyle = textTheme.labelMedium?.copyWith(
     color: LinagoraSysColors.material().onSurfaceVariant,
@@ -48,7 +50,8 @@ Widget linagoraTextThemeUseCase(BuildContext context) {
               '${entry.key} · ${style?.fontSize?.toStringAsFixed(0)}px · $weight',
               style: captionStyle,
             ),
-            Text('The quick brown fox 🦊♥︎❤️♥️ jumps over the lazy dog 🐶😎', style: style),
+            Text('The quick brown fox 🦊♥︎❤️♥️ jumps over the lazy dog 🐶😎',
+                style: style),
           ],
         ),
       );
