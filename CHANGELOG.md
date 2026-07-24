@@ -1,3 +1,13 @@
+## 0.2.1 - 2026-07-24
+
+### Added
+
+* `LinagoraTextStyle.titleSmall2` (15px · Medium) and
+  `LinagoraTextStyle.bodyMedium4` (15px · Regular), imported from the Figma
+  tokens `M3/title/small2` and `M3/body/Medium4`.
+* `LinagoraTextThemeExtension.titleSmall2` and
+  `LinagoraTextThemeExtension.bodyMedium4` exposing the new tokens.
+
 ## 0.2.0 - 2026-06-22
 
 ### Added
