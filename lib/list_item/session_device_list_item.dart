@@ -2,9 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:linagora_design_flutter/buttons/linagora_button.dart';
 import 'package:linagora_design_flutter/buttons/linagora_button_size.dart';
 import 'package:linagora_design_flutter/buttons/linagora_icon_button.dart';
+import 'package:linagora_design_flutter/colors/linagora_ref_colors.dart';
 import 'package:linagora_design_flutter/colors/linagora_sys_colors.dart';
+import 'package:linagora_design_flutter/list_item/session_device_avatar.dart';
 import 'package:linagora_design_flutter/spacings/linagora_spacing.dart';
 import 'package:linagora_design_flutter/style/linagora_divider_style.dart';
+import 'package:linagora_design_flutter/style/linagora_text_theme.dart';
 
 /// A row describing one logged-in device/session (e.g. in account settings),
 /// with a platform-icon avatar, device name, last-active time, an optional
@@ -41,6 +44,9 @@ class SessionDeviceListItem extends StatelessWidget {
   /// [platformIconWidget].
   final Widget? deleteIconWidget;
 
+  /// Tooltip shown on the trailing delete icon button.
+  final String deleteTooltip;
+
   /// Shows a bottom hairline divider inset past the avatar, matching the
   /// mobile settings-list design. Ignored on the wide layout.
   final bool showDivider;
@@ -57,6 +63,7 @@ class SessionDeviceListItem extends StatelessWidget {
     this.onVerifyPressed,
     this.onDelete,
     this.deleteIconWidget,
+    this.deleteTooltip = 'Delete',
     this.showDivider = false,
   });
 
@@ -76,7 +83,7 @@ class SessionDeviceListItem extends StatelessWidget {
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              _Avatar(
+              SessionDeviceAvatar(
                 icon: platformIcon,
                 iconWidget: platformIconWidget,
                 verified: verified,
@@ -94,22 +101,23 @@ class SessionDeviceListItem extends StatelessWidget {
               ),
               if (!verified) ...[
                 const SizedBox(width: LinagoraSpacing.base),
-                // Bounded, not Expanded/Flexible: caps a long verifyLabel
-                // so it can't force a Row overflow, while still leaving
-                // _Content's Expanded as the primary space claimant.
-                ConstrainedBox(
-                  constraints: const BoxConstraints(maxWidth: 120),
+                SizedBox(
+                  width: 88,
+                  height: 40,
                   child: LinagoraButton(
                     label: verifyLabel,
                     onPressed: onVerifyPressed,
-                    size:
-                    isMobile ? LinagoraButtonSize.xs : LinagoraButtonSize.m,
+                    size: LinagoraButtonSize.xs,
                   ),
                 ),
               ],
               if (onDelete != null) ... [
                 const SizedBox(width: LinagoraSpacing.base),
-                _DeleteButton(onDelete: onDelete, iconWidget: deleteIconWidget),
+                _DeleteButton(
+                  onDelete: onDelete,
+                  iconWidget: deleteIconWidget,
+                  tooltip: deleteTooltip,
+                ),
               ],
             ],
           ),
@@ -149,76 +157,6 @@ class SessionDeviceListItem extends StatelessWidget {
   }
 }
 
-class _Avatar extends StatelessWidget {
-  final IconData icon;
-
-  /// Overrides [icon] with any widget — see
-  /// [SessionDeviceListItem.platformIconWidget].
-  final Widget? iconWidget;
-  final bool verified;
-  final double size;
-
-  const _Avatar({
-    required this.icon,
-    this.iconWidget,
-    required this.verified,
-    required this.size,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final colors = LinagoraSysColors.material();
-    // Figma: 44px avatar → ~18.86px badge circle → ~13.3px warning glyph.
-    final badgeSize = size * 18.86 / 44;
-    final badgeIconSize = size * 13.3 / 44;
-    final glyphSize = size * 24 / 56;
-
-    return SizedBox(
-      width: size,
-      height: size,
-      child: Stack(
-        clipBehavior: Clip.none,
-        children: [
-          Container(
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              color: verified ? colors.success : colors.warning,
-            ),
-            child: Center(
-              child: iconWidget != null
-                  ? SizedBox.square(dimension: glyphSize, child: iconWidget)
-                  : Icon(
-                icon,
-                size: glyphSize,
-                color: colors.onSuccess,
-              ),
-            ),
-          ),
-          if (!verified)
-            Positioned(
-              right: 0,
-              bottom: 0,
-              child: Container(
-                width: badgeSize,
-                height: badgeSize,
-                alignment: Alignment.center,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: colors.onPrimary,
-                ),
-                child: Icon(
-                  Icons.warning_rounded,
-                  size: badgeIconSize,
-                  color: colors.onWarning,
-                ),
-              ),
-            ),
-        ],
-      ),
-    );
-  }
-}
-
 class _Content extends StatelessWidget {
   final String deviceName;
   final String lastActiveText;
@@ -237,12 +175,11 @@ class _Content extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = LinagoraSysColors.material();
-    final textTheme = Theme
-        .of(context)
-        .textTheme;
-    final titleStyle = (isMobile && !verified
-        ? textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w600)
-        : textTheme.bodyMedium)
+    final textTheme = LinagoraTextTheme.material();
+    final textThemeExtension = LinagoraTextThemeExtension.material();
+    final titleStyle = (isMobile
+            ? textThemeExtension.bodyMedium2
+            : textTheme.bodyMedium)
         ?.copyWith(color: colors.onSurface);
 
     return Column(
@@ -257,7 +194,8 @@ class _Content extends StatelessWidget {
         ),
         Text(
           lastActiveText,
-          style: textTheme.bodyMedium?.copyWith(color: colors.tertiary),
+          style: textTheme.bodyMedium
+              ?.copyWith(color: LinagoraRefColors.material().tertiary[30]),
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
         ),
@@ -276,8 +214,13 @@ class _Content extends StatelessWidget {
 class _DeleteButton extends StatelessWidget {
   final VoidCallback? onDelete;
   final Widget? iconWidget;
+  final String tooltip;
 
-  const _DeleteButton({required this.onDelete, this.iconWidget});
+  const _DeleteButton({
+    required this.onDelete,
+    this.iconWidget,
+    required this.tooltip,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -285,7 +228,7 @@ class _DeleteButton extends StatelessWidget {
     return LinagoraIconButton(
       icon: Icons.delete_outline,
       color: colors.onTertiaryContainer,
-      tooltip: 'Delete',
+      tooltip: tooltip,
       onPressed: onDelete,
       iconWidget: iconWidget,
     );

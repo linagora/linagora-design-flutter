@@ -386,10 +386,10 @@ class LinagoraSysColors {
         _outlineVariantDark = const Color(0xFF49454F),
         warning = const Color(0xFFFFB300),
         onWarning = const Color(0xFFFF6F00),
-        _warningDark = const Color(0xFFFFB300),
-        _onWarningDark = const Color(0xFFFF6F00),
+        _warningDark = null,
+        _onWarningDark = null,
         success = const Color(0xFF00AD48),
         onSuccess = const Color(0xFFFFFFFF),
-        _successDark = const Color(0xFF00AD48),
-        _onSuccessDark = const Color(0xFFFFFFFF);
+        _successDark = null,
+        _onSuccessDark = null;
 }

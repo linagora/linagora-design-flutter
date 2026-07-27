@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:linagora_design_flutter/buttons/linagora_icon_button.dart';
 import 'package:linagora_design_flutter/colors/linagora_sys_colors.dart';
 import 'package:linagora_design_flutter/spacings/linagora_spacing.dart';
 import 'package:linagora_design_flutter/style/linagora_text_theme.dart';
@@ -32,8 +33,8 @@ class LinagoraTextField extends StatelessWidget {
   /// Placeholder text shown when the field is empty.
   final String? hintText;
 
-  /// Style for [hintText]. Defaults to [LinagoraTextTheme] `bodyLarge`
-  /// colored with [LinagoraSysColors.tertiary].
+  /// Style for [hintText]. Defaults to [LinagoraTextTheme] `bodyMedium`
+  /// (matching the typed-input font) colored with [LinagoraSysColors.tertiary].
   final TextStyle? hintStyle;
 
   /// Style for the floating label in the default (non-error) state.
@@ -119,9 +120,10 @@ class LinagoraTextField extends StatelessWidget {
     final dsDecoration = InputDecoration(
       labelText: label,
       hintText: hintText,
-      // Hint: M3 bodyLarge colored with the DS tertiary.
+      // Hint: matches the typed-input font (M3 bodyMedium) colored with the
+      // DS tertiary, so placeholder and typed text don't visibly change size.
       hintStyle:
-          hintStyle ?? textTheme.bodyLarge?.copyWith(color: colors.tertiary),
+          hintStyle ?? textTheme.bodyMedium?.copyWith(color: colors.tertiary),
       // Label: M3 bodySmall; error state recolors it below.
       labelStyle:
           labelStyle ?? textTheme.bodySmall?.copyWith(color: colors.onSurface),
@@ -133,8 +135,10 @@ class LinagoraTextField extends StatelessWidget {
       fillColor: colors.surface,
       suffixIcon: trailingIcon == null && trailingIconWidget == null
           ? null
-          : IconButton(
-              icon: trailingIconWidget ?? Icon(trailingIcon),
+          : LinagoraIconButton(
+              icon: trailingIcon,
+              color: colors.onSurfaceVariant,
+              iconWidget: trailingIconWidget,
               onPressed: onTrailingIconPressed,
             ),
       border: defaultBorder,
@@ -155,7 +159,7 @@ class LinagoraTextField extends StatelessWidget {
       decoration: dsDecoration.mergeWith(decoration),
     );
 
-    return _maybeWrapWithHeader(field, colors);
+    return _maybeWrapWithHeader(context, field, colors);
   }
 
   /// Builds the variant-appropriate border with the given color and width.
@@ -171,11 +175,16 @@ class LinagoraTextField extends StatelessWidget {
   }
 
   /// Wraps [field] with the optional [title]/[description] header when set.
-  Widget _maybeWrapWithHeader(Widget field, LinagoraSysColors colors) {
+  Widget _maybeWrapWithHeader(
+    BuildContext context,
+    Widget field,
+    LinagoraSysColors colors,
+  ) {
     if (title == null && description == null) return field;
 
-    // DS M3 theme: titleLarge for the heading, bodyMedium for the body.
-    final textTheme = LinagoraTextTheme.material();
+    // Header typography from the ambient theme so an app-provided text theme
+    // wins: titleLarge for the heading, bodyMedium for the body.
+    final textTheme = Theme.of(context).textTheme;
     return Column(
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.start,
