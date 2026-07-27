@@ -3,7 +3,6 @@ import 'package:linagora_design_flutter/buttons/linagora_icon_button.dart';
 import 'package:linagora_design_flutter/colors/linagora_sys_colors.dart';
 import 'package:linagora_design_flutter/spacings/linagora_spacing.dart';
 import 'package:linagora_design_flutter/style/linagora_text_theme.dart';
-import 'package:linagora_design_flutter/text_field/input_decoration_merge_extension.dart';
 import 'package:linagora_design_flutter/text_field/linagora_text_field_variant.dart';
 
 /// A Material 3 floating-label text field with the design system's
@@ -115,11 +114,12 @@ class LinagoraTextField extends StatelessWidget {
 
     final textTheme = LinagoraTextTheme.material();
 
-    // DS-built decoration from the design tokens; caller [decoration] can
-    // override any field on top of it (see [_mergeDecoration]).
-    final dsDecoration = InputDecoration(
-      labelText: label,
-      hintText: hintText,
+    // DS style/border/padding defaults as a theme. Flutter's
+    // [InputDecoration.applyDefaults] fills any null field on the caller's
+    // [decoration] from this — so the caller wins and we pick up new
+    // InputDecoration fields for free. Content fields (labelText, hintText,
+    // errorText, suffixIcon) can't live on a theme, so they're layered below.
+    final dsTheme = InputDecorationTheme(
       // Hint: matches the typed-input font (M3 bodyMedium) colored with the
       // DS tertiary, so placeholder and typed text don't visibly change size.
       hintStyle:
@@ -129,23 +129,36 @@ class LinagoraTextField extends StatelessWidget {
           labelStyle ?? textTheme.bodySmall?.copyWith(color: colors.onSurface),
       // On error the label/helper follow M3 labelSmall in the error color.
       errorStyle: textTheme.labelSmall?.copyWith(color: effectiveErrorColor),
-      helperText: errorText == null ? supportingText : null,
-      errorText: errorText,
       filled: variant == LinagoraTextFieldVariant.filled,
       fillColor: colors.surface,
-      suffixIcon: trailingIcon == null && trailingIconWidget == null
-          ? null
-          : LinagoraIconButton(
-              icon: trailingIcon,
-              color: colors.onSurfaceVariant,
-              iconWidget: trailingIconWidget,
-              onPressed: onTrailingIconPressed,
-            ),
       border: defaultBorder,
       enabledBorder: defaultBorder,
       focusedBorder: defaultBorder,
       errorBorder: errorBorder,
       focusedErrorBorder: errorBorder,
+    );
+
+    // Start from the caller override (or empty), apply DS style defaults, then
+    // fill DS content fields only where the caller left them unset.
+    final merged = (decoration ?? const InputDecoration()).applyDefaults(
+      dsTheme,
+    );
+    final dsDecoration = merged.copyWith(
+      labelText: merged.labelText ?? label,
+      hintText: merged.hintText ?? hintText,
+      helperText:
+          merged.helperText ?? (errorText == null ? supportingText : null),
+      errorText: merged.errorText ?? errorText,
+      suffixIcon:
+          merged.suffixIcon ??
+          (trailingIcon == null && trailingIconWidget == null
+              ? null
+              : LinagoraIconButton(
+                  icon: trailingIcon,
+                  color: colors.onSurfaceVariant,
+                  iconWidget: trailingIconWidget,
+                  onPressed: onTrailingIconPressed,
+                )),
     );
 
     final field = TextFormField(
@@ -154,9 +167,9 @@ class LinagoraTextField extends StatelessWidget {
       enabled: enabled,
       onChanged: onChanged,
       // Input: M3 bodyMedium colored onSurface.
-      style: inputStyle ??
-          textTheme.bodyMedium?.copyWith(color: colors.onSurface),
-      decoration: dsDecoration.mergeWith(decoration),
+      style:
+          inputStyle ?? textTheme.bodyMedium?.copyWith(color: colors.onSurface),
+      decoration: dsDecoration,
     );
 
     return _maybeWrapWithHeader(context, field, colors);
@@ -198,8 +211,9 @@ class LinagoraTextField extends StatelessWidget {
           const SizedBox(height: LinagoraSpacing.base),
           Text(
             description!,
-            style:
-                textTheme.bodyMedium?.copyWith(color: colors.onSurfaceVariant),
+            style: textTheme.bodyMedium?.copyWith(
+              color: colors.onSurfaceVariant,
+            ),
           ),
         ],
         const SizedBox(height: LinagoraSpacing.base * 2),
