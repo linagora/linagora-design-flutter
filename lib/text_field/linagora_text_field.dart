@@ -37,8 +37,8 @@ class LinagoraTextField extends StatelessWidget {
   final TextStyle? hintStyle;
 
   /// Style for the floating label in the default (non-error) state.
-  /// Defaults to [LinagoraTextTheme] `bodySmall` colored with
-  /// [LinagoraSysColors.onSurface].
+  /// Defaults to [LinagoraTextTheme] `bodyMedium` (matching the hint/input
+  /// font) colored with [LinagoraSysColors.onSurface].
   final TextStyle? labelStyle;
 
   /// Style for the typed input text. Defaults to [LinagoraTextTheme]
@@ -124,9 +124,10 @@ class LinagoraTextField extends StatelessWidget {
       // DS tertiary, so placeholder and typed text don't visibly change size.
       hintStyle:
           hintStyle ?? textTheme.bodyMedium?.copyWith(color: colors.tertiary),
-      // Label: M3 bodySmall; error state recolors it below.
+      // Label: matches the hint/input font (M3 bodyMedium); error state
+      // recolors it below.
       labelStyle:
-          labelStyle ?? textTheme.bodySmall?.copyWith(color: colors.onSurface),
+          labelStyle ?? textTheme.bodyMedium?.copyWith(color: colors.onSurface),
       // On error the label/helper follow M3 labelSmall in the error color.
       errorStyle: textTheme.labelSmall?.copyWith(color: effectiveErrorColor),
       filled: variant == LinagoraTextFieldVariant.filled,

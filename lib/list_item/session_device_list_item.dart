@@ -101,9 +101,7 @@ class SessionDeviceListItem extends StatelessWidget {
               ),
               if (!verified) ...[
                 const SizedBox(width: LinagoraSpacing.base),
-                SizedBox(
-                  width: 88,
-                  height: 40,
+                Flexible(
                   child: LinagoraButton(
                     label: verifyLabel,
                     onPressed: onVerifyPressed,
