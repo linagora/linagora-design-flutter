@@ -1,4 +1,4 @@
-## 0.2.2 - 2026-07-28
+## 0.2.3 - 2026-07-28
 
 ### Added
 
@@ -10,6 +10,12 @@
 * `LinagoraIconButton`: icon button with overlay color and padding support.
 * `SessionDeviceListItem` and `SessionDeviceAvatar`: list item components for
   displaying session/device info.
+
+## 0.2.2 - 2026-07-24
+
+### Added
+
+* `WebLinkGenerator`: utility for generating web links.
 
 ## 0.2.1 - 2026-07-24
 
