@@ -1,3 +1,16 @@
+## 0.2.2 - 2026-07-28
+
+### Added
+
+* `LinagoraBanner`: dismissible banner widget with title, description, action
+  and leading icon.
+* `LinagoraTextField`: text field component with variants, validation states
+  and `InputDecorationMerge` extension for flexible `InputDecoration`
+  overrides.
+* `LinagoraIconButton`: icon button with overlay color and padding support.
+* `SessionDeviceListItem` and `SessionDeviceAvatar`: list item components for
+  displaying session/device info.
+
 ## 0.2.1 - 2026-07-24
 
 ### Added
