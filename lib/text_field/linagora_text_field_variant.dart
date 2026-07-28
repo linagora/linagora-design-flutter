@@ -1,0 +1,4 @@
+enum LinagoraTextFieldVariant {
+  filled,
+  outline,
+}
