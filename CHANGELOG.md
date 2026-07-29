@@ -1,3 +1,9 @@
+## 0.2.4 - 2026-07-29
+
+### Changed
+
+* `SessionDeviceListItem`: constrain trailing button width.
+
 ## 0.2.3 - 2026-07-28
 
 ### Added
