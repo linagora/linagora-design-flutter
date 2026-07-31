@@ -17,6 +17,7 @@ export 'package:linagora_design_flutter/style/linagora_hover_style.dart';
 export 'package:linagora_design_flutter/list_item/twake_inkwell.dart';
 export 'package:linagora_design_flutter/list_item/session_device_avatar.dart';
 export 'package:linagora_design_flutter/list_item/session_device_list_item.dart';
+export 'package:linagora_design_flutter/list_item/linagora_setting_item.dart';
 export 'package:linagora_design_flutter/cozy_config_manager/cozy_config_manager.dart';
 export 'package:linagora_design_flutter/reaction/reaction_dialog.dart';
 export 'package:linagora_design_flutter/spacings/linagora_spacing.dart';

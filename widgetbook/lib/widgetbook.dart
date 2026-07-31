@@ -6,6 +6,7 @@ import 'package:widgetbook_workspace/components/buttons/linagora_button_use_case
 import 'package:widgetbook_workspace/components/chat/message_bubble_use_case.dart';
 import 'package:widgetbook_workspace/components/contact_component/matrix_contact_use_case.dart';
 import 'package:widgetbook_workspace/components/contact_component/phonebook_contact_use_case.dart';
+import 'package:widgetbook_workspace/components/list_item/linagora_setting_item_use_case.dart';
 import 'package:widgetbook_workspace/components/list_item/session_device_list_item_use_case.dart';
 import 'package:widgetbook_workspace/components/text_field/linagora_text_field_use_case.dart';
 import 'package:widgetbook_workspace/components/typography/linagora_text_theme_use_case.dart';
@@ -28,12 +29,11 @@ class WidgetbookApp extends StatelessWidget {
       darkTheme: ThemeData.light(),
       addons: [
         GitHubAddon('widgetbook'),
-        DeviceFrameAddon(
-          devices: [
-            Devices.ios.iPhone13,
-            Devices.ios.iPad,
+        ViewportAddon(
+          [
+            IosViewports.iPhone13,
+            IosViewports.iPad,
           ],
-          initialDevice: Devices.ios.iPhone13,
         ),
         InspectorAddon(),
         ThemeAddon(
@@ -164,6 +164,15 @@ class WidgetbookApp extends StatelessWidget {
                   name: 'Unverified',
                   builder: (context) =>
                       sessionDeviceListItemUnverifiedUseCase(context),
+                ),
+              ],
+            ),
+            WidgetbookComponent(
+              name: 'Linagora setting item',
+              useCases: [
+                WidgetbookUseCase(
+                  name: 'Default',
+                  builder: (context) => linagoraSettingItemUseCase(context),
                 ),
               ],
             ),

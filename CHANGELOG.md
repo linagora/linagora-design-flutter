@@ -1,3 +1,11 @@
+## 0.2.6 - 2026-07-31
+
+### Added
+
+* `LinagoraSettingItem`: settings row with leading icon, title/subtitle,
+  trailing chevron/spinner, optional divider, hover/pressed background,
+  matching Figma "Setting item" (node 58604:6126, states 58604:6124/6125).
+
 ## 0.2.5 - 2026-07-31
 
 ### Added

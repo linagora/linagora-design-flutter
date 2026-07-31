@@ -23,17 +23,16 @@ Widget linagoraTextFieldUseCase(BuildContext context) {
     label: 'With title/description',
     initialValue: false,
   );
-  final textInputAction = context.knobs.object.dropdown<TextInputAction?>(
+  final textInputAction = context.knobs.objectOrNull.dropdown<TextInputAction>(
     label: 'Text input action',
     options: const [
-      null,
       TextInputAction.done,
       TextInputAction.next,
       TextInputAction.go,
       TextInputAction.search,
     ],
     initialOption: null,
-    labelBuilder: (v) => v?.name ?? 'default',
+    labelBuilder: (v) => v.name,
   );
   return Padding(
     padding: const EdgeInsets.all(LinagoraSpacing.base * 2),
