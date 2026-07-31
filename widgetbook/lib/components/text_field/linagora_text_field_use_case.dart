@@ -23,6 +23,18 @@ Widget linagoraTextFieldUseCase(BuildContext context) {
     label: 'With title/description',
     initialValue: false,
   );
+  final textInputAction = context.knobs.object.dropdown<TextInputAction?>(
+    label: 'Text input action',
+    options: const [
+      null,
+      TextInputAction.done,
+      TextInputAction.next,
+      TextInputAction.go,
+      TextInputAction.search,
+    ],
+    initialOption: null,
+    labelBuilder: (v) => v?.name ?? 'default',
+  );
   return Padding(
     padding: const EdgeInsets.all(LinagoraSpacing.base * 2),
     child: LinagoraTextField(
@@ -54,6 +66,14 @@ Widget linagoraTextFieldUseCase(BuildContext context) {
       enabled: context.knobs.boolean(label: 'Enabled', initialValue: true),
       variant: variant,
       onChanged: (_) {},
+      autofocus: context.knobs.boolean(
+        label: 'Autofocus',
+        initialValue: false,
+      ),
+      textInputAction: textInputAction,
+      onSubmitted: (value) => ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Submitted: $value')),
+      ),
     ),
   );
 }

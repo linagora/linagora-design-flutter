@@ -1,3 +1,11 @@
+## 0.2.5 - 2026-07-31
+
+### Added
+
+* `LinagoraTextField`: `autofocus`, `onSubmitted`, `textInputAction`,
+  `focusNode` and `keyboardType` for keyboard-driven submit and external
+  focus control.
+
 ## 0.2.4 - 2026-07-29
 
 ### Changed

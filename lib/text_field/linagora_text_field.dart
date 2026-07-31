@@ -29,6 +29,23 @@ class LinagoraTextField extends StatelessWidget {
   final LinagoraTextFieldVariant variant;
   final ValueChanged<String>? onChanged;
 
+  /// Whether the field should request focus as soon as it's built.
+  final bool autofocus;
+
+  /// Called when the user submits via the keyboard action (Enter/Done/Go).
+  final ValueChanged<String>? onSubmitted;
+
+  /// Keyboard action button shown in place of the return key (e.g. done, go,
+  /// next). Defaults to the platform/[TextInputType] default when unset.
+  final TextInputAction? textInputAction;
+
+  /// External [FocusNode] to control focus from outside the field.
+  final FocusNode? focusNode;
+
+  /// Keyboard type shown for input (e.g. email, number). Defaults to
+  /// [TextInputType.text] via [TextFormField].
+  final TextInputType? keyboardType;
+
   /// Placeholder text shown when the field is empty.
   final String? hintText;
 
@@ -87,6 +104,11 @@ class LinagoraTextField extends StatelessWidget {
     this.enabled = true,
     this.variant = LinagoraTextFieldVariant.outline,
     this.onChanged,
+    this.autofocus = false,
+    this.onSubmitted,
+    this.textInputAction,
+    this.focusNode,
+    this.keyboardType,
     this.title,
     this.description,
     this.hintText,
@@ -167,6 +189,11 @@ class LinagoraTextField extends StatelessWidget {
       obscureText: obscureText,
       enabled: enabled,
       onChanged: onChanged,
+      autofocus: autofocus,
+      onFieldSubmitted: onSubmitted,
+      textInputAction: textInputAction,
+      focusNode: focusNode,
+      keyboardType: keyboardType,
       // Input: M3 bodyMedium colored onSurface.
       style:
           inputStyle ?? textTheme.bodyMedium?.copyWith(color: colors.onSurface),
