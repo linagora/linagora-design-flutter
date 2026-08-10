@@ -8,6 +8,7 @@ import 'package:widgetbook_workspace/components/contact_component/matrix_contact
 import 'package:widgetbook_workspace/components/contact_component/phonebook_contact_use_case.dart';
 import 'package:widgetbook_workspace/components/list_item/linagora_setting_item_use_case.dart';
 import 'package:widgetbook_workspace/components/list_item/session_device_list_item_use_case.dart';
+import 'package:widgetbook_workspace/components/sidebar/linagora_sidebar_item_use_case.dart';
 import 'package:widgetbook_workspace/components/text_field/linagora_text_field_use_case.dart';
 import 'package:widgetbook_workspace/components/typography/linagora_text_theme_use_case.dart';
 import 'package:widgetbook_workspace/custom/github_addon.dart';
@@ -173,6 +174,20 @@ class WidgetbookApp extends StatelessWidget {
                 WidgetbookUseCase(
                   name: 'Default',
                   builder: (context) => linagoraSettingItemUseCase(context),
+                ),
+              ],
+            ),
+          ],
+        ),
+        WidgetbookFolder(
+          name: 'Sidebar',
+          children: [
+            WidgetbookComponent(
+              name: 'Linagora sidebar item',
+              useCases: [
+                WidgetbookUseCase(
+                  name: 'Default',
+                  builder: (context) => linagoraSidebarItemUseCase(context),
                 ),
               ],
             ),

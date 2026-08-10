@@ -35,6 +35,11 @@ class LinagoraButton extends StatelessWidget {
           style: style,
           child: child,
         ),
+      LinagoraButtonVariant.text => TextButton(
+          onPressed: onPressed,
+          style: style,
+          child: child,
+        ),
     };
   }
 
