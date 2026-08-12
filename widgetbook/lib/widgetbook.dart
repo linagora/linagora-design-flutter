@@ -40,13 +40,7 @@ class WidgetbookApp extends StatelessWidget {
       darkTheme: ThemeData.light(),
       addons: [
         GitHubAddon('widgetbook'),
-        ViewportAddon(
-          [
-            IosViewports.iPhone13,
-            IosViewports.iPad,
-            MacosViewports.desktop,
-          ],
-        ),
+        ViewportAddon(Viewports.all),
         InspectorAddon(),
         ThemeAddon(
           themes: [
@@ -254,8 +248,7 @@ class WidgetbookApp extends StatelessWidget {
               useCases: [
                 WidgetbookUseCase(
                   name: 'Virtualized folder tree',
-                  builder: (context) =>
-                      linagoraSidebarTreeListUseCase(context),
+                  builder: (context) => linagoraSidebarTreeListUseCase(context),
                 ),
               ],
             ),
