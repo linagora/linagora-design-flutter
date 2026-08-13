@@ -10,6 +10,12 @@ class LinagoraButton extends StatelessWidget {
   final LinagoraButtonSize size;
   final LinagoraButtonVariant variant;
 
+  /// Visual properties that override the variant and size defaults.
+  final ButtonStyle? style;
+
+  /// Space between [icon] and [label].
+  final double iconSpacing;
+
   const LinagoraButton({
     super.key,
     required this.label,
@@ -17,27 +23,31 @@ class LinagoraButton extends StatelessWidget {
     this.icon,
     this.size = LinagoraButtonSize.m,
     this.variant = LinagoraButtonVariant.filled,
-  });
+    this.style,
+    this.iconSpacing = LinagoraSpacing.base,
+  }) : assert(iconSpacing >= 0, 'Icon spacing cannot be negative');
 
   @override
   Widget build(BuildContext context) {
-    final style = _buildStyle(context);
+    final defaultStyle = _buildStyle(context);
+    // Caller values take precedence over the defaults.
+    final buttonStyle = style?.merge(defaultStyle) ?? defaultStyle;
     final child = _buildChild();
 
     return switch (variant) {
       LinagoraButtonVariant.filled => FilledButton(
           onPressed: onPressed,
-          style: style,
+          style: buttonStyle,
           child: child,
         ),
       LinagoraButtonVariant.outlined => OutlinedButton(
           onPressed: onPressed,
-          style: style,
+          style: buttonStyle,
           child: child,
         ),
       LinagoraButtonVariant.text => TextButton(
           onPressed: onPressed,
-          style: style,
+          style: buttonStyle,
           child: child,
         ),
     };
@@ -56,7 +66,7 @@ class LinagoraButton extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       children: [
         Icon(icon),
-        const SizedBox(width: LinagoraSpacing.base),
+        SizedBox(width: iconSpacing),
         Flexible(child: text),
       ],
     );

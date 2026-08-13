@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:linagora_design_flutter/sidebar/linagora_sidebar_control.dart';
 import 'package:linagora_design_flutter/spacings/linagora_spacing.dart';
 import 'package:linagora_design_flutter/style/linagora_text_theme.dart';
 
@@ -18,6 +19,9 @@ class LinagoraSidebarStyle {
 
   /// Gap between the leading glyph, the label and the trailing slot.
   final double itemSpacing;
+
+  /// Minimum height of a section header.
+  final double sectionHeaderMinHeight;
 
   final Color hoverBackground;
   final Color selectedBackground;
@@ -41,6 +45,10 @@ class LinagoraSidebarStyle {
   /// Trailing controls — the chevron, row actions and overflow icon — which
   /// sit a step back from the label.
   final Color trailingForeground;
+
+  /// Section header foreground. Null derives it from [foreground] — see
+  /// [resolvedSectionHeaderForeground], which is what widgets read.
+  final Color? sectionHeaderForeground;
 
   /// Applied to the whole row content while disabled, so every slot dims by
   /// the same amount.
@@ -72,6 +80,8 @@ class LinagoraSidebarStyle {
     required this.trailingForeground,
     required this.labelTextStyle,
     required this.badgeTextStyle,
+    this.sectionHeaderMinHeight = LinagoraSidebarControl.tapTarget,
+    this.sectionHeaderForeground,
     this.disabledOpacity = 0.38,
   });
 
@@ -100,6 +110,17 @@ class LinagoraSidebarStyle {
 
   factory LinagoraSidebarStyle.dark() => _dark;
 
+  /// How far a section header's caption sits behind a row label. Applied to
+  /// [foreground] whenever a style leaves [sectionHeaderForeground] unset, so
+  /// the step exists in exactly one place.
+  static const double _sectionHeaderOpacity = 0.64;
+
+  /// The colour a section header actually paints with: [sectionHeaderForeground]
+  /// when a style names one, otherwise the step back from [foreground].
+  Color get resolvedSectionHeaderForeground =>
+      sectionHeaderForeground ??
+      foreground.withValues(alpha: _sectionHeaderOpacity);
+
   /// The style matching the ambient [Theme] brightness.
   static LinagoraSidebarStyle of(BuildContext context) =>
       Theme.of(context).brightness == Brightness.dark
@@ -121,6 +142,7 @@ class LinagoraSidebarStyle {
     itemHorizontalPadding: itemHorizontalPadding,
     chevronSize: chevronSize,
     itemSpacing: itemSpacing,
+    sectionHeaderMinHeight: sectionHeaderMinHeight,
     hoverBackground: hoverBackground,
     selectedBackground: selectedBackground,
     badgeBackground: badgeBackground,
@@ -130,6 +152,9 @@ class LinagoraSidebarStyle {
     foreground: foreground,
     activeForeground: activeForeground,
     trailingForeground: trailingForeground,
+    // Resolved, so a style that names the derived colour explicitly compares
+    // equal to one that leaves it to be derived.
+    sectionHeaderForeground: resolvedSectionHeaderForeground,
     labelTextStyle: labelTextStyle,
     badgeTextStyle: badgeTextStyle,
     disabledOpacity: disabledOpacity,
@@ -202,6 +227,7 @@ typedef _SidebarStyleValues = ({
   double itemHorizontalPadding,
   double chevronSize,
   double itemSpacing,
+  double sectionHeaderMinHeight,
   Color hoverBackground,
   Color selectedBackground,
   Color badgeBackground,
@@ -211,6 +237,8 @@ typedef _SidebarStyleValues = ({
   Color foreground,
   Color activeForeground,
   Color trailingForeground,
+  // Non-null: [_values] stores the resolved colour, never the raw field.
+  Color sectionHeaderForeground,
   TextStyle labelTextStyle,
   TextStyle badgeTextStyle,
   double disabledOpacity,

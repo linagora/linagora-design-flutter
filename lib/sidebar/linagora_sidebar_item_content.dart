@@ -137,6 +137,13 @@ class _SidebarItemLabel extends StatelessWidget {
   final LinagoraSidebarStyle style;
   final Color foregroundColor;
 
+  /// How far a tappable chevron's box extends past its glyph on each side. A
+  /// decorative one is a bare glyph and overhangs nothing.
+  double get _chevronOverhang {
+    if (item.onExpandToggle == null || !item.enabled) return 0;
+    return LinagoraSidebarControl.overhang(style.chevronSize);
+  }
+
   @override
   Widget build(BuildContext context) {
     final expanded = item.expanded;
@@ -158,17 +165,16 @@ class _SidebarItemLabel extends StatelessWidget {
           // [itemSpacing]. Clamped: a style with a spacing smaller than the
           // overhang would otherwise ask for a negative width.
           SizedBox(
-            width: math.max(
-              0,
-              style.itemSpacing - _SidebarItemChevron.overhang(item, style),
-            ),
+            width: math.max(0, style.itemSpacing - _chevronOverhang),
           ),
-          _SidebarItemChevron(
-            expanded: expanded,
+          LinagoraSidebarControl(
+            icon: LinagoraSidebarControl.disclosureIcon(expanded),
+            iconSize: style.chevronSize,
             color: style.trailingForeground,
-            size: style.chevronSize,
-            onToggle: item.enabled ? item.onExpandToggle : null,
+            onTap: item.enabled ? item.onExpandToggle : null,
             semanticLabel: item.expandToggleLabel,
+            // The row already publishes expansion, so the toggle stays quiet
+            // about it rather than announcing the same state twice.
           ),
         ],
       ],
@@ -194,55 +200,6 @@ class _SidebarItemLeading extends StatelessWidget {
     return SizedBox.square(
       dimension: size,
       child: leading ?? Icon(icon, size: size, color: color),
-    );
-  }
-}
-
-class _SidebarItemChevron extends StatelessWidget {
-  const _SidebarItemChevron({
-    required this.expanded,
-    required this.color,
-    required this.size,
-    required this.onToggle,
-    required this.semanticLabel,
-  });
-
-  /// Touch target for the tappable chevron. The glyph stays [size]; this is
-  /// the box around it. Kept under the row height so it cannot stretch a row.
-  static const double _tapTarget = 24;
-
-  /// How far a tappable chevron's box extends past its glyph on each side.
-  static double overhang(LinagoraSidebarItem item, LinagoraSidebarStyle style) {
-    if (item.onExpandToggle == null || !item.enabled) return 0;
-    return (_tapTarget - style.chevronSize) / 2;
-  }
-
-  final bool expanded;
-  final Color color;
-  final double size;
-  final VoidCallback? onToggle;
-  final String? semanticLabel;
-
-  @override
-  Widget build(BuildContext context) {
-    final icon = Icon(
-      expanded ? Icons.keyboard_arrow_down : Icons.keyboard_arrow_right,
-      size: size,
-      color: color,
-    );
-    if (onToggle == null) return icon;
-
-    return Semantics(
-      button: true,
-      label: semanticLabel,
-      child: InkResponse(
-        onTap: onToggle,
-        customBorder: const CircleBorder(),
-        child: SizedBox.square(
-          dimension: _tapTarget,
-          child: Center(child: icon),
-        ),
-      ),
     );
   }
 }
