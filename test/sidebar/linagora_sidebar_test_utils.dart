@@ -23,11 +23,16 @@ Future<void> pumpSidebar(
 }) {
   return tester.pumpWidget(
     MaterialApp(
-      theme: ThemeData(brightness: surface.brightness),
-      home: Scaffold(
-        body: Directionality(
-          textDirection: surface.textDirection,
-          child: SizedBox(width: surface.width, child: child),
+      home: Theme(
+        // An inner theme switches synchronously between test pumps. MaterialApp
+        // animates theme changes, which otherwise exposes the previous
+        // brightness for the first assertion after changing [surface].
+        data: ThemeData(brightness: surface.brightness),
+        child: Scaffold(
+          body: Directionality(
+            textDirection: surface.textDirection,
+            child: SizedBox(width: surface.width, child: child),
+          ),
         ),
       ),
     ),

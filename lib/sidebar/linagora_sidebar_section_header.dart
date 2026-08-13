@@ -98,7 +98,11 @@ class LinagoraSidebarSectionHeader extends StatelessWidget {
     );
   }
 
-  /// Preserves [titleSpacing] after a tappable target expands around its glyph.
+  /// Absorbs the overhang of a tappable target into the gap so the visual
+  /// spacing stays [titleSpacing]. With the stock chevron the overhang already
+  /// exceeds [titleSpacing], so the clamp wins and the glyph sits its full
+  /// overhang away — closing the gap further would put the target under the
+  /// caption.
   double _disclosureSpacing(LinagoraSidebarStyle style) {
     if (onExpandToggle == null) return titleSpacing;
     return math.max(
