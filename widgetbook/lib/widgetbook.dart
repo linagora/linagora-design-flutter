@@ -10,7 +10,9 @@ import 'package:widgetbook_workspace/components/list_item/linagora_setting_item_
 import 'package:widgetbook_workspace/components/list_item/session_device_list_item_use_case.dart';
 import 'package:widgetbook_workspace/components/sidebar/linagora_sidebar_item_use_case.dart';
 import 'package:widgetbook_workspace/components/sidebar/linagora_sidebar_section_header_use_case.dart';
+import 'package:widgetbook_workspace/components/sidebar/linagora_sidebar_storage_use_case.dart';
 import 'package:widgetbook_workspace/components/sidebar/linagora_sidebar_tree_list_use_case.dart';
+import 'package:widgetbook_workspace/components/sidebar/linagora_sidebar_version_use_case.dart';
 import 'package:widgetbook_workspace/components/text_field/linagora_text_field_use_case.dart';
 import 'package:widgetbook_workspace/components/typography/linagora_text_theme_use_case.dart';
 import 'package:widgetbook_workspace/custom/github_addon.dart';
@@ -184,6 +186,24 @@ class WidgetbookApp extends StatelessWidget {
         WidgetbookFolder(
           name: 'Sidebar',
           children: [
+            WidgetbookComponent(
+              name: 'Linagora sidebar storage',
+              useCases: [
+                WidgetbookUseCase(
+                  name: 'Default',
+                  builder: (context) => linagoraSidebarStorageUseCase(context),
+                ),
+              ],
+            ),
+            WidgetbookComponent(
+              name: 'Linagora sidebar version',
+              useCases: [
+                WidgetbookUseCase(
+                  name: 'Default',
+                  builder: (context) => linagoraSidebarVersionUseCase(context),
+                ),
+              ],
+            ),
             WidgetbookComponent(
               name: 'Linagora sidebar section header',
               useCases: [

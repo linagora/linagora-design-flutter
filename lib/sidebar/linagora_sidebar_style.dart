@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:linagora_design_flutter/colors/linagora_sys_colors.dart';
 import 'package:linagora_design_flutter/sidebar/linagora_sidebar_control.dart';
 import 'package:linagora_design_flutter/spacings/linagora_spacing.dart';
 import 'package:linagora_design_flutter/style/linagora_text_theme.dart';
@@ -50,6 +51,27 @@ class LinagoraSidebarStyle {
   /// [resolvedSectionHeaderForeground], which is what widgets read.
   final Color? sectionHeaderForeground;
 
+  /// The storage quota bar height. It is intentionally thinner than a row
+  /// divider so the quota reads as status rather than a section boundary.
+  final double progressHeight;
+
+  /// Storage title and quota-caption foreground. Null keeps legacy custom
+  /// styles working by deriving the secondary text step from [foreground].
+  final Color? storageForeground;
+
+  /// The storage glyph foreground. The Figma icon token is stronger than the
+  /// storage title and caption, especially in dark mode.
+  final Color? storageIconForeground;
+
+  /// The small build/version line beneath the storage caption.
+  final Color? storageVersionForeground;
+
+  /// Filled and unfilled storage quota colours.
+  final Color? progressColor;
+  final Color? progressWarningColor;
+  final Color? progressFullColor;
+  final Color? progressTrackColor;
+
   /// Applied to the whole row content while disabled, so every slot dims by
   /// the same amount.
   final double disabledOpacity;
@@ -82,6 +104,14 @@ class LinagoraSidebarStyle {
     required this.badgeTextStyle,
     this.sectionHeaderMinHeight = LinagoraSidebarControl.tapTarget,
     this.sectionHeaderForeground,
+    this.progressHeight = 3,
+    this.storageForeground,
+    this.storageIconForeground,
+    this.storageVersionForeground,
+    this.progressColor,
+    this.progressWarningColor,
+    this.progressFullColor,
+    this.progressTrackColor,
     this.disabledOpacity = 0.38,
   });
 
@@ -94,6 +124,8 @@ class LinagoraSidebarStyle {
       trailing: const Color(0xFF737576),
     ),
     sectionHeaderForeground: const Color(0xFF424244).withValues(alpha: 0.64),
+    progressWarningColor: LinagoraSysColors.material().warning,
+    progressFullColor: LinagoraSysColors.material().error,
   );
 
   /// Dark inverts the overlay — a near-black wash is invisible on it — and
@@ -105,6 +137,8 @@ class LinagoraSidebarStyle {
       active: const Color(0xFF91BFFF),
       trailing: const Color(0xFFB0B3B5),
     ),
+    progressWarningColor: LinagoraSysColors.material().warningDark,
+    progressFullColor: LinagoraSysColors.material().errorDark,
   );
 
   factory LinagoraSidebarStyle.light() => _light;
@@ -121,6 +155,34 @@ class LinagoraSidebarStyle {
   Color get resolvedSectionHeaderForeground =>
       sectionHeaderForeground ??
       foreground.withValues(alpha: _sectionHeaderOpacity);
+
+  /// Secondary text colour shared by the storage label and quota caption.
+  Color get resolvedStorageForeground =>
+      storageForeground ?? foreground.withValues(alpha: _sectionHeaderOpacity);
+
+  /// The icon uses the full sidebar foreground, while the nearby storage text
+  /// uses [resolvedStorageForeground].
+  Color get resolvedStorageIconForeground => storageIconForeground ?? foreground;
+
+  /// The version uses a steel-grey token in the stock themes. Custom styles
+  /// that predate storage fall back to their secondary foreground.
+  Color get resolvedStorageVersionForeground =>
+      storageVersionForeground ?? resolvedStorageForeground;
+
+  /// Storage progress falls back to the active item colour, keeping injected
+  /// pre-storage styles usable without duplicating their colour palette.
+  Color get resolvedProgressColor => progressColor ?? activeForeground;
+
+  /// Warning and full states retain the material semantic colours for custom
+  /// styles that predate storage, while stock styles supply their own tokens.
+  Color get resolvedProgressWarningColor =>
+      progressWarningColor ?? LinagoraSysColors.material().warning;
+
+  Color get resolvedProgressFullColor =>
+      progressFullColor ?? LinagoraSysColors.material().error;
+
+  Color get resolvedProgressTrackColor =>
+      progressTrackColor ?? selectedBackground;
 
   /// The style matching the ambient [Theme] brightness.
   static LinagoraSidebarStyle of(BuildContext context) =>
@@ -158,6 +220,14 @@ class LinagoraSidebarStyle {
     sectionHeaderForeground: resolvedSectionHeaderForeground,
     labelTextStyle: labelTextStyle,
     badgeTextStyle: badgeTextStyle,
+    progressHeight: progressHeight,
+    storageForeground: resolvedStorageForeground,
+    storageIconForeground: resolvedStorageIconForeground,
+    storageVersionForeground: resolvedStorageVersionForeground,
+    progressColor: resolvedProgressColor,
+    progressWarningColor: resolvedProgressWarningColor,
+    progressFullColor: resolvedProgressFullColor,
+    progressTrackColor: resolvedProgressTrackColor,
     disabledOpacity: disabledOpacity,
   );
 
@@ -191,6 +261,8 @@ class LinagoraSidebarStyle {
     required _Overlay overlay,
     required _Ink ink,
     Color? sectionHeaderForeground,
+    required Color progressWarningColor,
+    required Color progressFullColor,
   }) {
     final selected = overlay.base.withValues(alpha: overlay.selected);
     return LinagoraSidebarStyle(
@@ -213,6 +285,11 @@ class LinagoraSidebarStyle {
       sectionHeaderForeground: sectionHeaderForeground,
       labelTextStyle: _labelTextStyle,
       badgeTextStyle: _badgeTextStyle,
+      storageVersionForeground: const Color(0xFF818C99),
+      progressColor: ink.active,
+      progressWarningColor: progressWarningColor,
+      progressFullColor: progressFullColor,
+      progressTrackColor: selected,
     );
   }
 }
@@ -244,5 +321,13 @@ typedef _SidebarStyleValues = ({
   Color sectionHeaderForeground,
   TextStyle labelTextStyle,
   TextStyle badgeTextStyle,
+  double progressHeight,
+  Color storageForeground,
+  Color storageIconForeground,
+  Color storageVersionForeground,
+  Color progressColor,
+  Color progressWarningColor,
+  Color progressFullColor,
+  Color progressTrackColor,
   double disabledOpacity,
 });
