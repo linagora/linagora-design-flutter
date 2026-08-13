@@ -34,6 +34,9 @@ class _LinagoraSidebarItemContent extends StatelessWidget {
     return Semantics(
       // Text and InkWell already publish the label and button role.
       selected: item.active,
+      // Expanded belongs to the row: a decorative chevron has no semantics,
+      // while a tappable one is a separate control. Leaves have no state.
+      expanded: item.expanded,
       child: Material(
         color: backgroundColor,
         borderRadius: borderRadius,
@@ -86,7 +89,11 @@ class _SidebarItemRow extends StatelessWidget {
       // Minimum, not fixed: the row grows with the text scale.
       constraints: BoxConstraints(minHeight: style.itemMinHeight),
       child: Padding(
-        padding: EdgeInsets.symmetric(horizontal: style.itemHorizontalPadding),
+        // Indent content only, preserving the full-width row background.
+        padding: EdgeInsetsDirectional.only(
+          start: style.itemHorizontalPadding + LinagoraSidebarIndent.of(context),
+          end: style.itemHorizontalPadding,
+        ),
         child: Row(
           children: [
             if (_hasLeading) ...[

@@ -32,5 +32,8 @@ export 'package:linagora_design_flutter/banners/linagora_banner.dart';
 export 'package:linagora_design_flutter/text_field/linagora_text_field.dart';
 export 'package:linagora_design_flutter/text_field/linagora_text_field_variant.dart';
 export 'package:linagora_design_flutter/sidebar/linagora_sidebar_badge.dart';
+export 'package:linagora_design_flutter/sidebar/linagora_sidebar_indent.dart';
 export 'package:linagora_design_flutter/sidebar/linagora_sidebar_item.dart';
 export 'package:linagora_design_flutter/sidebar/linagora_sidebar_style.dart';
+export 'package:linagora_design_flutter/sidebar/linagora_sidebar_sub_item.dart';
+export 'package:linagora_design_flutter/sidebar/linagora_sidebar_tree_list.dart';

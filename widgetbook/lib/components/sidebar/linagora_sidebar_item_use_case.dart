@@ -3,6 +3,8 @@ import 'package:linagora_design_flutter/linagora_design_flutter.dart';
 import 'package:widgetbook/widgetbook.dart';
 import 'package:widgetbook_annotation/widgetbook_annotation.dart' as widgetbook;
 
+import 'sidebar_preview_surface.dart';
+
 part 'linagora_sidebar_item_preview_configuration.dart';
 part 'linagora_sidebar_item_preview_hover_trailing.dart';
 
@@ -25,7 +27,7 @@ Widget _primaryPreview(
   _SidebarItemContent content,
   _SidebarItemAffordances affordances,
 ) {
-  return _SidebarPreviewSurface(
+  return SidebarPreviewSurface(
     width: state.width,
     child: LinagoraSidebarItem(
       label: content.label,
@@ -41,39 +43,4 @@ Widget _primaryPreview(
       onTap: () {},
     ),
   );
-}
-
-/// Stands in for the sidebar shell, so the translucent fills composite over a
-/// realistic surface.
-class _SidebarPreviewSurface extends StatelessWidget {
-  const _SidebarPreviewSurface({required this.width, required this.child});
-
-  /// Inset around the row, subtracted from the viewport to get the width the
-  /// row can actually occupy.
-  static const double padding = 16;
-
-  /// Caps the row; the row itself fills whatever width it is given.
-  final double width;
-  final Widget child;
-
-  @override
-  Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-
-    return ColoredBox(
-      color: isDark ? const Color(0xFF272A31) : const Color(0xFFF3F6F9),
-      child: Padding(
-        padding: const EdgeInsets.all(padding),
-        child: Align(
-          alignment: Alignment.topLeft,
-          // A cap rather than a fixed width, so a value wider than the
-          // viewport simply fills it instead of overflowing.
-          child: ConstrainedBox(
-            constraints: BoxConstraints(maxWidth: width),
-            child: child,
-          ),
-        ),
-      ),
-    );
-  }
 }
