@@ -17,6 +17,14 @@
 * Widgetbook: add the missing `LinagoraSettingItem` use case file, which
   `widgetbook.dart` already imported and called.
 
+## 0.2.7 - 2026-08-11
+
+### Removed
+
+* `TwakeInter.ttf`: dropped unweighted/redundant font asset from
+  `assets/fonts/` and `pubspec.yaml`; weight 400 now resolves solely from
+  `TwakeInter-Regular.ttf`.
+
 ## 0.2.6 - 2026-07-31
 
 ### Added

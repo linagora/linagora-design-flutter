@@ -1,6 +1,6 @@
 name: linagora_design_flutter
 description: Common widgets for Linagora products
-version: 0.2.6
+version: 0.2.7
 # Remove this later when publishing to pub.dev.
 publish_to: none
 
@@ -35,12 +35,10 @@ flutter:
   # To add assets to your package, add an assets section, like this:
   assets:
     - assets/images/
-    - assets/fonts/
 
   fonts:
     - family: TwakeInter
       fonts:
-        - asset: assets/fonts/TwakeInter.ttf
         - asset: assets/fonts/TwakeInter-Regular.ttf
           weight: 400
         - asset: assets/fonts/TwakeInter-Medium.ttf
