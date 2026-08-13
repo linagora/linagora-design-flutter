@@ -19,6 +19,7 @@ void main() {
   testWidgets('pins hover when hovered is true', _hoverForced);
   testWidgets('dims every slot of a disabled row', _disabledDimsUniformly);
   testWidgets('publishes the selected state to semantics', _semanticsSelected);
+  testWidgets('publishes folder expansion to semantics', _semanticsExpansion);
   testWidgets('honours the colour overrides', _colourOverrides);
   testWidgets('lets an injected style beat the ambient theme', _styleOverride);
   testWidgets('resolves dark tokens from the ambient theme', _darkTokens);
@@ -164,6 +165,30 @@ Future<void> _semanticsSelected(WidgetTester tester) async {
         hasFocusAction: true,
       ),
     );
+  } finally {
+    handle.dispose();
+  }
+}
+
+Future<void> _semanticsExpansion(WidgetTester tester) async {
+  final handle = tester.ensureSemantics();
+  try {
+    for (final expanded in <bool?>[true, false, null]) {
+      await pumpSidebarItem(
+        tester,
+        LinagoraSidebarItem(label: 'Folders', expanded: expanded),
+      );
+
+      expect(
+        tester.getSemantics(find.byType(LinagoraSidebarItem)),
+        matchesSemantics(
+          hasExpandedState: expanded != null,
+          isExpanded: expanded ?? false,
+          hasSelectedState: true,
+          isSelected: false,
+        ),
+      );
+    }
   } finally {
     handle.dispose();
   }

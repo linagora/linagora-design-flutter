@@ -1,16 +1,5 @@
 part of 'linagora_sidebar_item_use_case.dart';
 
-const double _minSidebarWidth = 204;
-const double _defaultSidebarWidth = 204;
-
-/// The row can occupy the viewport minus the preview's own inset. Guarded so
-/// the slider always has a range, even on a viewport narrower than the floor.
-double _maxSidebarWidth(BuildContext context) {
-  final available =
-      MediaQuery.sizeOf(context).width - _SidebarPreviewSurface.padding * 2;
-  return available > _minSidebarWidth ? available : _minSidebarWidth + 1;
-}
-
 /// Knobs are registered while the use case builds, so a knob that only applies
 /// under another one is registered only when that one is on. It then leaves
 /// the panel entirely rather than sitting there doing nothing.
@@ -45,13 +34,7 @@ class _SidebarItemState {
       active: context.knobs.boolean(label: 'active', initialValue: false),
       hover: context.knobs.boolean(label: 'hover', initialValue: false),
       enabled: context.knobs.boolean(label: 'enabled', initialValue: true),
-      width: context.knobs.double.slider(
-        label: 'sidebar width',
-        initialValue: _defaultSidebarWidth,
-        min: _minSidebarWidth,
-        // Tracks the selected viewport, so the row cannot overflow it.
-        max: _maxSidebarWidth(context),
-      ),
+      width: SidebarPreviewSurface.widthKnob(context),
     );
   }
 }
