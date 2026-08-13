@@ -1,3 +1,22 @@
+## Unreleased
+
+### Added
+
+* `LinagoraSidebarItem`: left-menu navigation row with leading icon or widget,
+  count badge, expand/collapse chevron, hover-revealed trailing slot, and
+  application-owned `active`, `expanded` and `enabled` state.
+* `LinagoraSidebarBadge`: counter pill capped at the width of `999+`.
+* `LinagoraSidebarStyle`: sidebar design tokens, resolved from the ambient
+  theme brightness, overridable per widget.
+* `LinagoraButtonVariant.text`: renders a `TextButton`. Existing exhaustive
+  switches over the enum need a new branch.
+* `LinagoraIconButton`: `tapTargetSize` and `visualDensity`.
+
+### Fixed
+
+* Widgetbook: add the missing `LinagoraSettingItem` use case file, which
+  `widgetbook.dart` already imported and called.
+
 ## 0.2.6 - 2026-07-31
 
 ### Added
