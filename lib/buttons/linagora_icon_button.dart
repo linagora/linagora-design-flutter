@@ -27,6 +27,16 @@ class LinagoraIconButton extends StatelessWidget {
   /// don't read [IconTheme]).
   final Widget? iconWidget;
 
+  /// Defaults to [MaterialTapTargetSize.padded], which targets a 48px minimum.
+  /// The default compact [visualDensity] reduces that to 40px. Pass
+  /// [MaterialTapTargetSize.shrinkWrap] to fit a fixed row height.
+  final MaterialTapTargetSize tapTargetSize;
+
+  /// Defaults to [VisualDensity.compact], which shortens the box vertically
+  /// and so renders the overlay as an ellipse. Pass [VisualDensity.standard]
+  /// to keep it square, and the overlay circular.
+  final VisualDensity visualDensity;
+
   const LinagoraIconButton({
     super.key,
     this.icon,
@@ -36,6 +46,8 @@ class LinagoraIconButton extends StatelessWidget {
     this.iconSize = 24,
     this.iconWidget,
     this.overlayColor,
+    this.tapTargetSize = MaterialTapTargetSize.padded,
+    this.visualDensity = VisualDensity.compact,
   }) : assert(
           icon != null || iconWidget != null,
           'Provide either icon or iconWidget',
@@ -52,11 +64,24 @@ class LinagoraIconButton extends StatelessWidget {
       tooltip: tooltip,
       onPressed: onPressed,
       padding: const EdgeInsets.all(LinagoraSpacing.base / 2),
-      constraints: const BoxConstraints(),
-      visualDensity: VisualDensity.compact,
+      constraints: _constraints(context),
+      visualDensity: visualDensity,
       style: IconButton.styleFrom(
         overlayColor: overlayColor ?? Colors.transparent,
+        tapTargetSize: tapTargetSize,
       ),
+    );
+  }
+
+  BoxConstraints _constraints(BuildContext context) {
+    if (
+        Theme.of(context).useMaterial3 ||
+        tapTargetSize == MaterialTapTargetSize.shrinkWrap) {
+      return const BoxConstraints();
+    }
+    return const BoxConstraints(
+      minWidth: kMinInteractiveDimension,
+      minHeight: kMinInteractiveDimension,
     );
   }
 }

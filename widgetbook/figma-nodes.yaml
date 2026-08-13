@@ -1,0 +1,3 @@
+# Figma node URLs for widgets exposed in widgetbook.
+# Each URL must include a ?node-id= so the Figma MCP can resolve one component.
+LinagoraSidebarItem: "https://www.figma.com/design/XqLqMINlZw09BdEHI8yLb9/Teammail---1.1?node-id=11101-2135"
