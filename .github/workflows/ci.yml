@@ -1,0 +1,44 @@
+name: CI
+
+on:
+  pull_request:
+    branches: [master]
+  push:
+    branches: [master]
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    name: Test & Analyze
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.38.9'
+          channel: stable
+          cache: true
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Run tests
+        run: flutter test
+
+      # --no-fatal-infos tolerates the pre-existing info-level deprecation
+      # baseline in lib/ while still failing on errors and warnings.
+      # Scoped to lib/ and test/ so widgetbook/ and example/ issues stay out.
+      - name: Analyze
+        if: always()
+        run: flutter analyze --no-fatal-infos lib test
