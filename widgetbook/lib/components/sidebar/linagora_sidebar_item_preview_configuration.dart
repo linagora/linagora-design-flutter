@@ -20,7 +20,7 @@ class _SidebarItemState {
 
   final bool enabled;
 
-  /// Caps the row. The Figma reference is 204px wide.
+  /// Caps the row to the selected preview width.
   final double width;
 
   factory _SidebarItemState.fromKnobs(BuildContext context) {
