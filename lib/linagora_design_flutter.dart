@@ -38,12 +38,15 @@ export 'package:linagora_design_flutter/sidebar/linagora_sidebar_button_styles.d
 export 'package:linagora_design_flutter/sidebar/linagora_sidebar_control.dart';
 export 'package:linagora_design_flutter/sidebar/linagora_sidebar_indent.dart';
 export 'package:linagora_design_flutter/sidebar/linagora_sidebar_item.dart';
+export 'package:linagora_design_flutter/sidebar/linagora_sidebar_item_action_group.dart';
 export 'package:linagora_design_flutter/sidebar/linagora_sidebar_item_action_scope.dart';
 export 'package:linagora_design_flutter/sidebar/linagora_sidebar_item_drop_target.dart';
 export 'package:linagora_design_flutter/sidebar/linagora_sidebar_confirm_popover.dart';
 export 'package:linagora_design_flutter/sidebar/linagora_sidebar_footer.dart';
 export 'package:linagora_design_flutter/sidebar/linagora_sidebar_grouped_tree_list.dart';
 export 'package:linagora_design_flutter/sidebar/linagora_sidebar_menu.dart';
+export 'package:linagora_design_flutter/sidebar/linagora_sidebar_menu_action.dart';
+export 'package:linagora_design_flutter/sidebar/linagora_sidebar_popover_action.dart';
 export 'package:linagora_design_flutter/sidebar/linagora_sidebar_popover_shape.dart';
 export 'package:linagora_design_flutter/sidebar/linagora_sidebar_primary_action.dart';
 export 'package:linagora_design_flutter/sidebar/linagora_sidebar_scroll_coordinator.dart';
