@@ -1,6 +1,7 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 import 'package:linagora_design_flutter/sidebar/linagora_sidebar_style.dart';
-import 'package:linagora_design_flutter/style/linagora_text_theme.dart';
 
 /// The counter pill at the end of a [LinagoraSidebarItem].
 ///
@@ -29,20 +30,19 @@ class LinagoraSidebarBadge extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final style = this.style ?? LinagoraSidebarStyle.of(context);
-    final textStyle = LinagoraTextTheme.material().labelSmall?.copyWith(
+    final textStyle = style.badgeTextStyle.copyWith(
       color: foregroundColor ?? style.badgeForeground,
     );
+    final counter = _measureCounter(context, textStyle, style.badgeHeight);
 
     return ConstrainedBox(
       constraints: BoxConstraints(
-        maxWidth: _widestWidth(context, textStyle) +
-            style.badgeHorizontalPadding * 2,
+        maxWidth: counter.width + style.badgeHorizontalPadding * 2,
       ),
       child: Container(
-        // No alignment: a centred Container fills the constraints it is given
-        // rather than hugging its label — vertically that stretched the pill
-        // to the row height, horizontally to the cap. The minimum keeps a
-        // single digit round; [Text.textAlign] centres it inside that.
+        // No alignment on the Container: it would fill the constraints it
+        // is given rather than hug its counter. The minimum keeps a single
+        // digit round.
         constraints: BoxConstraints(
           minWidth: style.badgeHeight,
           minHeight: style.badgeHeight,
@@ -54,31 +54,80 @@ class LinagoraSidebarBadge extends StatelessWidget {
           color: backgroundColor ?? style.badgeBackground,
           shape: const StadiumBorder(),
         ),
-        child: Text(
-          label,
-          maxLines: 1,
-          overflow: TextOverflow.ellipsis,
-          textAlign: TextAlign.center,
-          style: textStyle,
+        // The factors hug the counter and centre it across a pill the
+        // minimum has widened. Down the pill the inset places it, so this
+        // alignment stays at the top.
+        child: Align(
+          alignment: Alignment.topCenter,
+          widthFactor: 1,
+          heightFactor: 1,
+          child: Padding(
+            padding: EdgeInsets.only(top: counter.topInset),
+            child: Text(
+              label,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              textAlign: TextAlign.center,
+              textHeightBehavior: LinagoraSidebarStyle.middleAligned,
+              style: textStyle,
+            ),
+          ),
         ),
       ),
     );
   }
 
-  double _widestWidth(BuildContext context, TextStyle? textStyle) {
+  /// The pill's width ceiling, and how far its counter is dropped inside it.
+  ///
+  /// The inset centres the digits' *ink*. Centring the paragraph box instead
+  /// lands them low, by the font's descent plus whatever the engine rounds off
+  /// the ascent — most of a pixel on a pill only 16 tall.
+  ({double width, double topInset}) _measureCounter(
+    BuildContext context,
+    TextStyle textStyle,
+    double pillHeight,
+  ) {
+    final textScaler = MediaQuery.textScalerOf(context);
     final painter = TextPainter(
-      text: TextSpan(text: widestLabel, style: textStyle),
+      // Measured on the glyphs, as the counter is drawn: the line height
+      // would otherwise report a baseline pushed down by its leading.
+      text: TextSpan(
+        text: widestLabel,
+        style: textStyle.copyWith(height: kTextHeightNone),
+      ),
       textDirection: Directionality.of(context),
-      textScaler: MediaQuery.textScalerOf(context),
+      textScaler: textScaler,
       maxLines: 1,
     );
     // TextPainter owns a native paragraph, so it is released even if layout
     // throws.
     try {
       painter.layout();
-      return painter.width;
+      final capHeight = textScaler.scale(textStyle.fontSize ?? 0) *
+          LinagoraSidebarStyle.badgeCapHeightRatio;
+      // Where the baseline leaves the ink centred.
+      final baseline = (pillHeight + capHeight) / 2;
+      final ascent = _paintedAscent(painter);
+      return (
+        width: painter.width,
+        // A counter larger than the pill grows it, and then sits at its top
+        // rather than being pulled up out of the stadium.
+        topInset: math.max(0, baseline - ascent),
+      );
     } finally {
       painter.dispose();
     }
+  }
+
+  /// How far below its box a paragraph puts the baseline it draws on.
+  ///
+  /// The engine may snap that ascent to a whole pixel while
+  /// [LineMetrics.ascent] still reports the font's own — a third of a pixel
+  /// apart at a counter's size. The paragraph's height gives away which.
+  static double _paintedAscent(TextPainter painter) {
+    final line = painter.computeLineMetrics().single;
+    final snapped =
+        (painter.height - (line.ascent + line.descent)).abs() > 0.01;
+    return snapped ? line.ascent.roundToDouble() : line.ascent;
   }
 }

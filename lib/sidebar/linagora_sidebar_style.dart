@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:linagora_design_flutter/spacings/linagora_spacing.dart';
+import 'package:linagora_design_flutter/style/linagora_text_theme.dart';
 
 /// Design tokens for the shared left menu.
 ///
@@ -45,6 +46,14 @@ class LinagoraSidebarStyle {
   /// the same amount.
   final double disabledOpacity;
 
+  /// Row label, mailbox and folder alike: 14 · w500 · 18.4px line · 0.25
+  /// letter spacing. Carries no colour — the row inks it from its state.
+  final TextStyle labelTextStyle;
+
+  /// Badge counter, and the default for text in the trailing slot:
+  /// 11 · w500 · 16px line · 0.5 letter spacing.
+  final TextStyle badgeTextStyle;
+
   const LinagoraSidebarStyle({
     required this.itemMinHeight,
     required this.itemBorderRadius,
@@ -61,13 +70,16 @@ class LinagoraSidebarStyle {
     required this.foreground,
     required this.activeForeground,
     required this.trailingForeground,
+    required this.labelTextStyle,
+    required this.badgeTextStyle,
     this.disabledOpacity = 0.38,
   });
 
   static final LinagoraSidebarStyle _light = _build(
     overlay: (base: const Color(0xFF1D192B), hover: 0.04, selected: 0.08),
     ink: (
-      normal: const Color(0xFF49494B),
+      // Primary text at 90%, shared by the label and the badge count.
+      normal: const Color(0xFF424244).withValues(alpha: 0.9),
       active: const Color(0xFF0A84FF),
       trailing: const Color(0xFF737576),
     ),
@@ -118,8 +130,36 @@ class LinagoraSidebarStyle {
     foreground: foreground,
     activeForeground: activeForeground,
     trailingForeground: trailingForeground,
+    labelTextStyle: labelTextStyle,
+    badgeTextStyle: badgeTextStyle,
     disabledOpacity: disabledOpacity,
   );
+
+  /// Lays text out on its glyphs, dropping the leading a fixed line height
+  /// adds around them.
+  ///
+  /// Flutter splits that leading in proportion to the font's ascent and
+  /// descent, which leaves the text low in its box. Sidebar labels are single
+  /// lines centred by their row, so the leading only pushes them off centre.
+  static const TextHeightBehavior middleAligned = TextHeightBehavior(
+    applyHeightToFirstAscent: false,
+    applyHeightToLastDescent: false,
+  );
+
+  /// The shared `bodyMedium` token on the sidebar's tighter 18.4px line.
+  static final TextStyle _labelTextStyle = LinagoraTextTheme.material()
+      .bodyMedium!
+      .copyWith(height: 18.4 / 14);
+
+  static final TextStyle _badgeTextStyle =
+      LinagoraTextTheme.material().labelSmall!;
+
+  /// Cap height of TwakeInter (`OS/2.sCapHeight`), and so a digit's ink, as a
+  /// share of the font size.
+  ///
+  /// The badge centres that ink rather than the paragraph around it, which
+  /// reaches lower. Another face costs a fraction of a pixel.
+  static const double badgeCapHeightRatio = 1490 / 2048;
 
   static LinagoraSidebarStyle _build({
     required _Overlay overlay,
@@ -137,11 +177,14 @@ class LinagoraSidebarStyle {
       selectedBackground: selected,
       badgeBackground: selected,
       badgeHeight: LinagoraSpacing.base * 2,
-      badgeHorizontalPadding: LinagoraSpacing.base * 0.75,
+      // Off the 8px scale: it is what hugs `999+` to a 39px pill.
+      badgeHorizontalPadding: 4.5,
       badgeForeground: ink.normal,
       foreground: ink.normal,
       activeForeground: ink.active,
       trailingForeground: ink.trailing,
+      labelTextStyle: _labelTextStyle,
+      badgeTextStyle: _badgeTextStyle,
     );
   }
 }
@@ -168,5 +211,7 @@ typedef _SidebarStyleValues = ({
   Color foreground,
   Color activeForeground,
   Color trailingForeground,
+  TextStyle labelTextStyle,
+  TextStyle badgeTextStyle,
   double disabledOpacity,
 });

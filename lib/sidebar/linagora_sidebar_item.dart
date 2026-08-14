@@ -6,7 +6,6 @@ import 'package:linagora_design_flutter/behaviors/right_click_focus.dart';
 import 'package:linagora_design_flutter/sidebar/linagora_sidebar_badge.dart';
 import 'package:linagora_design_flutter/sidebar/linagora_sidebar_indent.dart';
 import 'package:linagora_design_flutter/sidebar/linagora_sidebar_style.dart';
-import 'package:linagora_design_flutter/style/linagora_text_theme.dart';
 
 part 'linagora_sidebar_item_content.dart';
 

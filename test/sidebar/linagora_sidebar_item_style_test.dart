@@ -98,7 +98,7 @@ Future<void> _textScale(WidgetTester tester) async {
   await tester.pumpWidget(
     const MaterialApp(
       home: MediaQuery(
-        data: MediaQueryData(textScaler: TextScaler.linear(2.5)),
+        data: MediaQueryData(textScaler: TextScaler.linear(3)),
         child: Scaffold(
           body: SizedBox(
             width: 204,
@@ -114,10 +114,15 @@ Future<void> _textScale(WidgetTester tester) async {
   );
 
   expect(tester.takeException(), isNull);
+
+  // The row is laid out on the label's glyphs, so it follows the text once
+  // they outgrow the minimum — which is the premise this asserts first.
+  final minHeight = LinagoraSidebarStyle.light().itemMinHeight;
   expect(
-    tester.getSize(sidebarRowFinder).height,
-    greaterThan(LinagoraSidebarStyle.light().itemMinHeight),
+    tester.getSize(find.text('Action required')).height,
+    greaterThan(minHeight),
   );
+  expect(tester.getSize(sidebarRowFinder).height, greaterThan(minHeight));
 }
 
 Future<void> _trailingIsMuted(WidgetTester tester) async {
@@ -245,6 +250,8 @@ LinagoraSidebarStyle _styleWithSpacing(double itemSpacing) {
     foreground: style.foreground,
     activeForeground: style.activeForeground,
     trailingForeground: style.trailingForeground,
+    labelTextStyle: style.labelTextStyle,
+    badgeTextStyle: style.badgeTextStyle,
     disabledOpacity: style.disabledOpacity,
   );
 }
