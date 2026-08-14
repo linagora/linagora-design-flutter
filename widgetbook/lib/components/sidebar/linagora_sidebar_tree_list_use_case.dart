@@ -78,45 +78,35 @@ class _SidebarTreeListPreviewState extends State<_SidebarTreeListPreview> {
   }
 
   List<LinagoraSidebarTreeListEntry<_PreviewFolder>> get _visibleEntries {
-    final entries = <LinagoraSidebarTreeListEntry<_PreviewFolder>>[
-      const LinagoraSidebarTreeListEntry(
-        id: 'personal',
-        data: _PreviewFolder(
-          id: 'personal',
-          label: 'Personal folders',
-          hasChildren: true,
-        ),
-      ),
-    ];
-    if (!_isExpanded('personal')) return entries;
-
-    for (var index = 0; index < widget.rootFolderCount; index++) {
-      _addFolder(entries, index: index, depth: 1);
-    }
-    return entries;
-  }
-
-  void _addFolder(
-    List<LinagoraSidebarTreeListEntry<_PreviewFolder>> entries, {
-    required int index,
-    required int depth,
-  }) {
-    final id = 'folder-$index${depth == 1 ? '' : '-$depth'}';
-    final hasChildren = index == 0 && depth < widget.maximumDepth;
-    entries.add(
-      LinagoraSidebarTreeListEntry(
-        id: id,
-        depth: depth,
-        data: _PreviewFolder(
-          id: id,
-          label: _folderLabel(index, depth),
-          hasChildren: hasChildren,
-        ),
+    return LinagoraSidebarTreeFlattener.flatten(
+      roots: [_personalFolder],
+      adapter: LinagoraSidebarTreeAdapter<_PreviewFolder>(
+        childrenOf: (folder) => folder.children,
+        idOf: (folder) => folder.id,
+        isExpanded: (folder) => folder.hasChildren && _isExpanded(folder.id),
       ),
     );
-    if (hasChildren && _isExpanded(id)) {
-      _addFolder(entries, index: index, depth: depth + 1);
-    }
+  }
+
+  _PreviewFolder get _personalFolder => _PreviewFolder(
+    id: 'personal',
+    label: 'Personal folders',
+    hasChildren: true,
+    children: [
+      for (var index = 0; index < widget.rootFolderCount; index++)
+        _folder(index: index, depth: 1),
+    ],
+  );
+
+  _PreviewFolder _folder({required int index, required int depth}) {
+    final id = 'folder-$index${depth == 1 ? '' : '-$depth'}';
+    final hasChildren = index == 0 && depth < widget.maximumDepth;
+    return _PreviewFolder(
+      id: id,
+      label: _folderLabel(index, depth),
+      hasChildren: hasChildren,
+      children: hasChildren ? [_folder(index: index, depth: depth + 1)] : [],
+    );
   }
 
   String _folderLabel(int index, int depth) {
@@ -162,9 +152,11 @@ class _PreviewFolder {
     required this.id,
     required this.label,
     required this.hasChildren,
+    this.children = const [],
   });
 
   final String id;
   final String label;
   final bool hasChildren;
+  final List<_PreviewFolder> children;
 }

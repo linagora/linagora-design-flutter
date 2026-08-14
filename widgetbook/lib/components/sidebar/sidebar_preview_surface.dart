@@ -13,6 +13,8 @@ class SidebarPreviewSurface extends StatelessWidget {
 
   static const double padding = 16;
   static const double defaultWidth = 204;
+  static const double minimumWidth = defaultWidth;
+  static const double defaultHeight = 720;
 
   /// The width this surface can actually hand a preview: the selected viewport
   /// minus its horizontal inset.
@@ -25,6 +27,12 @@ class SidebarPreviewSurface extends StatelessWidget {
     return math.max(0, available);
   }
 
+  /// The height the selected viewport can hand a fixed-height sidebar preview.
+  static double contentHeight(BuildContext context) {
+    final available = MediaQuery.sizeOf(context).height - padding * 2;
+    return math.max(0, available);
+  }
+
   /// Registers the shared sidebar width knob and returns the chosen width.
   ///
   /// On a viewport too narrow for the minimum preview width there is a single
@@ -33,13 +41,28 @@ class SidebarPreviewSurface extends StatelessWidget {
   /// anything is better absent than dead.
   static double widthKnob(BuildContext context) {
     final content = contentWidth(context);
-    if (content <= defaultWidth) return content;
+    if (content <= minimumWidth) return content;
 
     return context.knobs.double.slider(
       label: 'Sidebar width',
       description: 'Choose a preview width up to the selected viewport.',
-      initialValue: defaultWidth,
-      min: defaultWidth,
+      initialValue: math.min(defaultWidth, content),
+      min: minimumWidth,
+      max: content,
+    );
+  }
+
+  /// Registers a height knob for previews whose footer stays fixed while the
+  /// menu content scrolls.
+  static double heightKnob(BuildContext context) {
+    final content = contentHeight(context);
+    if (content <= defaultHeight) return content;
+
+    return context.knobs.double.slider(
+      label: 'Sidebar height',
+      description: 'Choose the preview height before its content scrolls.',
+      initialValue: defaultHeight,
+      min: defaultHeight,
       max: content,
     );
   }

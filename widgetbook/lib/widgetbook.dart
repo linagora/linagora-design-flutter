@@ -9,6 +9,7 @@ import 'package:widgetbook_workspace/components/contact_component/phonebook_cont
 import 'package:widgetbook_workspace/components/list_item/linagora_setting_item_use_case.dart';
 import 'package:widgetbook_workspace/components/list_item/session_device_list_item_use_case.dart';
 import 'package:widgetbook_workspace/components/sidebar/linagora_sidebar_item_use_case.dart';
+import 'package:widgetbook_workspace/components/sidebar/linagora_sidebar_grouped_tree_list_use_case.dart';
 import 'package:widgetbook_workspace/components/sidebar/linagora_sidebar_section_header_use_case.dart';
 import 'package:widgetbook_workspace/components/sidebar/linagora_sidebar_storage_use_case.dart';
 import 'package:widgetbook_workspace/components/sidebar/linagora_sidebar_tree_list_use_case.dart';
@@ -221,6 +222,16 @@ class WidgetbookApp extends StatelessWidget {
                   name: 'Virtualized folder tree',
                   builder: (context) =>
                       linagoraSidebarTreeListUseCase(context),
+                ),
+              ],
+            ),
+            WidgetbookComponent(
+              name: 'Linagora sidebar grouped tree list',
+              useCases: [
+                WidgetbookUseCase(
+                  name: 'Grouped virtualized folder trees',
+                  builder: (context) =>
+                      linagoraSidebarGroupedTreeListUseCase(context),
                 ),
               ],
             ),
