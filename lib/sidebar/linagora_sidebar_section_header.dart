@@ -1,7 +1,11 @@
+import 'dart:async';
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
+import 'package:linagora_design_flutter/sidebar/linagora_sidebar_action_details.dart';
+import 'package:linagora_design_flutter/sidebar/linagora_sidebar_callback_utils.dart';
 import 'package:linagora_design_flutter/sidebar/linagora_sidebar_control.dart';
+import 'package:linagora_design_flutter/sidebar/linagora_sidebar_scroll_coordinator.dart';
 import 'package:linagora_design_flutter/sidebar/linagora_sidebar_style.dart';
 import 'package:linagora_design_flutter/style/linagora_text_theme.dart';
 
@@ -12,21 +16,32 @@ class LinagoraSidebarSectionHeader extends StatelessWidget {
   /// Gap between the caption and its disclosure chevron.
   static const double titleSpacing = 4;
 
+  /// Visual gap between [actions] glyphs.
+  static const double actionSpacing = 8;
+
   const LinagoraSidebarSectionHeader({
     super.key,
     required this.label,
     this.expanded,
     this.onExpandToggle,
+    this.onExpandTogglePressed,
     this.expandToggleLabel,
+    this.scrollIntoViewOnExpand = false,
     this.actions = const [],
     this.foregroundColor,
     this.style,
   }) : assert(
-         onExpandToggle == null || expanded != null,
+         onExpandToggle == null || onExpandTogglePressed == null,
+         'Provide either onExpandToggle or onExpandTogglePressed, not both',
+       ),
+       assert(
+         (onExpandToggle == null && onExpandTogglePressed == null) ||
+             expanded != null,
          'A tappable disclosure needs expanded to render the chevron',
        ),
        assert(
-         onExpandToggle == null || expandToggleLabel != null,
+         (onExpandToggle == null && onExpandTogglePressed == null) ||
+             expandToggleLabel != null,
          'A tappable disclosure needs expandToggleLabel for screen readers',
        );
 
@@ -38,8 +53,17 @@ class LinagoraSidebarSectionHeader extends StatelessWidget {
   /// Toggles the disclosure; without it the chevron is decorative.
   final VoidCallback? onExpandToggle;
 
+  /// Async-capable disclosure callback that receives the toggle's geometry.
+  ///
+  /// Use this for scroll-to-expanded behaviour without an application-owned
+  /// [GlobalKey]. It is mutually exclusive with [onExpandToggle].
+  final OnLinagoraSidebarExpandTogglePressed? onExpandTogglePressed;
+
   /// Localized accessible name for [onExpandToggle].
   final String? expandToggleLabel;
+
+  /// Reveals the disclosure in its enclosing sidebar body after an expansion.
+  final bool scrollIntoViewOnExpand;
 
   /// Trailing controls, typically [LinagoraSidebarSectionHeaderAction]s.
   final List<Widget> actions;
@@ -79,7 +103,7 @@ class LinagoraSidebarSectionHeader extends StatelessWidget {
           // publish it through the section heading.
           child: Semantics(
             header: true,
-            expanded: onExpandToggle == null ? expanded : null,
+            expanded: !_hasInteractiveDisclosure ? expanded : null,
             child: Text(
               label,
               maxLines: 1,
@@ -104,7 +128,7 @@ class LinagoraSidebarSectionHeader extends StatelessWidget {
   /// overhang away — closing the gap further would put the target under the
   /// caption.
   double _disclosureSpacing(LinagoraSidebarStyle style) {
-    if (onExpandToggle == null) return titleSpacing;
+    if (!_hasInteractiveDisclosure) return titleSpacing;
     return math.max(
       0,
       titleSpacing - LinagoraSidebarControl.overhang(style.chevronSize),
@@ -112,21 +136,53 @@ class LinagoraSidebarSectionHeader extends StatelessWidget {
   }
 
   Widget _disclosure(LinagoraSidebarStyle style, Color foreground) {
-    if (onExpandToggle == null) {
+    if (!_hasInteractiveDisclosure) {
       return Icon(
         LinagoraSidebarControl.disclosureIcon(expanded!),
         size: style.chevronSize,
         color: foreground,
       );
     }
-    return LinagoraSidebarControl(
-      icon: LinagoraSidebarControl.disclosureIcon(expanded!),
-      iconSize: style.chevronSize,
-      color: foreground,
-      onTap: onExpandToggle,
-      semanticLabel: expandToggleLabel,
-      expanded: expanded,
+    return Builder(
+      builder: (toggleContext) => LinagoraSidebarControl(
+        icon: LinagoraSidebarControl.disclosureIcon(expanded!),
+        iconSize: style.chevronSize,
+        color: foreground,
+        onTap: () => _toggle(toggleContext),
+        semanticLabel: expandToggleLabel,
+        expanded: expanded,
+      ),
     );
+  }
+
+  bool get _hasInteractiveDisclosure =>
+      onExpandToggle != null || onExpandTogglePressed != null;
+
+  void _toggle(BuildContext context) {
+    final shouldReveal = scrollIntoViewOnExpand && expanded == false;
+    final callback = onExpandTogglePressed;
+    if (callback != null) {
+      unawaited(_runExpandTogglePressed(context, callback, shouldReveal));
+      return;
+    }
+    onExpandToggle?.call();
+    if (shouldReveal) {
+      LinagoraSidebarScrollCoordinator.scheduleReveal(context);
+    }
+  }
+
+  Future<void> _runExpandTogglePressed(
+    BuildContext context,
+    OnLinagoraSidebarExpandTogglePressed callback,
+    bool shouldReveal,
+  ) async {
+    final completed = await runLinagoraSidebarCallback(
+      () => callback(LinagoraSidebarActionDetails.fromContext(context)),
+      callbackName: 'LinagoraSidebarSectionHeader.onExpandTogglePressed',
+    );
+    if (completed && shouldReveal && context.mounted) {
+      LinagoraSidebarScrollCoordinator.scheduleReveal(context);
+    }
   }
 
   Widget _actions(Color foreground) {
@@ -148,16 +204,32 @@ class LinagoraSidebarSectionHeaderAction extends StatelessWidget {
 
   const LinagoraSidebarSectionHeaderAction({
     super.key,
-    required this.icon,
+    this.icon,
+    this.iconWidget,
+    this.child,
     required this.onTap,
     this.semanticLabel,
     this.color,
   }) : assert(
+         icon != null || iconWidget != null || child != null,
+         'A header action needs an icon, iconWidget, or child',
+       ),
+       assert(
          onTap == null || semanticLabel != null,
          'A tappable header action needs semanticLabel for screen readers',
        );
 
-  final IconData icon;
+  /// Material icon used when no [iconWidget] or [child] is supplied.
+  final IconData? icon;
+
+  /// Replaces [icon], allowing a product to provide an SVG or another widget.
+  final Widget? iconWidget;
+
+  /// Generic visual content for the action.
+  ///
+  /// This takes precedence over [iconWidget] and [icon].
+  final Widget? child;
+
   final VoidCallback? onTap;
   final String? semanticLabel;
 
@@ -166,6 +238,36 @@ class LinagoraSidebarSectionHeaderAction extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final icon = this.icon;
+    if (child == null && iconWidget == null && icon != null) {
+      return _legacyIconAction(context, icon);
+    }
+
+    final glyph = _glyph(context);
+    final control = onTap == null
+        ? glyph
+        : Semantics(
+            button: true,
+            label: semanticLabel,
+            child: InkResponse(
+              onTap: onTap,
+              containedInkWell: true,
+              highlightShape: BoxShape.circle,
+              radius: size / 2,
+              customBorder: const CircleBorder(),
+              child: SizedBox.square(
+                dimension: size,
+                child: Center(child: glyph),
+              ),
+            ),
+          );
+
+    final tooltip = semanticLabel;
+    if (onTap == null || tooltip == null) return control;
+    return Tooltip(message: tooltip, child: control);
+  }
+
+  Widget _legacyIconAction(BuildContext context, IconData icon) {
     final control = LinagoraSidebarControl(
       icon: icon,
       iconSize: size,
@@ -178,5 +280,22 @@ class LinagoraSidebarSectionHeaderAction extends StatelessWidget {
     final tooltip = semanticLabel;
     if (onTap == null || tooltip == null) return control;
     return Tooltip(message: tooltip, child: control);
+  }
+
+  Widget _glyph(BuildContext context) {
+    final icon = this.icon;
+    final foreground = color ?? IconTheme.of(context).color;
+    final visual =
+        child ?? iconWidget ?? Icon(icon!, size: size, color: foreground);
+    return SizedBox.square(
+      dimension: size,
+      child: IconTheme.merge(
+        data: IconThemeData(
+          color: foreground,
+          size: size,
+        ),
+        child: visual,
+      ),
+    );
   }
 }
