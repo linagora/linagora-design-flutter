@@ -9,6 +9,8 @@ class _SidebarItemState {
     required this.active,
     required this.hover,
     required this.enabled,
+    required this.showAnchorAction,
+    required this.showDropTarget,
     required this.width,
   });
 
@@ -19,6 +21,12 @@ class _SidebarItemState {
   final bool hover;
 
   final bool enabled;
+
+  /// Shows the async item action that reports its popup anchor details.
+  final bool showAnchorAction;
+
+  /// Adds a generic [Draggable] source for the item's typed drop target.
+  final bool showDropTarget;
 
   /// Caps the row to the selected preview width.
   final double width;
@@ -34,6 +42,14 @@ class _SidebarItemState {
       active: context.knobs.boolean(label: 'active', initialValue: false),
       hover: context.knobs.boolean(label: 'hover', initialValue: false),
       enabled: context.knobs.boolean(label: 'enabled', initialValue: true),
+      showAnchorAction: context.knobs.boolean(
+        label: 'Show anchor action',
+        initialValue: false,
+      ),
+      showDropTarget: context.knobs.boolean(
+        label: 'Show generic drop target',
+        initialValue: false,
+      ),
       width: SidebarPreviewSurface.widthKnob(context),
     );
   }
@@ -45,6 +61,8 @@ class _SidebarItemContent {
     required this.icon,
     required this.badgeLabel,
     required this.expanded,
+    required this.supportingMode,
+    required this.supportingValue,
   });
 
   final String label;
@@ -58,6 +76,9 @@ class _SidebarItemContent {
   /// Null when the chevron is switched off, which is also what tells the row
   /// it is a leaf rather than a tree node.
   final bool? expanded;
+
+  final _SidebarItemSupportingMode supportingMode;
+  final String supportingValue;
 
   factory _SidebarItemContent.fromKnobs(BuildContext context) {
     final label = context.knobs.string(label: 'label', initialValue: 'Inbox');
@@ -89,12 +110,27 @@ class _SidebarItemContent {
     final badgeLabel = showBadge
         ? context.knobs.string(label: 'badge label', initialValue: '999+')
         : null;
+    final supportingMode =
+        context.knobs.object.dropdown<_SidebarItemSupportingMode>(
+      label: 'Supporting content',
+      options: _SidebarItemSupportingMode.values,
+      initialOption: _SidebarItemSupportingMode.none,
+      labelBuilder: (mode) => mode.label,
+    );
+    final supportingValue = supportingMode == _SidebarItemSupportingMode.none
+        ? ''
+        : context.knobs.string(
+            label: 'Supporting value',
+            initialValue: 'design@linagora.com',
+          );
 
     return _SidebarItemContent(
       label: label,
       icon: icon,
       badgeLabel: badgeLabel,
       expanded: expanded,
+      supportingMode: supportingMode,
+      supportingValue: supportingValue,
     );
   }
 
@@ -103,6 +139,16 @@ class _SidebarItemContent {
     if (expanded == null) return null;
     return expanded ? 'Collapse' : 'Expand';
   }
+
+  String? get supportingText => switch (supportingMode) {
+        _SidebarItemSupportingMode.text => supportingValue,
+        _ => null,
+      };
+
+  Widget? get supportingContent => switch (supportingMode) {
+        _SidebarItemSupportingMode.widget => Text(supportingValue),
+        _ => null,
+      };
 }
 
 /// The controls revealed on hover, so their knobs only exist while `hover` is
@@ -179,4 +225,14 @@ enum _SidebarItemIcon {
 
   final String label;
   final IconData icon;
+}
+
+enum _SidebarItemSupportingMode {
+  none('None'),
+  text('Supporting text'),
+  widget('Supporting widget');
+
+  const _SidebarItemSupportingMode(this.label);
+
+  final String label;
 }

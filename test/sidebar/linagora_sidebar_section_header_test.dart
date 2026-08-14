@@ -371,9 +371,14 @@ Future<void> _tapTargets(WidgetTester tester) async {
 
   final toggleFinder = _targetFor(Icons.keyboard_arrow_down);
   final actionFinder = _targetFor(Icons.add);
+  final legacyActionFinder = find.ancestor(
+    of: find.byIcon(Icons.add),
+    matching: find.byType(LinagoraSidebarControl),
+  );
   final toggle = tester.widget<InkResponse>(toggleFinder);
   final action = tester.widget<InkResponse>(actionFinder);
 
+  expect(legacyActionFinder, findsOneWidget);
   expect(tester.getSize(toggleFinder), const Size.square(24));
   _expectSquareSize(tester.getSize(actionFinder), 16.67);
   for (final control in [toggle, action]) {

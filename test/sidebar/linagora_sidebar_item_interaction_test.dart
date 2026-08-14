@@ -15,9 +15,19 @@ void main() {
   );
   testWidgets('keeps Material touch feedback on every platform', _touchRipple);
   testWidgets(
+    'keeps trailing actions independent from the row',
+    _trailingAction,
+  );
+  testWidgets('styles text actions from the trailing token', _textActionStyle);
+  testWidgets(
+    'names a trailing action separately from the row',
+    _trailingActionSemantics,
+  );
+  testWidgets(
     'handles tappable chevron interaction',
     _tappableChevronInteraction,
   );
+  testWidgets('reports tappable chevron geometry', _tappableChevronGeometry);
   testWidgets('leaves the chevron inert without a toggle', _chevronInert);
   testWidgets('gives a tappable chevron a touch target', _chevronTapTarget);
   testWidgets('reports a secondary press', _secondaryPress);
@@ -61,11 +71,7 @@ Future<void> _disabledDoesNotTap(WidgetTester tester) async {
   var taps = 0;
   await pumpSidebarItem(
     tester,
-    LinagoraSidebarItem(
-      label: 'Archives',
-      enabled: false,
-      onTap: () => taps++,
-    ),
+    LinagoraSidebarItem(label: 'Archives', enabled: false, onTap: () => taps++),
   );
 
   await tester.tap(find.text('Archives'));
@@ -106,6 +112,108 @@ Future<void> _touchRipple(WidgetTester tester) async {
   expect(inkWell.highlightColor, isNull);
 }
 
+Future<void> _trailingAction(WidgetTester tester) async {
+  var rowTaps = 0;
+  var cleanTaps = 0;
+  await pumpSidebarItem(
+    tester,
+    LinagoraSidebarItem(
+      label: 'Spam',
+      onTap: () => rowTaps++,
+      trailing: LinagoraSidebarItemAction(
+        semanticLabel: 'Clean spam',
+        onTap: () => cleanTaps++,
+        child: const Text('Clean'),
+      ),
+    ),
+  );
+
+  await tester.tap(find.text('Clean'));
+
+  expect(cleanTaps, 1);
+  expect(rowTaps, 0);
+  final action = find.byType(LinagoraSidebarItemAction);
+  expect(
+    find.ancestor(of: action, matching: find.byType(Material)),
+    findsWidgets,
+  );
+  expect(
+    find.descendant(of: action, matching: find.byType(InkWell)),
+    findsOneWidget,
+  );
+  expect(
+    tester
+        .getSize(find.descendant(of: action, matching: find.byType(InkWell)))
+        .height,
+    LinagoraSidebarItemAction.minimumDimension,
+  );
+}
+
+Future<void> _textActionStyle(WidgetTester tester) async {
+  await pumpSidebarItem(
+    tester,
+    const LinagoraSidebarItem(
+      label: 'Trash',
+      trailing: LinagoraSidebarItemAction(
+        semanticLabel: 'Clean Trash',
+        onTap: sidebarNoop,
+        child: Text('Clean'),
+      ),
+    ),
+  );
+
+  final action = find.byType(LinagoraSidebarItemAction);
+  final textStyle = (tester
+          .widget<RichText>(
+            find.descendant(of: action, matching: find.byType(RichText)),
+          )
+          .text as TextSpan)
+      .style!;
+
+  expect(textStyle.fontSize, 11);
+  expect(textStyle.height, 16 / 11);
+  expect(textStyle.fontWeight, FontWeight.w500);
+  expect(textStyle.letterSpacing, 0.5);
+  expect(textStyle.color, LinagoraSidebarStyle.light().trailingForeground);
+}
+
+/// A screen reader reaches the action through its own node, so the row keeps
+/// its own name and the action stays activatable on its own.
+Future<void> _trailingActionSemantics(WidgetTester tester) async {
+  final handle = tester.ensureSemantics();
+  try {
+    await pumpSidebarItem(
+      tester,
+      const LinagoraSidebarItem(
+        label: 'Spam',
+        onTap: sidebarNoop,
+        trailing: LinagoraSidebarItemAction(
+          semanticLabel: 'Clean spam',
+          onTap: sidebarNoop,
+          child: Text('Clean'),
+        ),
+      ),
+    );
+
+    expect(
+      tester.getSemantics(find.byType(LinagoraSidebarItemAction)),
+      matchesSemantics(
+        label: 'Clean spam',
+        isButton: true,
+        isFocusable: true,
+        hasTapAction: true,
+        hasFocusAction: true,
+      ),
+    );
+    expect(
+      tester.getSemantics(find.byType(LinagoraSidebarItem)),
+      containsSemantics(label: 'Spam'),
+    );
+  } finally {
+    handle.dispose();
+  }
+}
+
 Future<void> _tappableChevronInteraction(WidgetTester tester) async {
   final enabled = _ChevronCallbacks();
   await _tapTappableChevron(tester, enabled);
@@ -120,12 +228,36 @@ Future<void> _tappableChevronInteraction(WidgetTester tester) async {
   expect(find.byType(InkResponse), findsNothing);
 }
 
+Future<void> _tappableChevronGeometry(WidgetTester tester) async {
+  final _ExpandToggleRecorder recorder = _ExpandToggleRecorder();
+  await pumpSidebarItem(
+    tester,
+    LinagoraSidebarItem(
+      label: 'Folders',
+      expanded: false,
+      onExpandTogglePressed: recorder.press,
+      expandToggleLabel: 'Expand',
+    ),
+  );
+
+  await tester.tap(find.byIcon(Icons.keyboard_arrow_right));
+
+  final details = recorder.details;
+  expect(details, isNotNull);
+  expect(
+    details!.globalBounds.size,
+    const Size.square(LinagoraSidebarControl.tapTarget),
+  );
+  expect(details.anchor.left, greaterThanOrEqualTo(0));
+  expect(details.anchor.top, greaterThanOrEqualTo(0));
+  expect(details.anchor.right, greaterThanOrEqualTo(0));
+  expect(details.anchor.bottom, greaterThanOrEqualTo(0));
+}
+
 Future<void> _chevronInert(WidgetTester tester) async {
   await pumpSidebarItem(
     tester,
-    _chevronItem(
-      const _ChevronItemConfiguration(expanded: true),
-    ),
+    _chevronItem(const _ChevronItemConfiguration(expanded: true)),
   );
 
   expect(find.byType(InkResponse), findsNothing);
@@ -209,10 +341,7 @@ Future<void> _tooltip(WidgetTester tester) async {
     ),
   );
 
-  expect(
-    tester.widget<Tooltip>(find.byType(Tooltip)).message,
-    'Inbox folder',
-  );
+  expect(tester.widget<Tooltip>(find.byType(Tooltip)).message, 'Inbox folder');
 }
 
 Future<void> _keyboardActivation(WidgetTester tester) async {
@@ -258,7 +387,10 @@ Future<void> _desktopHovers(WidgetTester tester) async {
   await hoverSidebarItem(tester, find.text('Inbox'));
 
   expect(LinagoraSidebarItem.hoverSupported, isTrue);
-  expect(sidebarBackground(tester), LinagoraSidebarStyle.light().hoverBackground);
+  expect(
+    sidebarBackground(tester),
+    LinagoraSidebarStyle.light().hoverBackground,
+  );
 }
 
 void _validatesTappableChevron() {
@@ -276,6 +408,15 @@ void _validatesTappableChevron() {
         expanded: false,
         callbacks: _ChevronCallbacks(),
       ),
+    ),
+  );
+  _expectChevronAssertion(
+    () => LinagoraSidebarItem(
+      label: 'Folders',
+      expanded: false,
+      onExpandToggle: sidebarNoop,
+      onExpandTogglePressed: _noopExpandToggle,
+      expandToggleLabel: 'Expand',
     ),
   );
 }
@@ -337,3 +478,13 @@ class _ChevronCallbacks {
 
   void onExpandToggle() => toggles++;
 }
+
+class _ExpandToggleRecorder {
+  LinagoraSidebarActionDetails? details;
+
+  Future<void> press(LinagoraSidebarActionDetails details) async {
+    this.details = details;
+  }
+}
+
+Future<void> _noopExpandToggle(LinagoraSidebarActionDetails details) async {}

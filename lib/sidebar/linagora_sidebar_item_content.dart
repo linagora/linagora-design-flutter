@@ -7,6 +7,9 @@ class _LinagoraSidebarItemContent extends StatelessWidget {
     required this.backgroundColor,
     required this.foregroundColor,
     required this.isInteractive,
+    required this.hasActiveAction,
+    required this.actionActivity,
+    required this.suppressRowInkFeedback,
     required this.trailing,
     required this.onHoverChanged,
   });
@@ -16,9 +19,13 @@ class _LinagoraSidebarItemContent extends StatelessWidget {
   final Color backgroundColor;
   final Color foregroundColor;
   final bool isInteractive;
+  final bool hasActiveAction;
+  final LinagoraSidebarActionActivity actionActivity;
+  final bool suppressRowInkFeedback;
   final Widget? trailing;
+
   /// Null on platforms that do not hover.
-  final ValueChanged<bool>? onHoverChanged;
+  final _OnLinagoraSidebarItemHoverChanged? onHoverChanged;
 
   /// Dims every slot at once. Colouring them one by one let the chevron and
   /// the badge keep full strength while the label faded.
@@ -30,6 +37,8 @@ class _LinagoraSidebarItemContent extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final borderRadius = BorderRadius.circular(style.itemBorderRadius);
+    final suppressInkFeedback =
+        hasActiveAction || suppressRowInkFeedback;
 
     return Semantics(
       // Text and InkWell already publish the label and button role.
@@ -41,7 +50,14 @@ class _LinagoraSidebarItemContent extends StatelessWidget {
         color: backgroundColor,
         borderRadius: borderRadius,
         child: InkWell(
-          onTap: isInteractive ? item.onTap : null,
+          onTap: isInteractive
+              ? () {
+                  // Trailing menu and popover actions begin their activity
+                  // before this ancestor callback can run. Their press must
+                  // never select the row beneath them.
+                  if (!actionActivity.isActive) item.onTap?.call();
+                }
+              : null,
           onSecondaryTapDown: item.enabled ? item.onSecondaryTapDown : null,
           // Fires only for pointer devices, and only where the platform
           // hovers at all.
@@ -54,6 +70,25 @@ class _LinagoraSidebarItemContent extends StatelessWidget {
           // The row paints its own hover fill. Splash and highlight stay on
           // every platform — they are the touch feedback on mobile.
           hoverColor: Colors.transparent,
+          // An item InkWell begins its splash on pointer-down, before a nested
+          // trailing action can become active. Suppress that ancestor feedback
+          // for rows that reveal actions, otherwise it briefly washes over the
+          // entire item behind the action's own Material. Before an action
+          // opens, a lone focus state keeps keyboard focus feedback on the
+          // row. Once open, every row feedback state stays transparent.
+          splashColor: suppressInkFeedback ? Colors.transparent : null,
+          highlightColor: suppressInkFeedback ? Colors.transparent : null,
+          focusColor: hasActiveAction ? Colors.transparent : null,
+          overlayColor: hasActiveAction
+              ? const WidgetStatePropertyAll(Colors.transparent)
+              : suppressRowInkFeedback
+              ? WidgetStateProperty.resolveWith(
+                  (states) => states.length == 1 &&
+                          states.contains(WidgetState.focused)
+                      ? null
+                      : Colors.transparent,
+                )
+              : null,
           child: _disable(
             _SidebarItemRow(
               item: item,
@@ -91,7 +126,8 @@ class _SidebarItemRow extends StatelessWidget {
       child: Padding(
         // Indent content only, preserving the full-width row background.
         padding: EdgeInsetsDirectional.only(
-          start: style.itemHorizontalPadding + LinagoraSidebarIndent.of(context),
+          start:
+              style.itemHorizontalPadding + LinagoraSidebarIndent.of(context),
           end: style.itemHorizontalPadding,
         ),
         child: Row(
@@ -100,7 +136,7 @@ class _SidebarItemRow extends StatelessWidget {
               _SidebarItemLeading(
                 leading: item.leading,
                 icon: item.icon,
-                color: foregroundColor,
+                color: item.iconColor ?? foregroundColor,
                 size: style.itemIconSize,
               ),
               SizedBox(width: style.itemSpacing),
@@ -140,16 +176,43 @@ class _SidebarItemLabel extends StatelessWidget {
   /// How far a tappable chevron's box extends past its glyph on each side. A
   /// decorative one is a bare glyph and overhangs nothing.
   double get _chevronOverhang {
-    if (item.onExpandToggle == null || !item.enabled) return 0;
+    if (!_hasExpandToggle || !item.enabled) return 0;
     return LinagoraSidebarControl.overhang(style.chevronSize);
   }
 
+  bool get _hasExpandToggle =>
+      item.onExpandToggle != null || item.onExpandTogglePressed != null;
+
   @override
   Widget build(BuildContext context) {
+    final supporting = _supporting();
+    if (supporting == null) return _title();
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        _title(),
+        const SizedBox(height: LinagoraSidebarItem.supportingSpacing),
+        DefaultTextStyle.merge(
+          style: LinagoraTextTheme.material().bodySmall?.copyWith(
+            color: foregroundColor,
+          ),
+          child: supporting,
+        ),
+      ],
+    );
+  }
+
+  Widget _title() {
     final expanded = item.expanded;
 
     return Row(
       children: [
+        // [_SidebarItemRow] gives this label the bounded width left after its
+        // leading and trailing slots. Flex only the single-line title: the
+        // surrounding Column must stay height-intrinsic so supporting content
+        // can make the row grow instead of overflowing.
         Flexible(
           child: Text(
             item.label,
@@ -164,21 +227,60 @@ class _SidebarItemLabel extends StatelessWidget {
           // gap shrinks by the overhang to keep the visual spacing at
           // [itemSpacing]. Clamped: a style with a spacing smaller than the
           // overhang would otherwise ask for a negative width.
-          SizedBox(
-            width: math.max(0, style.itemSpacing - _chevronOverhang),
-          ),
-          LinagoraSidebarControl(
-            icon: LinagoraSidebarControl.disclosureIcon(expanded),
-            iconSize: style.chevronSize,
-            color: style.trailingForeground,
-            onTap: item.enabled ? item.onExpandToggle : null,
-            semanticLabel: item.expandToggleLabel,
-            // The row already publishes expansion, so the toggle stays quiet
-            // about it rather than announcing the same state twice.
+          SizedBox(width: math.max(0, style.itemSpacing - _chevronOverhang)),
+          Builder(
+            builder: (BuildContext controlContext) => LinagoraSidebarControl(
+              icon: LinagoraSidebarControl.disclosureIcon(expanded),
+              iconSize: style.chevronSize,
+              color: style.trailingForeground,
+              onTap: item.enabled && _hasExpandToggle
+                  ? () => _handleExpandToggle(controlContext)
+                  : null,
+              semanticLabel: item.expandToggleLabel,
+              // The row already publishes expansion, so the toggle stays quiet
+              // about it rather than announcing the same state twice.
+            ),
           ),
         ],
       ],
     );
+  }
+
+  void _handleExpandToggle(BuildContext context) {
+    final shouldReveal = item.scrollIntoViewOnExpand && item.expanded == false;
+    final OnLinagoraSidebarExpandTogglePressed? callback =
+        item.onExpandTogglePressed;
+    if (callback != null) {
+      unawaited(_runExpandTogglePressed(context, callback, shouldReveal));
+      return;
+    }
+    item.onExpandToggle?.call();
+    if (shouldReveal) {
+      LinagoraSidebarScrollCoordinator.scheduleReveal(context);
+    }
+  }
+
+  Future<void> _runExpandTogglePressed(
+    BuildContext context,
+    OnLinagoraSidebarExpandTogglePressed callback,
+    bool shouldReveal,
+  ) async {
+    final completed = await runLinagoraSidebarCallback(
+      () => callback(LinagoraSidebarActionDetails.fromContext(context)),
+      callbackName: 'LinagoraSidebarItem.onExpandTogglePressed',
+    );
+    if (completed && shouldReveal && context.mounted) {
+      LinagoraSidebarScrollCoordinator.scheduleReveal(context);
+    }
+  }
+
+  Widget? _supporting() {
+    final content = item.supportingContent;
+    if (content != null) return content;
+
+    final text = item.supportingText;
+    if (text == null) return null;
+    return Text(text, maxLines: 1, overflow: TextOverflow.ellipsis);
   }
 }
 
