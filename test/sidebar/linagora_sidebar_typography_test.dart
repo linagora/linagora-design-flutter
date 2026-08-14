@@ -135,17 +135,28 @@ Future<void> _badgeHugs(WidgetTester tester) async {
   expect(pill.width, closeTo(counter.width + _badgePadding * 2, 0.01));
 }
 
+/// The label shares a line with what sits either side of it.
+///
+/// Its box is the glyphs themselves, so centring the box centres the text a
+/// reader sees. On a line height's box the text would hang low inside it and
+/// the row would read as misaligned even with the boxes lined up.
 Future<void> _labelIsCentred(WidgetTester tester) async {
   await pumpSidebarItem(
     tester,
-    const LinagoraSidebarItem(label: 'Inbox', icon: Icons.inbox_outlined),
+    const LinagoraSidebarItem(
+      label: 'Personal folders',
+      icon: Icons.folder_outlined,
+      expanded: true,
+    ),
   );
 
-  final label = tester.getRect(find.text('Inbox'));
-  final icon = tester.getRect(find.byIcon(Icons.inbox_outlined));
+  final label = tester.getRect(find.text('Personal folders'));
+  final icon = tester.getRect(find.byIcon(Icons.folder_outlined));
+  final chevron = tester.getRect(find.byIcon(Icons.keyboard_arrow_down));
 
   expect(label.center.dy, closeTo(icon.center.dy, 0.01));
-  _expectGlyphBox(label, 'Inbox', _labelSpec);
+  expect(label.center.dy, closeTo(chevron.center.dy, 0.01));
+  _expectGlyphBox(label, 'Personal folders', _labelSpec);
 }
 
 /// Standalone, so the pill is proven to lay out its own counter rather than
