@@ -42,6 +42,10 @@ class LinagoraSidebarTreeListEntry<T> {
 /// surrounding [PageStorage] bucket remains alive, or provide [controller]
 /// when the product needs to own and restore the offset itself. It must be in
 /// a bounded vertical region, for example an [Expanded] or [SizedBox].
+///
+/// This widget brings its own scroll view. Inside a host that already owns one
+/// — [LinagoraSidebarMenu] does — use [LinagoraSidebarSliverTreeList] instead,
+/// so the tree scrolls together with the content around it.
 class LinagoraSidebarTreeList<T> extends StatelessWidget {
   /// The maximum content indentation used by default for deep folder trees.
   static const double defaultMaxIndent =
@@ -64,7 +68,7 @@ class LinagoraSidebarTreeList<T> extends StatelessWidget {
          'A sidebar tree list maximum indent cannot be negative',
        ),
        assert(
-         _hasUniqueEntryIds(entries),
+         _SidebarTreeListRows._hasUniqueEntryIds(entries),
          'A sidebar tree list needs unique entry IDs',
        );
 
@@ -97,30 +101,109 @@ class LinagoraSidebarTreeList<T> extends StatelessWidget {
   /// every level to stay distinguishable.
   final double maxIndent;
 
-  /// Maps a row key back to its position so the sliver can move an existing
-  /// element instead of rebuilding it. It is created lazily when Flutter
-  /// updates keyed children.
-  late final Map<Object, int> _indexById = {
-    for (var index = 0; index < entries.length; index++)
-      entries[index].id: index,
-  };
+  late final _SidebarTreeListRows<T> _rows = _SidebarTreeListRows(
+    entries: entries,
+    itemBuilder: itemBuilder,
+    indent: indent,
+    maxIndent: maxIndent,
+  );
 
   @override
   Widget build(BuildContext context) {
     // [key] identifies this widget and must not be repeated on the list it
     // builds: a GlobalKey would then be claimed twice and throw. A
     // PageStorageKey still reaches the scroll position from up here.
-    return ListView.builder(
+    return ListView.custom(
       controller: controller,
       padding: padding,
       physics: physics,
       primary: primary,
       cacheExtent: cacheExtent,
-      itemCount: entries.length,
-      itemBuilder: _buildEntry,
-      findChildIndexCallback: _findEntryIndex,
+      childrenDelegate: _rows.delegate,
     );
   }
+}
+
+/// The rows of a [LinagoraSidebarTreeList] as a sliver, for a host that owns
+/// the scroll view.
+///
+/// [LinagoraSidebarMenu] owns one, so a folder tree placed in a
+/// [LinagoraSidebarMenuSection] scrolls as part of the menu: the navigation
+/// rows and section headers around it move with the folders, and the rows stay
+/// virtualized because the tree contributes to that single viewport rather
+/// than nesting its own.
+///
+/// Everything else matches [LinagoraSidebarTreeList] — the product still owns
+/// expansion state and flattens its visible [entries]. Scrolling belongs to
+/// the host, so this widget takes no controller, physics, or padding; wrap it
+/// in a [SliverPadding] when a region needs an inset.
+class LinagoraSidebarSliverTreeList<T> extends StatelessWidget {
+  LinagoraSidebarSliverTreeList({
+    super.key,
+    required this.entries,
+    required this.itemBuilder,
+    this.indent = LinagoraSidebarSubItem.defaultIndent,
+    this.maxIndent = LinagoraSidebarTreeList.defaultMaxIndent,
+  }) : assert(indent >= 0, 'A sidebar tree list indent cannot be negative'),
+       assert(
+         maxIndent >= 0,
+         'A sidebar tree list maximum indent cannot be negative',
+       ),
+       assert(
+         _SidebarTreeListRows._hasUniqueEntryIds(entries),
+         'A sidebar tree list needs unique entry IDs',
+       );
+
+  /// The already-visible tree rows, in their visual order.
+  final List<LinagoraSidebarTreeListEntry<T>> entries;
+
+  /// Builds the actual row, normally a [LinagoraSidebarItem].
+  final LinagoraSidebarTreeListItemBuilder<T> itemBuilder;
+
+  /// Horizontal content indentation added for every [LinagoraSidebarTreeListEntry.depth]
+  /// level.
+  final double indent;
+
+  /// Maximum accumulated content indentation for a nested row.
+  final double maxIndent;
+
+  late final _SidebarTreeListRows<T> _rows = _SidebarTreeListRows(
+    entries: entries,
+    itemBuilder: itemBuilder,
+    indent: indent,
+    maxIndent: maxIndent,
+  );
+
+  @override
+  Widget build(BuildContext context) => SliverList(delegate: _rows.delegate);
+}
+
+/// The row plumbing shared by the box and sliver tree lists: the same keys,
+/// the same indentation, and the same index lookup, so a tree behaves
+/// identically whichever scroll view it ends up in.
+class _SidebarTreeListRows<T> {
+  _SidebarTreeListRows({
+    required this.entries,
+    required this.itemBuilder,
+    required this.indent,
+    required this.maxIndent,
+  }) : _indexById = _indexEntries(entries);
+
+  final List<LinagoraSidebarTreeListEntry<T>> entries;
+  final LinagoraSidebarTreeListItemBuilder<T> itemBuilder;
+  final double indent;
+  final double maxIndent;
+
+  /// Maps a row key back to its position so the sliver can move an existing
+  /// element instead of rebuilding it. Duplicate IDs are rejected here too,
+  /// because assertions do not protect release-mode applications.
+  final Map<Object, int> _indexById;
+
+  SliverChildDelegate get delegate => SliverChildBuilderDelegate(
+    _buildEntry,
+    childCount: entries.length,
+    findChildIndexCallback: _findEntryIndex,
+  );
 
   /// Without this the sliver matches children by index alone, so inserting or
   /// removing one row rebuilds every row after it from scratch — losing hover,
@@ -154,5 +237,23 @@ class LinagoraSidebarTreeList<T> extends StatelessWidget {
   ) {
     final ids = <Object>{};
     return entries.every((entry) => ids.add(entry.id));
+  }
+
+  static Map<Object, int> _indexEntries<T>(
+    List<LinagoraSidebarTreeListEntry<T>> entries,
+  ) {
+    final indexById = <Object, int>{};
+    for (var index = 0; index < entries.length; index++) {
+      final id = entries[index].id;
+      if (indexById.containsKey(id)) {
+        throw ArgumentError.value(
+          id,
+          'entries',
+          'A sidebar tree list needs unique entry IDs',
+        );
+      }
+      indexById[id] = index;
+    }
+    return indexById;
   }
 }
