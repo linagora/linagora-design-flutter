@@ -114,11 +114,7 @@ class _SidebarItemRow extends StatelessWidget {
             ),
             if (trailing != null) ...[
               SizedBox(width: style.itemSpacing),
-              _SidebarItemTrailing(
-                color: style.trailingForeground,
-                iconSize: style.itemIconSize,
-                child: trailing!,
-              ),
+              _SidebarItemTrailing(style: style, child: trailing!),
             ],
           ],
         ),
@@ -152,9 +148,8 @@ class _SidebarItemLabel extends StatelessWidget {
             item.label,
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
-            style: LinagoraTextTheme.material().bodyMedium?.copyWith(
-              color: foregroundColor,
-            ),
+            textHeightBehavior: LinagoraSidebarStyle.middleAligned,
+            style: style.labelTextStyle.copyWith(color: foregroundColor),
           ),
         ),
         if (expanded != null) ...[
@@ -253,22 +248,19 @@ class _SidebarItemChevron extends StatelessWidget {
 }
 
 class _SidebarItemTrailing extends StatelessWidget {
-  const _SidebarItemTrailing({
-    required this.color,
-    required this.iconSize,
-    required this.child,
-  });
+  const _SidebarItemTrailing({required this.style, required this.child});
 
-  final Color color;
-  final double iconSize;
+  final LinagoraSidebarStyle style;
   final Widget child;
 
   @override
   Widget build(BuildContext context) {
+    final color = style.trailingForeground;
     return DefaultTextStyle.merge(
-      style: LinagoraTextTheme.material().labelSmall?.copyWith(color: color),
+      style: style.badgeTextStyle.copyWith(color: color),
+      textHeightBehavior: LinagoraSidebarStyle.middleAligned,
       child: IconTheme.merge(
-        data: IconThemeData(color: color, size: iconSize),
+        data: IconThemeData(color: color, size: style.itemIconSize),
         child: child,
       ),
     );
