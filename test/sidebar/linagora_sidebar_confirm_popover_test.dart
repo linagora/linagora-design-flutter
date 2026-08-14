@@ -39,6 +39,7 @@ void main() {
     'applies popoverStyle overrides to the shape and button tokens',
     _popoverStyleOverridesApply,
   );
+  testWidgets('points its arrow at the Clean trigger centre', _arrowAlignment);
   test('uses the primary confirmation variant by default', _defaultVariant);
   test('clamps popover geometry to a small layout', _clampsPopoverShape);
 }
@@ -350,6 +351,46 @@ Future<void> _popoverStyleOverridesApply(WidgetTester tester) async {
   );
 }
 
+Future<void> _arrowAlignment(WidgetTester tester) async {
+  const triggerLabel = 'Open Clear folder';
+  await tester.pumpWidget(
+    MaterialApp(
+      home: Scaffold(
+        body: Center(
+          child: LinagoraSidebarPopoverAction(
+            semanticLabel: triggerLabel,
+            child: const Text(triggerLabel),
+            popoverBuilder: (context, close) => LinagoraSidebarConfirmPopover(
+              key: _cardKey,
+              title: _title,
+              message: _message,
+              cancelLabel: 'Cancel',
+              confirmLabel: 'Clean',
+              closeSemanticLabel: 'Close clear confirmation',
+              onCancel: close,
+              onConfirm: close,
+            ),
+          ),
+        ),
+      ),
+    ),
+  );
+
+  await tester.tap(find.bySemanticsLabel(triggerLabel));
+  await tester.pump();
+
+  final triggerRect = tester.getRect(
+    find.ancestor(
+      of: find.text(triggerLabel),
+      matching: find.byType(LinagoraSidebarItemAction),
+    ),
+  );
+  final popoverRect = tester.getRect(find.byKey(_cardKey));
+  final shape = _shape(tester);
+  final arrowTipY =
+      popoverRect.bottom - shape.arrowOffset - shape.arrowSize;
+  expect(arrowTipY, closeTo(triggerRect.center.dy, 0.01));
+}
 Future<void> _pumpPopover(
   WidgetTester tester, {
   Brightness brightness = Brightness.light,

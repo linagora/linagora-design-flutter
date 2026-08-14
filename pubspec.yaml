@@ -6,7 +6,8 @@ publish_to: none
 
 environment:
   sdk: ">=3.10.0 <4.0.0"
-  flutter: ">=1.17.0"
+  # OverlayChildLocation, used by LinagoraSidebarPopoverAction, landed in 3.38.0.
+  flutter: ">=3.38.0"
 
 dependencies:
   auto_size_text: ^3.0.0
