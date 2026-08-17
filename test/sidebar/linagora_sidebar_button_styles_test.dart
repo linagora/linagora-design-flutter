@@ -34,6 +34,9 @@ Future<void> _sidebarPrimaryActionColours(WidgetTester tester) async {
 
     final enabledStates = <WidgetState>{};
     final disabledStates = <WidgetState>{WidgetState.disabled};
+    final hoveredStates = <WidgetState>{WidgetState.hovered};
+    final pressedStates = <WidgetState>{WidgetState.pressed};
+    final focusedStates = <WidgetState>{WidgetState.focused};
     final enabledBackground = brightness == Brightness.dark
         ? const Color(0xFF91BFFF)
         : colorScheme.primary;
@@ -51,6 +54,23 @@ Future<void> _sidebarPrimaryActionColours(WidgetTester tester) async {
       style.foregroundColor?.resolve(disabledStates),
       colorScheme.onSurface.withValues(alpha: 0.38),
     );
+    expect(style.overlayColor?.resolve(enabledStates), isNull);
+    expect(
+      style.overlayColor?.resolve(hoveredStates),
+      enabledForeground.withValues(alpha: 0.08),
+      reason: 'hovered, $brightness',
+    );
+    expect(
+      style.overlayColor?.resolve(pressedStates),
+      enabledForeground.withValues(alpha: 0.12),
+      reason: 'pressed, $brightness',
+    );
+    expect(
+      style.overlayColor?.resolve(focusedStates),
+      enabledForeground.withValues(alpha: 0.12),
+      reason: 'focused, $brightness',
+    );
+    expect(style.overlayColor?.resolve(disabledStates), isNull);
   }
 }
 

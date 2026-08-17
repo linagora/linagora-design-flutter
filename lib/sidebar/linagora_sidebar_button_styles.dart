@@ -26,6 +26,19 @@ abstract final class LinagoraSidebarButtonStyles {
             ? colorScheme.onSurface.withValues(alpha: _disabledContentOpacity)
             : foreground,
       ),
+      overlayColor: WidgetStateProperty.resolveWith((states) {
+        if (states.contains(WidgetState.disabled)) return null;
+        if (states.contains(WidgetState.pressed)) {
+          return foreground.withValues(alpha: _pressedOverlayOpacity);
+        }
+        if (states.contains(WidgetState.hovered)) {
+          return foreground.withValues(alpha: _hoverOverlayOpacity);
+        }
+        if (states.contains(WidgetState.focused)) {
+          return foreground.withValues(alpha: _pressedOverlayOpacity);
+        }
+        return null;
+      }),
       iconSize: const WidgetStatePropertyAll(_iconSize),
       minimumSize: const WidgetStatePropertyAll(Size(0, _minHeight)),
       padding: const WidgetStatePropertyAll(
@@ -52,6 +65,8 @@ abstract final class LinagoraSidebarButtonStyles {
   static const Color _darkForeground = Color(0xE61D212A);
   static const double _disabledContainerOpacity = 0.12;
   static const double _disabledContentOpacity = 0.38;
+  static const double _hoverOverlayOpacity = 0.08;
+  static const double _pressedOverlayOpacity = 0.12;
   static const double _lineHeight = 18.4;
 
   static TextStyle? _primaryActionTextStyle() {

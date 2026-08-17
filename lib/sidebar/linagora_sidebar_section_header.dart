@@ -12,9 +12,6 @@ class LinagoraSidebarSectionHeader extends StatelessWidget {
   /// Gap between the caption and its disclosure chevron.
   static const double titleSpacing = 4;
 
-  /// Visual gap between [actions] glyphs.
-  static const double actionSpacing = 0;
-
   const LinagoraSidebarSectionHeader({
     super.key,
     required this.label,

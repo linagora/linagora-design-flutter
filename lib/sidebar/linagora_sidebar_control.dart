@@ -44,6 +44,9 @@ class LinagoraSidebarControl extends StatelessWidget {
   final VoidCallback? onTap;
 
   /// Localized accessible name for an interactive control.
+  ///
+  /// This configures [Semantics] only. Callers that need a hover tooltip add it
+  /// around the control.
   final String? semanticLabel;
 
   /// Expanded state announced by a disclosure control.
