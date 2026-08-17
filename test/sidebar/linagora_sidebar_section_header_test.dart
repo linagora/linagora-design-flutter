@@ -18,6 +18,7 @@ void main() {
   testWidgets('publishes a decorative disclosure to semantics', _decorativeDisclosureSemantics);
   testWidgets('places compact actions flush at the trailing edge', _actions);
   testWidgets('preserves action semantics in the compact target', _actionSemantics);
+  testWidgets('creates one hover tooltip for an interactive action', _actionTooltip);
   testWidgets('keeps disclosure and compact action targets distinct', _tapTargets);
   testWidgets('keeps actions visible for scaled long titles', _scaledLongTitle);
   testWidgets('omits optional affordances when they are not supplied', _noAffordances);
@@ -327,6 +328,25 @@ Future<void> _actionSemantics(WidgetTester tester) {
       ),
     );
   });
+}
+
+Future<void> _actionTooltip(WidgetTester tester) async {
+  await pumpSidebar(
+    tester,
+    const LinagoraSidebarSectionHeader(
+      label: 'Folders',
+      actions: [
+        LinagoraSidebarSectionHeaderAction(
+          icon: Icons.search,
+          semanticLabel: 'Search folders',
+          onTap: _noop,
+        ),
+      ],
+    ),
+  );
+
+  expect(find.byType(Tooltip), findsOneWidget);
+  expect(tester.widget<Tooltip>(find.byType(Tooltip)).message, 'Search folders');
 }
 
 /// Disclosure retains its accessible target; Figma section actions do not add
