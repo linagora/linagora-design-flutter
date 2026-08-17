@@ -93,6 +93,7 @@ class LinagoraSidebarStyle {
       active: const Color(0xFF0A84FF),
       trailing: const Color(0xFF737576),
     ),
+    sectionHeaderForeground: const Color(0xFF424244).withValues(alpha: 0.64),
   );
 
   /// Dark inverts the overlay — a near-black wash is invisible on it — and
@@ -189,6 +190,7 @@ class LinagoraSidebarStyle {
   static LinagoraSidebarStyle _build({
     required _Overlay overlay,
     required _Ink ink,
+    Color? sectionHeaderForeground,
   }) {
     final selected = overlay.base.withValues(alpha: overlay.selected);
     return LinagoraSidebarStyle(
@@ -208,6 +210,7 @@ class LinagoraSidebarStyle {
       foreground: ink.normal,
       activeForeground: ink.active,
       trailingForeground: ink.trailing,
+      sectionHeaderForeground: sectionHeaderForeground,
       labelTextStyle: _labelTextStyle,
       badgeTextStyle: _badgeTextStyle,
     );

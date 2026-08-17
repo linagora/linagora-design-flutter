@@ -13,7 +13,7 @@ class LinagoraSidebarSectionHeader extends StatelessWidget {
   static const double titleSpacing = 4;
 
   /// Visual gap between [actions] glyphs.
-  static const double actionSpacing = 16;
+  static const double actionSpacing = 0;
 
   const LinagoraSidebarSectionHeader({
     super.key,
@@ -129,38 +129,21 @@ class LinagoraSidebarSectionHeader extends StatelessWidget {
   }
 
   Widget _actions(Color foreground) {
-    // Keep the visual gap after each target expands around its glyph.
-    final gap = math.max(
-      0.0,
-      actionSpacing -
-          LinagoraSidebarControl.overhang(
-                LinagoraSidebarSectionHeaderAction.size,
-              ) *
-              2,
-    );
-
     // Plain icons inherit the header's colour and size.
     return IconTheme.merge(
       data: IconThemeData(
         color: foreground,
         size: LinagoraSidebarSectionHeaderAction.size,
       ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          for (var index = 0; index < actions.length; index++) ...[
-            if (index > 0) SizedBox(width: gap),
-            actions[index],
-          ],
-        ],
-      ),
+      child: Row(mainAxisSize: MainAxisSize.min, children: actions),
     );
   }
 }
 
 /// A compact icon control for [LinagoraSidebarSectionHeader.actions].
 class LinagoraSidebarSectionHeaderAction extends StatelessWidget {
-  static const double size = 16;
+  /// Figma's XSmall icon-button dimension.
+  static const double size = 16.67;
 
   const LinagoraSidebarSectionHeaderAction({
     super.key,
@@ -188,6 +171,7 @@ class LinagoraSidebarSectionHeaderAction extends StatelessWidget {
       color: color ?? IconTheme.of(context).color,
       onTap: onTap,
       semanticLabel: semanticLabel,
+      targetSize: size,
     );
 
     final tooltip = semanticLabel;
