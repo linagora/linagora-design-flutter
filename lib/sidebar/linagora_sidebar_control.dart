@@ -2,13 +2,15 @@ import 'package:flutter/material.dart';
 
 /// Icon control shared by sidebar rows and section headers.
 ///
-/// Decorative icons keep their glyph size; interactive ones use [tapTarget].
+/// Decorative icons keep their glyph size; interactive ones use [tapTarget]
+/// unless a component supplies a smaller [targetSize].
 class LinagoraSidebarControl extends StatelessWidget {
   /// Compact target that fits within a sidebar row.
   static const double tapTarget = 24;
 
   /// Extra width the target extends past a glyph on each side.
-  static double overhang(double iconSize) => (tapTarget - iconSize) / 2;
+  static double overhang(double iconSize, {double targetSize = tapTarget}) =>
+      (targetSize - iconSize) / 2;
 
   /// Disclosure glyph for an [expanded] state.
   static IconData disclosureIcon(bool expanded) =>
@@ -22,9 +24,14 @@ class LinagoraSidebarControl extends StatelessWidget {
     this.onTap,
     this.semanticLabel,
     this.expanded,
+    this.targetSize,
   }) : assert(
          onTap == null || semanticLabel != null,
          'An interactive sidebar control needs semanticLabel for screen readers',
+       ),
+       assert(
+         targetSize == null || targetSize >= iconSize,
+         'A control target cannot be smaller than its icon',
        );
 
   final IconData icon;
@@ -42,10 +49,17 @@ class LinagoraSidebarControl extends StatelessWidget {
   /// Expanded state announced by a disclosure control.
   final bool? expanded;
 
+  /// The interactive control's square size. Defaults to [tapTarget].
+  ///
+  /// Use the glyph size for tightly packed controls whose Figma specification
+  /// does not reserve additional tap-target padding.
+  final double? targetSize;
+
   @override
   Widget build(BuildContext context) {
     final glyph = Icon(icon, size: iconSize, color: color);
     if (onTap == null) return glyph;
+    final resolvedTargetSize = targetSize ?? tapTarget;
 
     return Semantics(
       button: true,
@@ -55,10 +69,10 @@ class LinagoraSidebarControl extends StatelessWidget {
         onTap: onTap,
         containedInkWell: true,
         highlightShape: BoxShape.circle,
-        radius: tapTarget / 2,
+        radius: resolvedTargetSize / 2,
         customBorder: const CircleBorder(),
         child: SizedBox.square(
-          dimension: tapTarget,
+          dimension: resolvedTargetSize,
           child: Center(child: glyph),
         ),
       ),
