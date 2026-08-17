@@ -10,6 +10,7 @@ void main() {
   testWidgets('uses an injected sidebar style', _injectedStyle);
   testWidgets('does not overflow a long version string', _overflow);
   testWidgets('renders inside an unbounded-width parent', _unboundedWidth);
+  testWidgets('ellipsizes a long line in a bounded Row', _boundedRowOverflow);
   testWidgets(
     'centres itself in a stretched footer column',
     _centresInAStretchedColumn,
@@ -96,6 +97,19 @@ Future<void> _unboundedWidth(WidgetTester tester) async {
 
   expect(tester.takeException(), isNull);
   expect(find.text('version 0.13.2'), findsOneWidget);
+}
+
+Future<void> _boundedRowOverflow(WidgetTester tester) async {
+  const text = 'A version string that is far too long for the sidebar footer';
+  await pumpSidebar(
+    tester,
+    const Row(
+      children: [Expanded(child: LinagoraSidebarVersion(text: text))],
+    ),
+  );
+
+  expect(tester.getSize(find.byType(LinagoraSidebarVersion)).width, sidebarWidth);
+  expect(tester.takeException(), isNull);
 }
 
 /// A stretched footer column hands the line the full sidebar width, and the
