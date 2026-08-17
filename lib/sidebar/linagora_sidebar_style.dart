@@ -113,7 +113,10 @@ class LinagoraSidebarStyle {
     this.progressFullColor,
     this.progressTrackColor,
     this.disabledOpacity = 0.38,
-  });
+  }) : assert(
+         progressHeight > 0 && progressHeight < double.infinity,
+         'Storage progress height must be finite and greater than zero',
+       );
 
   static final LinagoraSidebarStyle _light = _build(
     overlay: (base: const Color(0xFF1D192B), hover: 0.04, selected: 0.08),
@@ -124,8 +127,10 @@ class LinagoraSidebarStyle {
       trailing: const Color(0xFF737576),
     ),
     sectionHeaderForeground: const Color(0xFF424244).withValues(alpha: 0.64),
-    progressWarningColor: LinagoraSysColors.material().warning,
-    progressFullColor: LinagoraSysColors.material().error,
+    progressColors: (
+      warning: LinagoraSysColors.material().warning,
+      full: LinagoraSysColors.material().error,
+    ),
   );
 
   /// Dark inverts the overlay — a near-black wash is invisible on it — and
@@ -137,8 +142,10 @@ class LinagoraSidebarStyle {
       active: const Color(0xFF91BFFF),
       trailing: const Color(0xFFB0B3B5),
     ),
-    progressWarningColor: LinagoraSysColors.material().warningDark,
-    progressFullColor: LinagoraSysColors.material().errorDark,
+    progressColors: (
+      warning: LinagoraSysColors.material().warningDark,
+      full: LinagoraSysColors.material().errorDark,
+    ),
   );
 
   factory LinagoraSidebarStyle.light() => _light;
@@ -261,8 +268,7 @@ class LinagoraSidebarStyle {
     required _Overlay overlay,
     required _Ink ink,
     Color? sectionHeaderForeground,
-    required Color progressWarningColor,
-    required Color progressFullColor,
+    required _ProgressColors progressColors,
   }) {
     final selected = overlay.base.withValues(alpha: overlay.selected);
     return LinagoraSidebarStyle(
@@ -287,8 +293,8 @@ class LinagoraSidebarStyle {
       badgeTextStyle: _badgeTextStyle,
       storageVersionForeground: const Color(0xFF818C99),
       progressColor: ink.active,
-      progressWarningColor: progressWarningColor,
-      progressFullColor: progressFullColor,
+      progressWarningColor: progressColors.warning,
+      progressFullColor: progressColors.full,
       progressTrackColor: selected,
     );
   }
@@ -299,6 +305,8 @@ typedef _Overlay = ({Color base, double hover, double selected});
 
 /// The row's three ink colours.
 typedef _Ink = ({Color normal, Color active, Color trailing});
+
+typedef _ProgressColors = ({Color warning, Color full});
 
 typedef _SidebarStyleValues = ({
   double itemMinHeight,

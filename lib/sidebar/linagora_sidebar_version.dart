@@ -10,6 +10,9 @@ import 'package:linagora_design_flutter/style/linagora_text_theme.dart';
 /// The text centres itself in whatever width its parent gives it — a footer
 /// [Column] with [CrossAxisAlignment.stretch] hands it the sidebar width — and
 /// hugs its content otherwise.
+///
+/// Inside a bounded [Row], wrap this widget in [Expanded] or [Flexible] so a
+/// long version has a width against which it can ellipsize.
 class LinagoraSidebarVersion extends StatelessWidget {
   const LinagoraSidebarVersion({super.key, required this.text, this.style});
 

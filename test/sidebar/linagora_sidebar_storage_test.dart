@@ -5,6 +5,11 @@ import 'package:linagora_design_flutter/linagora_design_flutter.dart';
 import 'linagora_sidebar_test_utils.dart';
 
 void main() {
+  test(
+    'requires a positive, finite storage progress height',
+    _requiresPositiveFiniteProgressHeight,
+  );
+  test('derives storage tokens for a legacy custom style', _legacyStorageTokens);
   testWidgets('renders the quota specification', _quotaSpecification);
   testWidgets('clamps invalid progress values', _clampsProgress);
   testWidgets(
@@ -24,7 +29,58 @@ void main() {
     'uses injected progress state tokens instead of ambient brightness',
     _injectedProgressStateTokens,
   );
+  testWidgets('uses custom warning and full progress tokens', _customProgressStates);
   testWidgets('does not overflow with long caller-provided content', _overflow);
+}
+
+void _requiresPositiveFiniteProgressHeight() {
+  for (final height in [0.0, -1.0, double.infinity, double.nan]) {
+    expect(
+      () => _storageStyle(
+        (
+          progressHeight: height,
+          foreground: _defaultStorageBase.foreground,
+          activeForeground: _defaultStorageBase.activeForeground,
+          selectedBackground: _defaultStorageBase.selectedBackground,
+        ),
+        _emptyProgressTokens,
+        _emptyStorageTokens,
+      ),
+      throwsAssertionError,
+      reason: '$height is not a valid progress height',
+    );
+  }
+}
+
+void _legacyStorageTokens() {
+  const foreground = Color(0xFF123456);
+  const active = Color(0xFF654321);
+  const selected = Color(0xFFABCDEF);
+  final style = _storageStyle(
+    (
+      progressHeight: _defaultStorageBase.progressHeight,
+      foreground: foreground,
+      activeForeground: active,
+      selectedBackground: selected,
+    ),
+    _emptyProgressTokens,
+    _emptyStorageTokens,
+  );
+
+  expect(style.progressHeight, 3);
+  expect(style.resolvedStorageForeground, foreground.withValues(alpha: 0.64));
+  expect(style.resolvedStorageIconForeground, foreground);
+  expect(
+    style.resolvedStorageVersionForeground,
+    foreground.withValues(alpha: 0.64),
+  );
+  expect(style.resolvedProgressColor, active);
+  expect(style.resolvedProgressTrackColor, selected);
+  expect(
+    style.resolvedProgressWarningColor,
+    LinagoraSysColors.material().warning,
+  );
+  expect(style.resolvedProgressFullColor, LinagoraSysColors.material().error);
 }
 
 Future<void> _quotaSpecification(WidgetTester tester) async {
@@ -143,22 +199,33 @@ Future<void> _progressStates(WidgetTester tester) async {
 Future<void> _progressColorOverrides(WidgetTester tester) async {
   const fill = Color(0xFF123456);
   const track = Color(0xFF654321);
-  await pumpSidebar(
-    tester,
-    const LinagoraSidebarStorage(
-      label: 'Storage',
-      progress: 1,
-      progressState: LinagoraSidebarStorageProgressState.full,
-      progressColor: fill,
-      progressTrackColor: track,
-    ),
-  );
+  final style = LinagoraSidebarStyle.light();
 
-  final indicator = tester.widget<LinearProgressIndicator>(
-    find.byType(LinearProgressIndicator),
-  );
-  expect(indicator.color, fill);
-  expect(indicator.backgroundColor, track);
+  Future<void> expectColours({Color? progressColor, Color? trackColor}) async {
+    await pumpSidebar(
+      tester,
+      LinagoraSidebarStorage(
+        label: 'Storage',
+        progress: 1,
+        progressState: LinagoraSidebarStorageProgressState.full,
+        progressColor: progressColor,
+        progressTrackColor: trackColor,
+      ),
+    );
+
+    final indicator = tester.widget<LinearProgressIndicator>(
+      find.byType(LinearProgressIndicator),
+    );
+    expect(indicator.color, progressColor ?? style.resolvedProgressFullColor);
+    expect(
+      indicator.backgroundColor,
+      trackColor ?? style.resolvedProgressTrackColor,
+    );
+  }
+
+  await expectColours(progressColor: fill);
+  await expectColours(trackColor: track);
+  await expectColours(progressColor: fill, trackColor: track);
 }
 
 Future<void> _optionalContent(WidgetTester tester) async {
@@ -246,35 +313,19 @@ Future<void> _injectedStyle(WidgetTester tester) async {
   const warning = Color(0xFFBA55D3);
   const full = Color(0xFFCD5C5C);
   const track = Color(0xFFFEDCBA);
-  const style = LinagoraSidebarStyle(
-    itemMinHeight: 36,
-    itemBorderRadius: 8,
-    itemIconSize: 16,
-    itemHorizontalPadding: 8,
-    chevronSize: 10,
-    itemSpacing: 8,
-    hoverBackground: Colors.transparent,
-    selectedBackground: Colors.transparent,
-    badgeBackground: Colors.transparent,
-    badgeHeight: 16,
-    badgeHorizontalPadding: 6,
-    badgeForeground: foreground,
-    foreground: foreground,
-    activeForeground: foreground,
-    trailingForeground: foreground,
-    labelTextStyle: TextStyle(),
-    badgeTextStyle: TextStyle(),
-    progressHeight: 5,
-    storageForeground: foreground,
-    storageIconForeground: icon,
-    progressColor: progress,
-    progressWarningColor: warning,
-    progressFullColor: full,
-    progressTrackColor: track,
+  final style = _storageStyle(
+    (
+      progressHeight: 5,
+      foreground: foreground,
+      activeForeground: null,
+      selectedBackground: Colors.transparent,
+    ),
+    (color: progress, warning: warning, full: full, track: track),
+    (foreground: foreground, iconForeground: icon, versionForeground: null),
   );
   await pumpSidebar(
     tester,
-    const LinagoraSidebarStorage(label: 'Storage', progress: 0.5, style: style),
+    LinagoraSidebarStorage(label: 'Storage', progress: 0.5, style: style),
   );
 
   final indicator = tester.widget<LinearProgressIndicator>(
@@ -306,6 +357,40 @@ Future<void> _injectedProgressStateTokens(WidgetTester tester) async {
   expect(indicator.color, LinagoraSysColors.material().errorDark);
 }
 
+Future<void> _customProgressStates(WidgetTester tester) async {
+  const normal = Color(0xFF123456);
+  const warning = Color(0xFF654321);
+  const full = Color(0xFFABCDEF);
+  final style = _storageStyle(
+    _defaultStorageBase,
+    (color: normal, warning: warning, full: full, track: null),
+    _emptyStorageTokens,
+  );
+
+  for (final stateAndColor in [
+    (state: LinagoraSidebarStorageProgressState.warning, color: warning),
+    (state: LinagoraSidebarStorageProgressState.full, color: full),
+  ]) {
+    await pumpSidebar(
+      tester,
+      LinagoraSidebarStorage(
+        label: 'Storage',
+        progress: 0.5,
+        progressState: stateAndColor.state,
+        style: style,
+      ),
+      surface: const SidebarSurface(brightness: Brightness.dark),
+    );
+
+    expect(
+      tester
+          .widget<LinearProgressIndicator>(find.byType(LinearProgressIndicator))
+          .color,
+      stateAndColor.color,
+    );
+  }
+}
+
 Future<void> _overflow(WidgetTester tester) async {
   await pumpSidebar(
     tester,
@@ -318,3 +403,77 @@ Future<void> _overflow(WidgetTester tester) async {
 
   expect(tester.takeException(), isNull);
 }
+
+LinagoraSidebarStyle _storageStyle(
+  _StorageStyleBase base,
+  _ProgressTokens progress,
+  _StorageTokens storage,
+) {
+  return LinagoraSidebarStyle(
+    itemMinHeight: 36,
+    itemBorderRadius: 8,
+    itemIconSize: 16,
+    itemHorizontalPadding: 8,
+    chevronSize: 10,
+    itemSpacing: 8,
+    hoverBackground: Colors.transparent,
+    selectedBackground: base.selectedBackground,
+    badgeBackground: Colors.transparent,
+    badgeHeight: 16,
+    badgeHorizontalPadding: 6,
+    badgeForeground: base.foreground,
+    foreground: base.foreground,
+    activeForeground: base.activeForeground ?? base.foreground,
+    trailingForeground: base.foreground,
+    labelTextStyle: const TextStyle(),
+    badgeTextStyle: const TextStyle(),
+    progressHeight: base.progressHeight,
+    storageForeground: storage.foreground,
+    storageIconForeground: storage.iconForeground,
+    storageVersionForeground: storage.versionForeground,
+    progressColor: progress.color,
+    progressWarningColor: progress.warning,
+    progressFullColor: progress.full,
+    progressTrackColor: progress.track,
+  );
+}
+
+typedef _StorageStyleBase = ({
+  double progressHeight,
+  Color foreground,
+  Color? activeForeground,
+  Color selectedBackground,
+});
+
+typedef _ProgressTokens = ({
+  Color? color,
+  Color? warning,
+  Color? full,
+  Color? track,
+});
+
+typedef _StorageTokens = ({
+  Color? foreground,
+  Color? iconForeground,
+  Color? versionForeground,
+});
+
+const _StorageStyleBase _defaultStorageBase = (
+  progressHeight: 3,
+  foreground: Color(0xFF123456),
+  activeForeground: null,
+  selectedBackground: Colors.transparent,
+);
+
+const _ProgressTokens _emptyProgressTokens = (
+  color: null,
+  warning: null,
+  full: null,
+  track: null,
+);
+
+const _StorageTokens _emptyStorageTokens = (
+  foreground: null,
+  iconForeground: null,
+  versionForeground: null,
+);
