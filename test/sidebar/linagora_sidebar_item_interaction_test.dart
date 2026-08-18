@@ -13,6 +13,10 @@ void main() {
     'swaps the badge for the hover trailing slot',
     onTargetPlatform(TargetPlatform.macOS, _hoverTrailing),
   );
+  testWidgets(
+    'keeps the focus ring visible while also hovered with a hoverTrailing slot',
+    _focusRingSurvivesHover,
+  );
   testWidgets('keeps Material touch feedback on every platform', _touchRipple);
   testWidgets(
     'keeps trailing actions independent from the row',
@@ -97,6 +101,42 @@ Future<void> _hoverTrailing(WidgetTester tester) async {
 
   expect(find.text('Clean'), findsOneWidget);
   expect(find.text('3'), findsNothing);
+}
+
+/// `hoverTrailing` sets `suppressRowInkFeedback`, which routes `overlayColor`
+/// through a resolver meant to keep a lone focus state visible while
+/// suppressing everything else. It only checks `states.length == 1`, so a
+/// row that is simultaneously keyboard-focused and pointer-hovered — the
+/// common desktop/web case of tabbing to a row the mouse already rests on —
+/// falls through to the same transparent branch as an unfocused hover.
+Future<void> _focusRingSurvivesHover(WidgetTester tester) async {
+  await pumpSidebarItem(
+    tester,
+    const LinagoraSidebarItem(
+      label: 'Spam',
+      hoverTrailing: Text('Clean'),
+      onTap: sidebarNoop,
+    ),
+  );
+
+  final inkWell = tester.widget<InkWell>(
+    find.descendant(
+      of: find.byType(LinagoraSidebarItem),
+      matching: find.byType(InkWell),
+    ),
+  );
+
+  expect(
+    inkWell.overlayColor?.resolve({WidgetState.focused}),
+    isNot(Colors.transparent),
+  );
+  expect(
+    inkWell.overlayColor?.resolve({WidgetState.focused, WidgetState.hovered}),
+    isNot(Colors.transparent),
+    reason:
+        'a keyboard-focused row must keep its focus ring even while the '
+        'pointer also happens to be hovering it',
+  );
 }
 
 Future<void> _touchRipple(WidgetTester tester) async {
