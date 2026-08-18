@@ -8,6 +8,37 @@ void main() {
     _sidebarPrimaryActionColours,
   );
   testWidgets('sizes the sidebar primary action', _sidebarPrimaryActionMetrics);
+  testWidgets(
+    'uses an injected sidebar style for a dark primary action',
+    _injectedSidebarStyle,
+  );
+  testWidgets(
+    'builds a primary action without repeating sidebar button wiring',
+    _buildsPrimaryAction,
+  );
+}
+
+Future<void> _buildsPrimaryAction(WidgetTester tester) async {
+  var presses = 0;
+  await tester.pumpWidget(
+    MaterialApp(
+      home: Scaffold(
+        body: SizedBox(
+          width: 204,
+          child: LinagoraSidebarPrimaryAction(
+            label: 'Create',
+            icon: Icons.add,
+            onPressed: () => presses++,
+            buttonKey: const Key('primary-action'),
+          ),
+        ),
+      ),
+    ),
+  );
+
+  expect(tester.getSize(find.byType(FilledButton)), const Size(204, 40));
+  await tester.tap(find.byKey(const Key('primary-action')));
+  expect(presses, 1);
 }
 
 Future<void> _sidebarPrimaryActionColours(WidgetTester tester) async {
@@ -77,6 +108,7 @@ Future<void> _sidebarPrimaryActionColours(WidgetTester tester) async {
 Future<void> _sidebarPrimaryActionMetrics(WidgetTester tester) async {
   await tester.pumpWidget(
     MaterialApp(
+      theme: ThemeData(visualDensity: VisualDensity.compact),
       home: Scaffold(
         body: SizedBox(
           width: 204,
@@ -99,6 +131,7 @@ Future<void> _sidebarPrimaryActionMetrics(WidgetTester tester) async {
   final label = tester.getRect(find.text('Compose'));
 
   expect(tester.getSize(find.byType(FilledButton)), const Size(204, 40));
+  expect(style.visualDensity, VisualDensity.standard);
   expect(style.iconSize?.resolve({}), 12);
   expect(
     style.shape?.resolve({}),
@@ -108,6 +141,31 @@ Future<void> _sidebarPrimaryActionMetrics(WidgetTester tester) async {
     label.left - icon.right,
     LinagoraSidebarButtonStyles.primaryActionIconSpacing,
   );
+}
+
+Future<void> _injectedSidebarStyle(WidgetTester tester) async {
+  const background = Color(0xFF0055AA);
+  final sidebarStyle = LinagoraSidebarStyle.dark().copyWith(
+    item: const LinagoraSidebarItemStyleOverride(
+      activeForeground: background,
+    ),
+  );
+
+  await tester.pumpWidget(
+    MaterialApp(
+      theme: ThemeData(brightness: Brightness.dark),
+      home: Scaffold(
+        body: LinagoraSidebarPrimaryAction(
+          label: 'Create',
+          onPressed: _noop,
+          sidebarStyle: sidebarStyle,
+        ),
+      ),
+    ),
+  );
+
+  final style = tester.widget<FilledButton>(find.byType(FilledButton)).style!;
+  expect(style.backgroundColor?.resolve({}), background);
 }
 
 void _noop() {}

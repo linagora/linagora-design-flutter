@@ -7,10 +7,13 @@ import 'package:linagora_design_flutter/style/linagora_text_theme.dart';
 /// Ready-made [ButtonStyle]s for sidebar navigation actions.
 abstract final class LinagoraSidebarButtonStyles {
   /// The primary sidebar action — Compose, Create, or New.
-  static ButtonStyle primaryAction(BuildContext context) {
+  static ButtonStyle primaryAction(
+    BuildContext context, {
+    LinagoraSidebarStyle? sidebarStyle,
+  }) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
-    final sidebar = LinagoraSidebarStyle.of(context);
+    final sidebar = sidebarStyle ?? LinagoraSidebarStyle.of(context);
     final isDark = theme.brightness == Brightness.dark;
     final background = isDark ? sidebar.activeForeground : colorScheme.primary;
     final foreground = isDark ? _darkForeground : colorScheme.onPrimary;
@@ -40,6 +43,7 @@ abstract final class LinagoraSidebarButtonStyles {
         return null;
       }),
       iconSize: const WidgetStatePropertyAll(_iconSize),
+      visualDensity: VisualDensity.standard,
       minimumSize: const WidgetStatePropertyAll(Size(0, _minHeight)),
       padding: const WidgetStatePropertyAll(
         EdgeInsets.symmetric(

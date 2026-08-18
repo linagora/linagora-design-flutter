@@ -4,6 +4,7 @@ import 'package:widgetbook/widgetbook.dart';
 import 'package:widgetbook_annotation/widgetbook_annotation.dart' as widgetbook;
 
 import '../sidebar/sidebar_preview_surface.dart';
+import '../sidebar/sidebar_preview_svg_icon.dart';
 
 @widgetbook.UseCase(name: 'Default', type: LinagoraButton)
 Widget linagoraButtonUseCase(BuildContext context) {
@@ -35,21 +36,52 @@ Widget _standardButtonPreview(BuildContext context) {
     initialOption: LinagoraButtonSize.m,
     labelBuilder: (s) => s.name.toUpperCase(),
   );
-  final withIcon = context.knobs.boolean(
-    label: 'With leading icon',
-    initialValue: true,
+  final iconSlot = context.knobs.object.dropdown<_LinagoraButtonIconSlot>(
+    label: 'Leading icon slot',
+    options: _LinagoraButtonIconSlot.values,
+    initialOption: _LinagoraButtonIconSlot.material,
+    labelBuilder: (slot) => slot.label,
   );
-  return Padding(
-    padding: const EdgeInsets.all(LinagoraSpacing.base * 2),
-    child: LinagoraButton(
-      label: context.knobs.string(
-        label: 'Label',
-        initialValue: 'Click me',
-      ),
-      icon: withIcon ? Icons.videocam_outlined : null,
-      onPressed: () {},
-      size: size,
-      variant: variant,
+  final layout = context.knobs.object.dropdown<_LinagoraButtonLayout>(
+    label: 'Layout',
+    options: _LinagoraButtonLayout.values,
+    initialOption: _LinagoraButtonLayout.natural,
+    labelBuilder: (layout) => layout.label,
+  );
+  final layoutWidth = !layout.usesLayoutWidth
+      ? null
+      : context.knobs.double.slider(
+          label: 'Layout width',
+          initialValue: 220,
+          min: 120,
+          max: 320,
+        );
+  final outerPadding = context.knobs.boolean(
+    label: 'Add outer padding',
+    initialValue: false,
+  );
+  final enabled = context.knobs.boolean(label: 'Enabled', initialValue: true);
+  final button = LinagoraButton(
+    label: context.knobs.string(label: 'Label', initialValue: 'Click me'),
+    icon: iconSlot.icon,
+    iconWidget: iconSlot.iconWidget,
+    onPressed: enabled ? _noop : null,
+    size: size,
+    variant: variant,
+    outerPadding:
+        outerPadding ? const EdgeInsets.all(LinagoraSpacing.base * 2) : null,
+    width: layout.usesFixedWidth ? layoutWidth : null,
+    constraints: layout.usesConstraints
+        ? BoxConstraints.tightFor(width: layoutWidth)
+        : null,
+    alignment: layout.alignment,
+  );
+
+  return SizedBox(
+    width: double.infinity,
+    child: Padding(
+      padding: const EdgeInsets.all(LinagoraSpacing.base * 2),
+      child: button,
     ),
   );
 }
@@ -106,3 +138,51 @@ enum _SidebarPrimaryActionIcon {
   final String label;
   final IconData icon;
 }
+
+enum _LinagoraButtonIconSlot {
+  none('No icon'),
+  material('Material icon'),
+  svgWidget('SVG widget');
+
+  const _LinagoraButtonIconSlot(this.label);
+
+  final String label;
+
+  IconData? get icon => switch (this) {
+        _LinagoraButtonIconSlot.material => Icons.videocam_outlined,
+        _ => null,
+      };
+
+  Widget? get iconWidget => switch (this) {
+        _LinagoraButtonIconSlot.svgWidget => const SidebarPreviewSvgIcon(),
+        _ => null,
+      };
+}
+
+enum _LinagoraButtonLayout {
+  natural('Natural'),
+  fixedWidth('Fixed width'),
+  constrained('Constraints'),
+  alignedRight('Fixed width, align right');
+
+  const _LinagoraButtonLayout(this.label);
+
+  final String label;
+
+  bool get usesLayoutWidth => this != _LinagoraButtonLayout.natural;
+
+  bool get usesFixedWidth => switch (this) {
+        _LinagoraButtonLayout.fixedWidth ||
+        _LinagoraButtonLayout.alignedRight => true,
+        _ => false,
+      };
+
+  bool get usesConstraints => this == _LinagoraButtonLayout.constrained;
+
+  AlignmentGeometry? get alignment => switch (this) {
+        _LinagoraButtonLayout.alignedRight => Alignment.centerRight,
+        _ => null,
+      };
+}
+
+void _noop() {}

@@ -7,7 +7,8 @@
   application-owned `active`, `expanded` and `enabled` state.
 * `LinagoraSidebarBadge`: counter pill capped at the width of `999+`.
 * `LinagoraSidebarStyle`: sidebar design tokens, resolved from the ambient
-  theme brightness, overridable per widget.
+  theme brightness, overridable per widget. `copyWith` applies immutable
+  item, section, storage and popover override groups.
 * `LinagoraButtonVariant.text`: renders a `TextButton`. Existing exhaustive
   switches over the enum need a new branch.
 * `LinagoraIconButton`: `tapTargetSize` and `visualDensity`.
