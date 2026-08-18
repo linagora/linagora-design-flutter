@@ -421,16 +421,18 @@ class _LinagoraSidebarConfirmPopoverPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final path = shape.getClip(size);
-    final shadowPaint = Paint()
-      ..color = shadow.color
-      // [BoxShadow.toPaint] disables its blur in golden tests. Painting the
-      // token directly keeps both the production surface and its golden
-      // reference faithful to the specified blur.
-      ..maskFilter = MaskFilter.blur(shadow.blurStyle, shadow.blurSigma);
-    canvas.save();
-    canvas.translate(shadow.offset.dx, shadow.offset.dy);
-    canvas.drawPath(path, shadowPaint);
-    canvas.restore();
+    // Match Flutter's normal golden-test convention. The stable card shape and
+    // shadow token are covered by tests, while the platform-specific blur is
+    // omitted only when a test explicitly sets [debugDisableShadows].
+    if (!debugDisableShadows) {
+      final shadowPaint = Paint()
+        ..color = shadow.color
+        ..maskFilter = MaskFilter.blur(shadow.blurStyle, shadow.blurSigma);
+      canvas.save();
+      canvas.translate(shadow.offset.dx, shadow.offset.dy);
+      canvas.drawPath(path, shadowPaint);
+      canvas.restore();
+    }
     canvas.drawPath(path, Paint()..color = backgroundColor);
   }
 
