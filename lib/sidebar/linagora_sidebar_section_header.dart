@@ -192,7 +192,15 @@ class LinagoraSidebarSectionHeader extends StatelessWidget {
         color: foreground,
         size: LinagoraSidebarSectionHeaderAction.size,
       ),
-      child: Row(mainAxisSize: MainAxisSize.min, children: actions),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          for (var index = 0; index < actions.length; index++) ...[
+            if (index > 0) const SizedBox(width: actionSpacing),
+            actions[index],
+          ],
+        ],
+      ),
     );
   }
 }

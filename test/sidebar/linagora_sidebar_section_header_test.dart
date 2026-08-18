@@ -292,8 +292,14 @@ Future<void> _actions(WidgetTester tester) async {
   _expectSquareSize(tester.getSize(addTarget), 16.67);
   _expectSquareSize(search.size, 16.67);
   _expectSquareSize(add.size, 16.67);
-  expect(tester.getRect(searchTarget).right, tester.getRect(addTarget).left);
-  expect(search.right, add.left);
+  expect(
+    tester.getRect(addTarget).left - tester.getRect(searchTarget).right,
+    LinagoraSidebarSectionHeader.actionSpacing,
+  );
+  expect(
+    add.left - search.right,
+    LinagoraSidebarSectionHeader.actionSpacing,
+  );
   expect(tester.getRect(addTarget).right, sidebarWidth);
 }
 
