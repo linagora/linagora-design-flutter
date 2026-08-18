@@ -55,6 +55,22 @@ void main() {
   test('applies popover style overrides', _popoverOverrides);
   test('preserves typography through an override', _preservesTypography);
   test('keeps the stock trailing ink tokens', _trailingInkTokens);
+  test(
+    'derives the popover surface from theme brightness',
+    _popoverBackgroundByBrightness,
+  );
+  test(
+    'rejects a negative item dimension override',
+    _rejectsNegativeItemDimension,
+  );
+  test(
+    'rejects a negative action icon padding override',
+    _rejectsNegativeActionIconPadding,
+  );
+  test(
+    'rejects an out-of-range disabled opacity override',
+    _rejectsInvalidDisabledOpacity,
+  );
   testWidgets('provides a sidebar style to descendant widgets', _themeScope);
 }
 
@@ -149,6 +165,41 @@ void _trailingInkTokens() {
   expect(
     LinagoraSidebarStyle.dark().trailingForeground,
     const Color(0xA3FFFFFF),
+  );
+}
+
+void _popoverBackgroundByBrightness() {
+  expect(LinagoraSidebarStyle.light().popoverBackground, Colors.white);
+  expect(
+    LinagoraSidebarStyle.dark().popoverBackground,
+    const Color(0xFF2B2930),
+  );
+}
+
+void _rejectsNegativeItemDimension() {
+  expect(
+    () => LinagoraSidebarStyle.light().copyWith(
+      item: const LinagoraSidebarItemStyleOverride(itemMinHeight: -1),
+    ),
+    throwsAssertionError,
+  );
+}
+
+void _rejectsNegativeActionIconPadding() {
+  expect(
+    () => LinagoraSidebarStyle.light().copyWith(
+      item: const LinagoraSidebarItemStyleOverride(actionIconPadding: -1),
+    ),
+    throwsAssertionError,
+  );
+}
+
+void _rejectsInvalidDisabledOpacity() {
+  expect(
+    () => LinagoraSidebarStyle.light().copyWith(
+      item: const LinagoraSidebarItemStyleOverride(disabledOpacity: 1.5),
+    ),
+    throwsAssertionError,
   );
 }
 

@@ -10,6 +10,12 @@ import 'package:linagora_design_flutter/style/linagora_text_theme.dart';
 /// the right light and dark values without registering anything in their
 /// [ThemeData]. Sidebar widgets take a `style` to override the whole set.
 class LinagoraSidebarStyle {
+  /// Brightness this token set was derived for.
+  ///
+  /// Widgets must use this instead of the ambient [Theme] when a sidebar
+  /// style is injected beneath a differently themed parent.
+  final Brightness brightness;
+
   final double itemMinHeight;
   final double itemBorderRadius;
   final double itemIconSize;
@@ -107,6 +113,7 @@ class LinagoraSidebarStyle {
   final TextStyle badgeTextStyle;
 
   const LinagoraSidebarStyle({
+    this.brightness = Brightness.light,
     required this.itemMinHeight,
     required this.itemBorderRadius,
     required this.itemIconSize,
@@ -197,6 +204,7 @@ class LinagoraSidebarStyle {
   }
 
   static final LinagoraSidebarStyle _light = _build(
+    brightness: Brightness.light,
     overlay: (base: const Color(0xFF1D192B), hover: 0.04, selected: 0.08),
     ink: (
       // Primary text at 90%, shared by the label and the badge count.
@@ -214,6 +222,7 @@ class LinagoraSidebarStyle {
   /// Dark inverts the overlay — a near-black wash is invisible on it — and
   /// doubles the opacity to reach the same contrast steps.
   static final LinagoraSidebarStyle _dark = _build(
+    brightness: Brightness.dark,
     overlay: (base: const Color(0xFFFFFFFF), hover: 0.08, selected: 0.16),
     ink: (
       normal: const Color(0xFFFFFFFF),
@@ -247,7 +256,8 @@ class LinagoraSidebarStyle {
 
   /// The icon uses the full sidebar foreground, while the nearby storage text
   /// uses [resolvedStorageForeground].
-  Color get resolvedStorageIconForeground => storageIconForeground ?? foreground;
+  Color get resolvedStorageIconForeground =>
+      storageIconForeground ?? foreground;
 
   /// The version uses a steel-grey token in the stock themes. Custom styles
   /// that predate storage fall back to their secondary foreground.
@@ -304,6 +314,7 @@ class LinagoraSidebarStyle {
   int get hashCode => _values.hashCode;
 
   _SidebarStyleValues get _values => (
+    brightness: brightness,
     itemMinHeight: itemMinHeight,
     itemBorderRadius: itemBorderRadius,
     itemIconSize: itemIconSize,
@@ -371,6 +382,7 @@ class LinagoraSidebarStyle {
   static const double badgeCapHeightRatio = 1490 / 2048;
 
   static LinagoraSidebarStyle _build({
+    required Brightness brightness,
     required _Overlay overlay,
     required _Ink ink,
     Color? sectionHeaderForeground,
@@ -378,6 +390,7 @@ class LinagoraSidebarStyle {
   }) {
     final selected = overlay.base.withValues(alpha: overlay.selected);
     return LinagoraSidebarStyle(
+      brightness: brightness,
       itemMinHeight: 36,
       itemBorderRadius: LinagoraSpacing.base,
       itemIconSize: LinagoraSpacing.base * 2,
@@ -405,7 +418,7 @@ class LinagoraSidebarStyle {
       progressTrackColor: selected,
       upsellBorderColor: ink.active,
       upsellForeground: ink.active,
-      popoverBackground: overlay.base == const Color(0xFFFFFFFF)
+      popoverBackground: brightness == Brightness.dark
           ? const Color(0xFF2B2930)
           : Colors.white,
       popoverShadowColor: Colors.black.withValues(alpha: 0.24),
@@ -547,6 +560,7 @@ class _LinagoraSidebarStyleBuilder {
       _popover.apply(override);
 
   LinagoraSidebarStyle build() => LinagoraSidebarStyle(
+    brightness: _item.brightness,
     itemMinHeight: _item.minHeight,
     itemBorderRadius: _item.borderRadius,
     itemIconSize: _item.iconSize,
@@ -588,7 +602,8 @@ class _LinagoraSidebarStyleBuilder {
 
 class _LinagoraSidebarItemStyleBuilder {
   _LinagoraSidebarItemStyleBuilder(LinagoraSidebarStyle style)
-    : minHeight = style.itemMinHeight,
+    : brightness = style.brightness,
+      minHeight = style.itemMinHeight,
       borderRadius = style.itemBorderRadius,
       iconSize = style.itemIconSize,
       horizontalPadding = style.itemHorizontalPadding,
@@ -607,6 +622,7 @@ class _LinagoraSidebarItemStyleBuilder {
       actionIconPadding = style.actionIconPadding,
       disabledOpacity = style.disabledOpacity;
 
+  final Brightness brightness;
   double minHeight;
   double borderRadius;
   double iconSize;
@@ -738,9 +754,8 @@ class LinagoraSidebarTheme extends InheritedTheme {
 
   final LinagoraSidebarStyle data;
 
-  static LinagoraSidebarStyle? maybeOf(BuildContext context) => context
-      .dependOnInheritedWidgetOfExactType<LinagoraSidebarTheme>()
-      ?.data;
+  static LinagoraSidebarStyle? maybeOf(BuildContext context) =>
+      context.dependOnInheritedWidgetOfExactType<LinagoraSidebarTheme>()?.data;
 
   @override
   bool updateShouldNotify(LinagoraSidebarTheme oldWidget) =>
@@ -760,6 +775,7 @@ typedef _Ink = ({Color normal, Color active, Color trailing});
 typedef _ProgressColors = ({Color warning, Color full});
 
 typedef _SidebarStyleValues = ({
+  Brightness brightness,
   double itemMinHeight,
   double itemBorderRadius,
   double itemIconSize,

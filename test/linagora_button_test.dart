@@ -16,6 +16,11 @@ void main() {
     'prefers an icon widget over an icon',
     _iconWidgetTakesPrecedence,
   );
+  testWidgets('applies box constraints to the button layout', _constraints);
+  test(
+    'rejects width and constraints supplied together',
+    _rejectsWidthAndConstraintsTogether,
+  );
 }
 
 Future<void> _xsTextButton(WidgetTester tester) async {
@@ -32,10 +37,7 @@ Future<void> _xsTextButton(WidgetTester tester) async {
   expect(tester.getSize(find.byType(TextButton)).height, 32);
 
   final style = tester.widget<TextButton>(find.byType(TextButton)).style!;
-  expect(
-    style.shape?.resolve({}),
-    isA<StadiumBorder>(),
-  );
+  expect(style.shape?.resolve({}), isA<StadiumBorder>());
   expect(
     style.padding?.resolve({}),
     const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
@@ -173,9 +175,39 @@ Future<void> _iconWidgetTakesPrecedence(WidgetTester tester) async {
   expect(find.byIcon(Icons.edit_outlined), findsNothing);
 }
 
+Future<void> _constraints(WidgetTester tester) async {
+  const clickableKey = Key('clickable-button');
+
+  await _pump(
+    tester,
+    const LinagoraButton(
+      label: 'Compose',
+      onPressed: _noop,
+      buttonKey: clickableKey,
+      constraints: BoxConstraints.tightFor(width: 160),
+    ),
+  );
+
+  expect(tester.getSize(find.byKey(clickableKey)).width, 160);
+}
+
+void _rejectsWidthAndConstraintsTogether() {
+  expect(
+    () => LinagoraButton(
+      label: 'Compose',
+      onPressed: _noop,
+      width: 160,
+      constraints: const BoxConstraints(maxWidth: 160),
+    ),
+    throwsAssertionError,
+  );
+}
+
 Future<void> _pump(WidgetTester tester, Widget button) {
   return tester.pumpWidget(
-    MaterialApp(home: Scaffold(body: Center(child: button))),
+    MaterialApp(
+      home: Scaffold(body: Center(child: button)),
+    ),
   );
 }
 

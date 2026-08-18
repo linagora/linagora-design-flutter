@@ -4,7 +4,7 @@ import 'package:linagora_design_flutter/buttons/linagora_button_variant.dart';
 import 'package:linagora_design_flutter/spacings/linagora_spacing.dart';
 
 class LinagoraButton extends StatelessWidget {
-  /// Default icon theme size. An [iconWidget] keeps its own layout constraints.
+  /// Default icon size, supplied through the generated [ButtonStyle].
   static const double defaultIconSize = 20;
 
   final String label;
@@ -137,13 +137,7 @@ class LinagoraButton extends StatelessWidget {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        if (iconWidget != null)
-          IconTheme.merge(
-            data: const IconThemeData(size: defaultIconSize),
-            child: iconWidget,
-          )
-        else
-          Icon(icon),
+        if (iconWidget != null) iconWidget else Icon(icon),
         SizedBox(width: iconSpacing),
         Flexible(child: text),
       ],
@@ -159,24 +153,20 @@ class LinagoraButton extends StatelessWidget {
           ? WidgetStatePropertyAll(BorderSide(color: primary))
           : null,
       tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-      minimumSize: WidgetStatePropertyAll(
-        switch (size) {
-          LinagoraButtonSize.xs => const Size(0, 32),
-          LinagoraButtonSize.m => const Size(0, 48),
-        },
-      ),
-      padding: WidgetStatePropertyAll(
-        switch (size) {
-          LinagoraButtonSize.xs => const EdgeInsets.symmetric(
-              horizontal: LinagoraSpacing.base * 1.5,
-              vertical: 6,
-            ),
-          LinagoraButtonSize.m => const EdgeInsets.symmetric(
-              horizontal: LinagoraSpacing.base * 3,
-              vertical: LinagoraSpacing.base * 1.5,
-            ),
-        },
-      ),
+      minimumSize: WidgetStatePropertyAll(switch (size) {
+        LinagoraButtonSize.xs => const Size(0, 32),
+        LinagoraButtonSize.m => const Size(0, 48),
+      }),
+      padding: WidgetStatePropertyAll(switch (size) {
+        LinagoraButtonSize.xs => const EdgeInsets.symmetric(
+          horizontal: LinagoraSpacing.base * 1.5,
+          vertical: 6,
+        ),
+        LinagoraButtonSize.m => const EdgeInsets.symmetric(
+          horizontal: LinagoraSpacing.base * 3,
+          vertical: LinagoraSpacing.base * 1.5,
+        ),
+      }),
     );
   }
 }

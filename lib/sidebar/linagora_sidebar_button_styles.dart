@@ -14,7 +14,7 @@ abstract final class LinagoraSidebarButtonStyles {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
     final sidebar = sidebarStyle ?? LinagoraSidebarStyle.of(context);
-    final isDark = theme.brightness == Brightness.dark;
+    final isDark = sidebar.brightness == Brightness.dark;
     final background = isDark ? sidebar.activeForeground : colorScheme.primary;
     final foreground = isDark ? _darkForeground : colorScheme.onPrimary;
 
