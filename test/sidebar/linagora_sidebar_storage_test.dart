@@ -9,11 +9,14 @@ void main() {
     'requires a positive, finite storage progress height',
     _requiresPositiveFiniteProgressHeight,
   );
+  test('derives legacy storage text tokens', _legacyStorageTextTokens);
+  test('derives legacy normal progress tokens', _legacyNormalProgressTokens);
   test(
-    'derives storage tokens for a legacy custom style',
-    _legacyStorageTokens,
+    'derives legacy semantic progress tokens',
+    _legacySemanticProgressTokens,
   );
-  testWidgets('renders the quota specification', _quotaSpecification);
+  testWidgets('renders quota size and progress metrics', _quotaMetrics);
+  testWidgets('renders quota ink from sidebar style', _quotaInk);
   testWidgets(
     'keeps the Figma storage typography in both themes',
     _storageTypography,
@@ -31,7 +34,11 @@ void main() {
   testWidgets('sizes an oversized custom icon widget', _constrainsIconWidget);
   testWidgets('forwards a tap from the full storage block', _tap);
   testWidgets('names a tappable block exactly once', _tapSemantics);
-  testWidgets('uses injected storage tokens', _injectedStyle);
+  testWidgets(
+    'uses injected storage layout and progress tokens',
+    _injectedLayoutAndProgressTokens,
+  );
+  testWidgets('uses injected storage text tokens', _injectedTextTokens);
   testWidgets(
     'uses injected progress state tokens instead of ambient brightness',
     _injectedProgressStateTokens,
@@ -62,30 +69,31 @@ void _requiresPositiveFiniteProgressHeight() {
   }
 }
 
-void _legacyStorageTokens() {
-  const foreground = Color(0xFF123456);
-  const active = Color(0xFF654321);
-  const selected = Color(0xFFABCDEF);
-  final style = _storageStyle(
-    (
-      progressHeight: _defaultStorageBase.progressHeight,
-      foreground: foreground,
-      activeForeground: active,
-      selectedBackground: selected,
-    ),
-    _emptyProgressTokens,
-    _emptyStorageTokens,
-  );
+void _legacyStorageTextTokens() {
+  final style = _legacyStorageStyle();
 
-  expect(style.progressHeight, 3);
-  expect(style.resolvedStorageForeground, foreground.withValues(alpha: 0.64));
-  expect(style.resolvedStorageIconForeground, foreground);
+  expect(
+    style.resolvedStorageForeground,
+    _legacyForeground.withValues(alpha: 0.64),
+  );
+  expect(style.resolvedStorageIconForeground, _legacyForeground);
   expect(
     style.resolvedStorageVersionForeground,
-    foreground.withValues(alpha: 0.64),
+    _legacyForeground.withValues(alpha: 0.64),
   );
-  expect(style.resolvedProgressColor, active);
-  expect(style.resolvedProgressTrackColor, selected);
+}
+
+void _legacyNormalProgressTokens() {
+  final style = _legacyStorageStyle();
+
+  expect(style.progressHeight, 3);
+  expect(style.resolvedProgressColor, _legacyActive);
+  expect(style.resolvedProgressTrackColor, _legacySelected);
+}
+
+void _legacySemanticProgressTokens() {
+  final style = _legacyStorageStyle();
+
   expect(
     style.resolvedProgressWarningColor,
     LinagoraSysColors.material().warning,
@@ -93,8 +101,33 @@ void _legacyStorageTokens() {
   expect(style.resolvedProgressFullColor, LinagoraSysColors.material().error);
 }
 
-Future<void> _quotaSpecification(WidgetTester tester) async {
-  await pumpSidebar(
+Future<void> _quotaMetrics(WidgetTester tester) async {
+  await _pumpQuota(tester);
+
+  final style = LinagoraSidebarStyle.light();
+  final progress = _quotaProgress(tester);
+
+  expect(tester.getSize(find.byIcon(Icons.cloud_outlined)), const Size(24, 24));
+  expect(progress.value, 0.02);
+  expect(progress.minHeight, style.progressHeight);
+}
+
+Future<void> _quotaInk(WidgetTester tester) async {
+  await _pumpQuota(tester);
+
+  final style = LinagoraSidebarStyle.light();
+  final progress = _quotaProgress(tester);
+
+  expect(progress.color, style.resolvedProgressColor);
+  expect(progress.backgroundColor, style.resolvedProgressTrackColor);
+  expect(
+    tester.widget<Icon>(find.byIcon(Icons.cloud_outlined)).color,
+    style.resolvedStorageIconForeground,
+  );
+}
+
+Future<void> _pumpQuota(WidgetTester tester) {
+  return pumpSidebar(
     tester,
     const LinagoraSidebarStorage(
       label: 'Storage',
@@ -102,26 +135,10 @@ Future<void> _quotaSpecification(WidgetTester tester) async {
       caption: '497.28 GB available',
     ),
   );
-
-  final style = LinagoraSidebarStyle.light();
-  final progress = tester.widget<LinearProgressIndicator>(
-    find.byType(LinearProgressIndicator),
-  );
-
-  expect(tester.getSize(find.byIcon(Icons.cloud_outlined)), const Size(24, 24));
-  expect(progress.value, 0.02);
-  expect(progress.minHeight, style.progressHeight);
-  expect(progress.color, style.resolvedProgressColor);
-  expect(progress.backgroundColor, style.resolvedProgressTrackColor);
-  _expectStorageTypography(tester.widget<Text>(find.text('Storage')).style);
-  _expectStorageTypography(
-    tester.widget<Text>(find.text('497.28 GB available')).style,
-  );
-  expect(
-    tester.widget<Icon>(find.byIcon(Icons.cloud_outlined)).color,
-    style.resolvedStorageIconForeground,
-  );
 }
+
+LinearProgressIndicator _quotaProgress(WidgetTester tester) => tester
+    .widget<LinearProgressIndicator>(find.byType(LinearProgressIndicator));
 
 Future<void> _storageTypography(WidgetTester tester) async {
   for (final brightness in Brightness.values) {
@@ -149,10 +166,14 @@ Future<void> _storageTypography(WidgetTester tester) async {
 }
 
 void _expectStorageTypography(TextStyle? style) {
+  _expectStorageFontMetrics(style);
+  expect(style?.letterSpacing, 0.5);
+}
+
+void _expectStorageFontMetrics(TextStyle? style) {
   expect(style?.fontSize, 12);
   expect(style?.fontWeight, FontWeight.w500);
   expect(style?.height, 15.76 / 12);
-  expect(style?.letterSpacing, 0.5);
 }
 
 Future<void> _clampsProgress(WidgetTester tester) async {
@@ -351,36 +372,40 @@ Future<void> _tapSemantics(WidgetTester tester) async {
   }
 }
 
-Future<void> _injectedStyle(WidgetTester tester) async {
-  const foreground = Color(0xFF123456);
-  const icon = Color(0xFF654321);
-  const progress = Color(0xFFABCDEF);
-  const warning = Color(0xFFBA55D3);
-  const full = Color(0xFFCD5C5C);
-  const track = Color(0xFFFEDCBA);
-  final style = _storageStyle(
-    (
-      progressHeight: 5,
-      foreground: foreground,
-      activeForeground: null,
-      selectedBackground: Colors.transparent,
-    ),
-    (color: progress, warning: warning, full: full, track: track),
-    (foreground: foreground, iconForeground: icon, versionForeground: null),
-  );
-  await pumpSidebar(
-    tester,
-    LinagoraSidebarStorage(label: 'Storage', progress: 0.5, style: style),
-  );
+Future<void> _injectedLayoutAndProgressTokens(WidgetTester tester) async {
+  final fixture = _injectedStorageFixture();
+  await _pumpInjectedStorage(tester, fixture.style);
 
   final indicator = tester.widget<LinearProgressIndicator>(
     find.byType(LinearProgressIndicator),
   );
   expect(indicator.minHeight, 5);
-  expect(indicator.color, progress);
-  expect(indicator.backgroundColor, track);
-  expect(tester.widget<Text>(find.text('Storage')).style?.color, foreground);
-  expect(tester.widget<Icon>(find.byIcon(Icons.cloud_outlined)).color, icon);
+  expect(indicator.color, fixture.progress);
+  expect(indicator.backgroundColor, fixture.track);
+}
+
+Future<void> _injectedTextTokens(WidgetTester tester) async {
+  final fixture = _injectedStorageFixture();
+  await _pumpInjectedStorage(tester, fixture.style);
+
+  expect(
+    tester.widget<Text>(find.text('Storage')).style?.color,
+    fixture.foreground,
+  );
+  expect(
+    tester.widget<Icon>(find.byIcon(Icons.cloud_outlined)).color,
+    fixture.icon,
+  );
+}
+
+Future<void> _pumpInjectedStorage(
+  WidgetTester tester,
+  LinagoraSidebarStyle style,
+) {
+  return pumpSidebar(
+    tester,
+    LinagoraSidebarStorage(label: 'Storage', progress: 0.5, style: style),
+  );
 }
 
 Future<void> _injectedProgressStateTokens(WidgetTester tester) async {
@@ -450,6 +475,43 @@ Future<void> _overflow(WidgetTester tester) async {
   expect(tester.takeException(), isNull);
 }
 
+LinagoraSidebarStyle _legacyStorageStyle() => _storageStyle(
+  (
+    progressHeight: _defaultStorageBase.progressHeight,
+    foreground: _legacyForeground,
+    activeForeground: _legacyActive,
+    selectedBackground: _legacySelected,
+  ),
+  _emptyProgressTokens,
+  _emptyStorageTokens,
+);
+
+_InjectedStorageFixture _injectedStorageFixture() {
+  const foreground = Color(0xFF123456);
+  const icon = Color(0xFF654321);
+  const progress = Color(0xFFABCDEF);
+  const warning = Color(0xFFBA55D3);
+  const full = Color(0xFFCD5C5C);
+  const track = Color(0xFFFEDCBA);
+
+  return (
+    style: _storageStyle(
+      (
+        progressHeight: 5,
+        foreground: foreground,
+        activeForeground: null,
+        selectedBackground: Colors.transparent,
+      ),
+      (color: progress, warning: warning, full: full, track: track),
+      (foreground: foreground, iconForeground: icon, versionForeground: null),
+    ),
+    foreground: foreground,
+    icon: icon,
+    progress: progress,
+    track: track,
+  );
+}
+
 LinagoraSidebarStyle _storageStyle(
   _StorageStyleBase base,
   _ProgressTokens progress,
@@ -503,6 +565,18 @@ typedef _StorageTokens = ({
   Color? iconForeground,
   Color? versionForeground,
 });
+
+typedef _InjectedStorageFixture = ({
+  LinagoraSidebarStyle style,
+  Color foreground,
+  Color icon,
+  Color progress,
+  Color track,
+});
+
+const _legacyForeground = Color(0xFF123456);
+const _legacyActive = Color(0xFF654321);
+const _legacySelected = Color(0xFFABCDEF);
 
 const _StorageStyleBase _defaultStorageBase = (
   progressHeight: 3,
