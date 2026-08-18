@@ -7,6 +7,15 @@ void main() {
   testWidgets('text variant renders a TextButton', _textVariant);
   testWidgets('lets callers override the visual button style', _styleOverride);
   testWidgets('keeps the defaults a caller style leaves unset', _styleFallback);
+  testWidgets(
+    'applies width, outer padding, and alignment to the button layout',
+    _layoutOptions,
+  );
+  testWidgets('preserves an icon widget size', _iconWidgetSize);
+  testWidgets(
+    'prefers an icon widget over an icon',
+    _iconWidgetTakesPrecedence,
+  );
 }
 
 Future<void> _xsTextButton(WidgetTester tester) async {
@@ -104,6 +113,64 @@ Future<void> _styleFallback(WidgetTester tester) async {
   expect(style.shape?.resolve({}), isA<StadiumBorder>());
   expect(style.minimumSize?.resolve({}), const Size(0, 48));
   expect(style.tapTargetSize, MaterialTapTargetSize.shrinkWrap);
+}
+
+Future<void> _layoutOptions(WidgetTester tester) async {
+  const clickableKey = Key('clickable-button');
+  const layoutKey = Key('layout-container');
+
+  await _pump(
+    tester,
+    const SizedBox(
+      key: layoutKey,
+      width: 360,
+      child: LinagoraButton(
+        label: 'Compose',
+        onPressed: _noop,
+        buttonKey: clickableKey,
+        width: 180,
+        outerPadding: EdgeInsets.symmetric(horizontal: 12),
+        alignment: Alignment.centerRight,
+      ),
+    ),
+  );
+
+  final buttonRect = tester.getRect(find.byKey(clickableKey));
+  final layoutRect = tester.getRect(find.byKey(layoutKey));
+
+  expect(buttonRect.width, 180);
+  expect(buttonRect.right, closeTo(layoutRect.right - 12, 0.01));
+}
+
+Future<void> _iconWidgetSize(WidgetTester tester) async {
+  const iconKey = Key('custom-icon');
+  await _pump(
+    tester,
+    const LinagoraButton(
+      label: 'Compose',
+      iconWidget: SizedBox(key: iconKey, width: 12, height: 12),
+      iconSpacing: 7,
+      onPressed: _noop,
+    ),
+  );
+
+  expect(tester.getSize(find.byKey(iconKey)), const Size(12, 12));
+}
+
+Future<void> _iconWidgetTakesPrecedence(WidgetTester tester) async {
+  const iconKey = Key('custom-icon');
+  await _pump(
+    tester,
+    const LinagoraButton(
+      label: 'Compose',
+      icon: Icons.edit_outlined,
+      iconWidget: SizedBox(key: iconKey, width: 12, height: 12),
+      onPressed: _noop,
+    ),
+  );
+
+  expect(find.byKey(iconKey), findsOneWidget);
+  expect(find.byIcon(Icons.edit_outlined), findsNothing);
 }
 
 Future<void> _pump(WidgetTester tester, Widget button) {

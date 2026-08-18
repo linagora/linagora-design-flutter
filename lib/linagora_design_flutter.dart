@@ -36,6 +36,7 @@ export 'package:linagora_design_flutter/sidebar/linagora_sidebar_button_styles.d
 export 'package:linagora_design_flutter/sidebar/linagora_sidebar_control.dart';
 export 'package:linagora_design_flutter/sidebar/linagora_sidebar_indent.dart';
 export 'package:linagora_design_flutter/sidebar/linagora_sidebar_item.dart';
+export 'package:linagora_design_flutter/sidebar/linagora_sidebar_primary_action.dart';
 export 'package:linagora_design_flutter/sidebar/linagora_sidebar_section_header.dart';
 export 'package:linagora_design_flutter/sidebar/linagora_sidebar_storage.dart';
 export 'package:linagora_design_flutter/sidebar/linagora_sidebar_style.dart';
