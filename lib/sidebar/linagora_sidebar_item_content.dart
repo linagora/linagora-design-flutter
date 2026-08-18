@@ -74,8 +74,9 @@ class _LinagoraSidebarItemContent extends StatelessWidget {
           // trailing action can become active. Suppress that ancestor feedback
           // for rows that reveal actions, otherwise it briefly washes over the
           // entire item behind the action's own Material. Before an action
-          // opens, a lone focus state keeps keyboard focus feedback on the
-          // row. Once open, every row feedback state stays transparent.
+          // opens, focus keeps keyboard feedback on the row even when the
+          // pointer is also hovering it. Once open, every row feedback state
+          // stays transparent.
           splashColor: suppressInkFeedback ? Colors.transparent : null,
           highlightColor: suppressInkFeedback ? Colors.transparent : null,
           focusColor: hasActiveAction ? Colors.transparent : null,
@@ -83,8 +84,7 @@ class _LinagoraSidebarItemContent extends StatelessWidget {
               ? const WidgetStatePropertyAll(Colors.transparent)
               : suppressRowInkFeedback
               ? WidgetStateProperty.resolveWith(
-                  (states) => states.length == 1 &&
-                          states.contains(WidgetState.focused)
+                  (states) => states.contains(WidgetState.focused)
                       ? null
                       : Colors.transparent,
                 )

@@ -47,7 +47,8 @@ class LinagoraSidebarScrollCoordinator extends InheritedWidget {
       if (renderObject == null || !renderObject.attached) return;
 
       final position = controller.position;
-      final viewport = RenderAbstractViewport.of(renderObject);
+      final viewport = RenderAbstractViewport.maybeOf(renderObject);
+      if (viewport == null) return;
       final revealOffset = viewport
           .getOffsetToReveal(renderObject, 1)
           .offset
