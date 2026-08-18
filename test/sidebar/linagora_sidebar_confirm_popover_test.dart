@@ -163,20 +163,30 @@ Future<void> _darkTokens(WidgetTester tester) async {
   expect(_shape(tester).arrowSide, LinagoraSidebarPopoverArrowSide.start);
 }
 
-Future<void> _lightGolden(WidgetTester tester) async {
-  await _pumpPopover(tester);
-  await expectLater(
-    find.byKey(_captureKey),
-    matchesGoldenFile('goldens/linagora_sidebar_confirm_popover_light.png'),
-  );
-}
+Future<void> _lightGolden(WidgetTester tester) => _withShadowsDisabled(() async {
+      await _pumpPopover(tester);
+      await expectLater(
+        find.byKey(_captureKey),
+        matchesGoldenFile('goldens/linagora_sidebar_confirm_popover_light.png'),
+      );
+    });
 
-Future<void> _darkGolden(WidgetTester tester) async {
-  await _pumpPopover(tester, brightness: Brightness.dark);
-  await expectLater(
-    find.byKey(_captureKey),
-    matchesGoldenFile('goldens/linagora_sidebar_confirm_popover_dark.png'),
-  );
+Future<void> _darkGolden(WidgetTester tester) => _withShadowsDisabled(() async {
+      await _pumpPopover(tester, brightness: Brightness.dark);
+      await expectLater(
+        find.byKey(_captureKey),
+        matchesGoldenFile('goldens/linagora_sidebar_confirm_popover_dark.png'),
+      );
+    });
+
+Future<void> _withShadowsDisabled(Future<void> Function() body) async {
+  final previous = debugDisableShadows;
+  debugDisableShadows = true;
+  try {
+    await body();
+  } finally {
+    debugDisableShadows = previous;
+  }
 }
 
 Future<void> _pumpPopover(
