@@ -252,6 +252,7 @@ Future<void> _loadTwakeInterFonts() async {
   final fontLoader = FontLoader('packages/linagora_design_flutter/TwakeInter')
     ..addFont(rootBundle.load('assets/fonts/TwakeInter-Regular.ttf'))
     ..addFont(rootBundle.load('assets/fonts/TwakeInter-Medium.ttf'))
-    ..addFont(rootBundle.load('assets/fonts/TwakeInter-SemiBold.ttf'));
+    ..addFont(rootBundle.load('assets/fonts/TwakeInter-SemiBold.ttf'))
+    ..addFont(rootBundle.load('assets/fonts/TwakeInter-Bold.ttf'));
   await fontLoader.load();
 }
