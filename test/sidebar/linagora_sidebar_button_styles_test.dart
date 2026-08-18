@@ -16,6 +16,14 @@ void main() {
     'builds a primary action without repeating sidebar button wiring',
     _buildsPrimaryAction,
   );
+  testWidgets(
+    'sizes an icon widget to the sidebar style, not the button default',
+    _sidebarPrimaryActionIconWidgetSize,
+  );
+  testWidgets(
+    'keys colours off the resolved sidebar style, not ambient brightness',
+    _mismatchedAmbientBrightness,
+  );
 }
 
 Future<void> _buildsPrimaryAction(WidgetTester tester) async {
@@ -39,6 +47,44 @@ Future<void> _buildsPrimaryAction(WidgetTester tester) async {
   expect(tester.getSize(find.byType(FilledButton)), const Size(204, 40));
   await tester.tap(find.byKey(const Key('primary-action')));
   expect(presses, 1);
+}
+
+Future<void> _sidebarPrimaryActionIconWidgetSize(WidgetTester tester) async {
+  const iconKey = Key('svg-icon');
+
+  await tester.pumpWidget(
+    const MaterialApp(
+      home: Scaffold(
+        body: LinagoraSidebarPrimaryAction(
+          label: 'Create',
+          onPressed: _noop,
+          iconWidget: Icon(Icons.add, key: iconKey),
+        ),
+      ),
+    ),
+  );
+
+  expect(tester.getSize(find.byKey(iconKey)), const Size(12, 12));
+}
+
+Future<void> _mismatchedAmbientBrightness(WidgetTester tester) async {
+  final sidebarStyle = LinagoraSidebarStyle.dark();
+
+  await tester.pumpWidget(
+    MaterialApp(
+      theme: ThemeData(brightness: Brightness.light),
+      home: Scaffold(
+        body: LinagoraSidebarPrimaryAction(
+          label: 'Create',
+          onPressed: _noop,
+          sidebarStyle: sidebarStyle,
+        ),
+      ),
+    ),
+  );
+
+  final style = tester.widget<FilledButton>(find.byType(FilledButton)).style!;
+  expect(style.backgroundColor?.resolve({}), sidebarStyle.activeForeground);
 }
 
 Future<void> _sidebarPrimaryActionColours(WidgetTester tester) async {
@@ -146,9 +192,7 @@ Future<void> _sidebarPrimaryActionMetrics(WidgetTester tester) async {
 Future<void> _injectedSidebarStyle(WidgetTester tester) async {
   const background = Color(0xFF0055AA);
   final sidebarStyle = LinagoraSidebarStyle.dark().copyWith(
-    item: const LinagoraSidebarItemStyleOverride(
-      activeForeground: background,
-    ),
+    item: const LinagoraSidebarItemStyleOverride(activeForeground: background),
   );
 
   await tester.pumpWidget(

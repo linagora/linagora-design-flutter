@@ -33,7 +33,10 @@ class LinagoraSidebarVersion extends StatelessWidget {
       textAlign: TextAlign.center,
       style: LinagoraTextTheme.material().labelSmall?.copyWith(
         color: style.resolvedStorageVersionForeground,
+        fontSize: 11,
         fontWeight: FontWeight.w400,
+        height: 14 / 11,
+        letterSpacing: 0,
       ),
     );
   }

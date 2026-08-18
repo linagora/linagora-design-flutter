@@ -27,6 +27,8 @@ Future<void> _typography(WidgetTester tester) async {
   expect(text.textAlign, TextAlign.center);
   expect(text.style?.fontSize, 11);
   expect(text.style?.fontWeight, FontWeight.w400);
+  expect(text.style?.height, 14 / 11);
+  expect(text.style?.letterSpacing, 0);
   expect(
     text.style?.color,
     LinagoraSidebarStyle.light().resolvedStorageVersionForeground,
@@ -108,7 +110,10 @@ Future<void> _boundedRowOverflow(WidgetTester tester) async {
     ),
   );
 
-  expect(tester.getSize(find.byType(LinagoraSidebarVersion)).width, sidebarWidth);
+  expect(
+    tester.getSize(find.byType(LinagoraSidebarVersion)).width,
+    sidebarWidth,
+  );
   expect(tester.takeException(), isNull);
 }
 

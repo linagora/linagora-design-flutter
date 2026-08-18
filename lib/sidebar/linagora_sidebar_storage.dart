@@ -139,15 +139,19 @@ class LinagoraSidebarStorage extends StatelessWidget {
     ],
   );
 
-  TextStyle? _captionStyle(Color foreground) => LinagoraTextTheme.material()
-      .bodySmall
-      ?.copyWith(color: foreground, letterSpacing: 0.5);
+  TextStyle? _captionStyle(Color foreground) =>
+      LinagoraTextTheme.material().bodySmall?.copyWith(
+        color: foreground,
+        fontSize: 12,
+        fontWeight: FontWeight.w500,
+        height: 15.76 / 12,
+        letterSpacing: 0.5,
+      );
 
   Color _progressColor(LinagoraSidebarStyle style) => switch (progressState) {
-      LinagoraSidebarStorageProgressState.normal => style.resolvedProgressColor,
-      LinagoraSidebarStorageProgressState.warning =>
-        style.resolvedProgressWarningColor,
-      LinagoraSidebarStorageProgressState.full =>
-        style.resolvedProgressFullColor,
-    };
+    LinagoraSidebarStorageProgressState.normal => style.resolvedProgressColor,
+    LinagoraSidebarStorageProgressState.warning =>
+      style.resolvedProgressWarningColor,
+    LinagoraSidebarStorageProgressState.full => style.resolvedProgressFullColor,
+  };
 }

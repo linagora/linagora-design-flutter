@@ -9,8 +9,15 @@ void main() {
     'requires a positive, finite storage progress height',
     _requiresPositiveFiniteProgressHeight,
   );
-  test('derives storage tokens for a legacy custom style', _legacyStorageTokens);
+  test(
+    'derives storage tokens for a legacy custom style',
+    _legacyStorageTokens,
+  );
   testWidgets('renders the quota specification', _quotaSpecification);
+  testWidgets(
+    'keeps the Figma storage typography in both themes',
+    _storageTypography,
+  );
   testWidgets('clamps invalid progress values', _clampsProgress);
   testWidgets(
     'maps storage states to semantic progress colours',
@@ -29,7 +36,10 @@ void main() {
     'uses injected progress state tokens instead of ambient brightness',
     _injectedProgressStateTokens,
   );
-  testWidgets('uses custom warning and full progress tokens', _customProgressStates);
+  testWidgets(
+    'uses custom warning and full progress tokens',
+    _customProgressStates,
+  );
   testWidgets('does not overflow with long caller-provided content', _overflow);
 }
 
@@ -103,11 +113,46 @@ Future<void> _quotaSpecification(WidgetTester tester) async {
   expect(progress.minHeight, style.progressHeight);
   expect(progress.color, style.resolvedProgressColor);
   expect(progress.backgroundColor, style.resolvedProgressTrackColor);
-  expect(tester.widget<Text>(find.text('Storage')).style?.fontSize, 12);
+  _expectStorageTypography(tester.widget<Text>(find.text('Storage')).style);
+  _expectStorageTypography(
+    tester.widget<Text>(find.text('497.28 GB available')).style,
+  );
   expect(
     tester.widget<Icon>(find.byIcon(Icons.cloud_outlined)).color,
     style.resolvedStorageIconForeground,
   );
+}
+
+Future<void> _storageTypography(WidgetTester tester) async {
+  for (final brightness in Brightness.values) {
+    await pumpSidebar(
+      tester,
+      const LinagoraSidebarStorage(
+        label: 'Storage',
+        progress: 0.02,
+        caption: '497.28 GB available',
+      ),
+      surface: SidebarSurface(brightness: brightness),
+    );
+
+    final style = brightness == Brightness.dark
+        ? LinagoraSidebarStyle.dark()
+        : LinagoraSidebarStyle.light();
+    final label = tester.widget<Text>(find.text('Storage'));
+    final caption = tester.widget<Text>(find.text('497.28 GB available'));
+
+    _expectStorageTypography(label.style);
+    _expectStorageTypography(caption.style);
+    expect(label.style?.color, style.resolvedStorageForeground);
+    expect(caption.style?.color, style.resolvedStorageForeground);
+  }
+}
+
+void _expectStorageTypography(TextStyle? style) {
+  expect(style?.fontSize, 12);
+  expect(style?.fontWeight, FontWeight.w500);
+  expect(style?.height, 15.76 / 12);
+  expect(style?.letterSpacing, 0.5);
 }
 
 Future<void> _clampsProgress(WidgetTester tester) async {
@@ -361,11 +406,12 @@ Future<void> _customProgressStates(WidgetTester tester) async {
   const normal = Color(0xFF123456);
   const warning = Color(0xFF654321);
   const full = Color(0xFFABCDEF);
-  final style = _storageStyle(
-    _defaultStorageBase,
-    (color: normal, warning: warning, full: full, track: null),
-    _emptyStorageTokens,
-  );
+  final style = _storageStyle(_defaultStorageBase, (
+    color: normal,
+    warning: warning,
+    full: full,
+    track: null,
+  ), _emptyStorageTokens);
 
   for (final stateAndColor in [
     (state: LinagoraSidebarStorageProgressState.warning, color: warning),
