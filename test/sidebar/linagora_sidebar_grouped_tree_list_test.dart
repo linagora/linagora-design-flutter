@@ -9,6 +9,10 @@ void main() {
     'keeps category headers and visible descendants in one virtualized list',
     _buildsGroupedTree,
   );
+  testWidgets(
+    'does not throw when a group has an initial depth of zero',
+    _initialDepthZeroGroup,
+  );
 }
 
 Future<void> _buildsGroupedTree(WidgetTester tester) async {
@@ -57,6 +61,55 @@ Future<void> _buildsGroupedTree(WidgetTester tester) async {
   expect(find.text('design'), findsOneWidget);
   expect(find.text('Team mailboxes'), findsOneWidget);
   expect(find.text('team-folder'), findsNothing);
+}
+
+/// `LinagoraSidebarTreeGroup.initialDepth` is only asserted `>= 0`, so a
+/// group-level `initialDepth: 0` is a value the API itself declares valid.
+/// `_buildRow` wraps every entry — including a depth-0 root — in
+/// `LinagoraSidebarSubItem`, whose constructor asserts `depth > 0`.
+/// `_SidebarTreeListRows._buildEntry` (the plain tree list's row builder)
+/// special-cases `depth == 0` to skip that wrapper; the grouped list's
+/// `_buildRow` has no such guard.
+Future<void> _initialDepthZeroGroup(WidgetTester tester) async {
+  const groups = [
+    LinagoraSidebarTreeGroup<_Node>(
+      id: 'root-level',
+      header: Text('Root level'),
+      roots: [_Node('project')],
+      initialDepth: 0,
+    ),
+  ];
+
+  await pumpSidebar(
+    tester,
+    SizedBox(
+      height: 300,
+      child: CustomScrollView(
+        slivers: [
+          LinagoraSidebarSliverGroupedTreeList<_Node>(
+            groups: groups,
+            adapter: LinagoraSidebarTreeAdapter<_Node>(
+              childrenOf: (node) => node.children,
+              idOf: (node) => node.id,
+              isExpanded: (node) => false,
+            ),
+            itemBuilder: (context, entry) => SizedBox(
+              height: 36,
+              child: Text(entry.data.id),
+            ),
+          ),
+        ],
+      ),
+    ),
+  );
+
+  expect(
+    tester.takeException(),
+    isNull,
+    reason:
+        'LinagoraSidebarTreeGroup.initialDepth allows 0, but '
+        'LinagoraSidebarSubItem asserts depth > 0 for every entry row',
+  );
 }
 
 class _Node {
