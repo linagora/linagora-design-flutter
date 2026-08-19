@@ -231,6 +231,16 @@ Future<void> _explicitDefaultWidthWinsOverPopoverStyle(
     cardSize.width - _shape(tester).arrowSize,
     LinagoraSidebarConfirmPopover.defaultWidth,
   );
+
+  await _pumpPopover(
+    tester,
+    popoverStyle: const LinagoraSidebarConfirmPopoverStyle(width: 340),
+  );
+  expect(
+    tester.getSize(find.byKey(_cardKey)).width - _shape(tester).arrowSize,
+    340,
+    reason: 'an omitted width delegates to popoverStyle',
+  );
 }
 
 /// Pins the close button's current contract — tap fires [onCancel] and its
@@ -381,8 +391,7 @@ Future<void> _pumpPopover(
                       onConfirm: onConfirm ?? _noop,
                       confirmButtonVariant: confirmButtonVariant,
                       style: style,
-                      width:
-                          width ?? LinagoraSidebarConfirmPopover.defaultWidth,
+                      width: width,
                       popoverStyle: popoverStyle,
                     ),
                   ),
