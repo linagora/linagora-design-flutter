@@ -42,6 +42,15 @@ void main() {
     'blocks a trailing action while the row is disabled',
     _disabledRowBlocksAction,
   );
+  testWidgets('rejects duplicate action ids', _duplicateActionIdThrows);
+  testWidgets(
+    'survives disposal while a popover is open',
+    _popoverDisposedWhileOpen,
+  );
+  testWidgets(
+    'hides siblings on its own activity outside an item',
+    _standaloneActionGroup,
+  );
 }
 
 Future<void> _menuActionKeepsTrailingVisible(WidgetTester tester) async {
@@ -1107,4 +1116,107 @@ Future<void> _disabledRowBlocksAction(WidgetTester tester) async {
   await tester.pump();
 
   expect(opened, isFalse);
+}
+
+Future<void> _duplicateActionIdThrows(WidgetTester tester) async {
+  await pumpSidebar(
+    tester,
+    const LinagoraSidebarItemActions(
+      actions: [
+        LinagoraSidebarItemActionEntry(
+          id: 'dup',
+          child: LinagoraSidebarItemAction(
+            semanticLabel: 'Clean Spam',
+            onTap: _noop,
+            child: Text('Clean'),
+          ),
+        ),
+        LinagoraSidebarItemActionEntry(
+          id: 'dup',
+          child: LinagoraSidebarItemAction(
+            semanticLabel: 'More Spam actions',
+            onTap: _noop,
+            child: Icon(Icons.more_horiz),
+          ),
+        ),
+      ],
+    ),
+  );
+
+  expect(tester.takeException(), isArgumentError);
+}
+
+Future<void> _popoverDisposedWhileOpen(WidgetTester tester) async {
+  await pumpSidebar(
+    tester,
+    LinagoraSidebarItem(
+      label: 'Spam',
+      hovered: true,
+      onTap: _noop,
+      hoverTrailing: LinagoraSidebarItemActions(
+        actions: [
+          LinagoraSidebarItemActionEntry(
+            id: 'clean-spam',
+            child: LinagoraSidebarPopoverAction(
+              semanticLabel: 'Clean Spam',
+              popoverBuilder: (context, close) => Material(
+                child: TextButton(
+                  onPressed: close,
+                  child: const Text('Close Clean'),
+                ),
+              ),
+              child: const Text('Clean'),
+            ),
+          ),
+        ],
+      ),
+    ),
+  );
+
+  await tester.tap(find.bySemanticsLabel('Clean Spam'));
+  await tester.pump();
+
+  // A virtualized sidebar recycles the row while its popover is still open.
+  await pumpSidebar(tester, const SizedBox.shrink());
+
+  expect(tester.takeException(), isNull);
+}
+
+/// Outside a [LinagoraSidebarItem], the group has no ancestor scope, so it
+/// falls back to its own local activity — still hiding an inactive sibling.
+Future<void> _standaloneActionGroup(WidgetTester tester) async {
+  const cleanKey = Key('standalone-clean-action');
+  final completion = Completer<void>();
+  await pumpSidebar(
+    tester,
+    LinagoraSidebarItemActions(
+      actions: [
+        LinagoraSidebarItemActionEntry(
+          id: 'more-spam',
+          child: LinagoraSidebarMenuAction(
+            semanticLabel: 'More Spam actions',
+            child: const Icon(Icons.more_horiz),
+            onPressed: (_) => completion.future,
+          ),
+        ),
+        LinagoraSidebarItemActionEntry(
+          id: 'clean-spam',
+          child: LinagoraSidebarItemAction(
+            key: cleanKey,
+            semanticLabel: 'Clean Spam',
+            onTap: _noop,
+            child: const Text('Clean'),
+          ),
+        ),
+      ],
+    ),
+  );
+
+  await tester.tap(find.bySemanticsLabel('More Spam actions'));
+  await tester.pump();
+  expect(_visibilityOf(tester, find.byKey(cleanKey)).visible, isFalse);
+
+  completion.complete();
+  await tester.pump();
+  expect(_visibilityOf(tester, find.byKey(cleanKey)).visible, isTrue);
 }
