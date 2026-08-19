@@ -5,6 +5,14 @@ import 'package:linagora_design_flutter/linagora_design_flutter.dart';
 
 void main() {
   testWidgets(
+    'shows no edges until a drag starts',
+    _hiddenWithoutDrag,
+  );
+  testWidgets(
+    'shows both edges while dragging with scroll room on each side',
+    _showsBothEdgesWhileDragging,
+  );
+  testWidgets(
     'stops scrolling once the drag ends mid-animation',
     _stopsScrollingWhenDragEnds,
   );
@@ -12,6 +20,58 @@ void main() {
     'uses the legacy callback API when no explicit controller is supplied',
     _legacyCallbackUnderAmbientCoordinator,
   );
+}
+
+Widget _sidebarWithOverlay(
+  ScrollController controller, {
+  required bool isDragging,
+}) {
+  return MaterialApp(
+    home: Scaffold(
+      body: SizedBox(
+        width: 204,
+        height: 200,
+        child: Stack(
+          children: [
+            ListView(
+              controller: controller,
+              children: [
+                for (var index = 0; index < 20; index++)
+                  SizedBox(height: 50, child: Text('Row $index')),
+              ],
+            ),
+            Positioned.fill(
+              child: LinagoraSidebarAutoScrollOverlay(
+                isDragging: isDragging,
+                controller: controller,
+              ),
+            ),
+          ],
+        ),
+      ),
+    ),
+  );
+}
+
+Future<void> _hiddenWithoutDrag(WidgetTester tester) async {
+  final controller = ScrollController(initialScrollOffset: 500);
+  addTearDown(controller.dispose);
+
+  await tester.pumpWidget(_sidebarWithOverlay(controller, isDragging: false));
+  await tester.pump();
+
+  expect(find.byType(LinagoraSidebarAutoScrollOverlay), findsOneWidget);
+  expect(find.byWidgetPredicate((widget) => widget is Align), findsNothing);
+}
+
+Future<void> _showsBothEdgesWhileDragging(WidgetTester tester) async {
+  final controller = ScrollController(initialScrollOffset: 500);
+  addTearDown(controller.dispose);
+
+  await tester.pumpWidget(_sidebarWithOverlay(controller, isDragging: true));
+  await tester.pump();
+
+  expect(find.byWidgetPredicate((widget) => widget is Align), findsNWidgets(2));
 }
 
 /// `_updateController` only removes its listener when `isDragging` flips to
