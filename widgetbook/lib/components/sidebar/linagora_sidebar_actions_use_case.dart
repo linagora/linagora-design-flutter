@@ -37,42 +37,43 @@ class _SidebarActionsPreviewState extends State<_SidebarActionsPreview> {
               LinagoraSidebarItemActionEntry(
                 id: 'clean-spam',
                 child: LinagoraSidebarPopoverAction(
-                semanticLabel: 'Clean Spam',
-                modalSemanticLabel: 'Clear folder',
-                child: const Text('Clean'),
-                popoverBuilder: (context, close) =>
-                    LinagoraSidebarConfirmPopover(
-                      title: 'Clear folder',
-                      message: 'This example confirms a product-owned action.',
-                      cancelLabel: 'Cancel',
-                      confirmLabel: 'Clean',
-                      closeSemanticLabel: 'Close confirmation',
-                      onCancel: close,
-                      onConfirm: () {
-                        close();
-                        setState(() => _event = 'Folder cleared');
-                      },
-                    ),
+                  semanticLabel: 'Clean Spam',
+                  modalSemanticLabel: 'Clear folder',
+                  child: const Text('Clean'),
+                  popoverBuilder: (context, close) =>
+                      LinagoraSidebarConfirmPopover(
+                    title: 'Clear folder',
+                    message: 'This example confirms a product-owned action.',
+                    cancelLabel: 'Cancel',
+                    confirmLabel: 'Clean',
+                    closeSemanticLabel: 'Close confirmation',
+                    onCancel: close,
+                    onConfirm: () {
+                      close();
+                      setState(() => _event = 'Folder cleared');
+                    },
+                  ),
                 ),
               ),
               LinagoraSidebarItemActionEntry(
                 id: 'more-spam',
                 child: LinagoraSidebarMenuAction(
-                semanticLabel: 'More Spam actions',
-                child: const Icon(Icons.more_horiz),
-                onPressed: (details) => showMenu<void>(
-                  context: context,
-                  useRootNavigator: true,
-                  position: details.belowMenuAnchor(
-                    Directionality.of(context),
-                  ),
-                  items: [
-                    PopupMenuItem<void>(
-                      onTap: () => setState(() => _event = 'Menu action'),
-                      child: const Text('Mark as read'),
+                  semanticLabel: 'More Spam actions',
+                  child: const Icon(Icons.more_horiz),
+                  onPressed: (details) => showMenu<void>(
+                    context: context,
+                    useRootNavigator: true,
+                    clipBehavior: Clip.antiAlias,
+                    position: details.belowMenuAnchor(
+                      Directionality.of(context),
                     ),
-                  ],
-                ),
+                    items: [
+                      PopupMenuItem<void>(
+                        onTap: () => setState(() => _event = 'Menu action'),
+                        child: const Text('Mark as read'),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ],
