@@ -39,8 +39,12 @@ void main() {
   testWidgets('confirmation popover mirrors its arrow in RTL', _confirmPopover);
   testWidgets('colours the confirm button from the tokens', _confirmColours);
   testWidgets(
-    'blocks a trailing action while the row is disabled',
+    'blocks a trailing menu action while the row is disabled',
     _disabledRowBlocksAction,
+  );
+  testWidgets(
+    'blocks a trailing popover action while the row is disabled',
+    _disabledRowBlocksPopoverAction,
   );
   testWidgets('rejects duplicate action ids', _duplicateActionIdThrows);
   testWidgets(
@@ -1083,10 +1087,7 @@ Future<void> _confirmPopover(WidgetTester tester) async {
   expect(_arrowSideOf(tester), LinagoraSidebarPopoverArrowSide.end);
 }
 
-/// Pins the intended behaviour, not the current one: `item.enabled = false`
-/// must block a `trailing` action from firing. It does not yet — see PR #103
-/// review — so this currently fails until `enabled` is threaded down to the
-/// trailing action.
+/// A disabled row disables its trailing menu trigger as well as the row.
 Future<void> _disabledRowBlocksAction(WidgetTester tester) async {
   var opened = false;
   await pumpSidebar(
@@ -1117,6 +1118,39 @@ Future<void> _disabledRowBlocksAction(WidgetTester tester) async {
   await tester.pump();
 
   expect(opened, isFalse);
+}
+
+Future<void> _disabledRowBlocksPopoverAction(WidgetTester tester) async {
+  var opened = false;
+  await pumpSidebar(
+    tester,
+    LinagoraSidebarItem(
+      label: 'Spam',
+      enabled: false,
+      onTap: _noop,
+      trailing: LinagoraSidebarItemActions(
+        actions: [
+          LinagoraSidebarItemActionEntry(
+            id: 'clean-spam',
+            child: LinagoraSidebarPopoverAction(
+              semanticLabel: 'Clean Spam',
+              popoverBuilder: (context, close) {
+                opened = true;
+                return const Material(child: Text('Confirm clear'));
+              },
+              child: const Text('Clean'),
+            ),
+          ),
+        ],
+      ),
+    ),
+  );
+
+  await tester.tap(find.byType(LinagoraSidebarPopoverAction));
+  await tester.pump();
+
+  expect(opened, isFalse);
+  expect(find.text('Confirm clear'), findsNothing);
 }
 
 Future<void> _duplicateActionIdThrows(WidgetTester tester) async {

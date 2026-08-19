@@ -32,7 +32,7 @@ class LinagoraSidebarActionActivity extends ChangeNotifier {
   }
 }
 
-/// Makes a [LinagoraSidebarActionActivity] available to trailing actions.
+/// Makes a row's activity and enabled state available to trailing actions.
 ///
 /// [LinagoraSidebarItem] installs it. An action without a scope still washes
 /// itself; it just has no row to keep visible.
@@ -41,17 +41,29 @@ class LinagoraSidebarItemActionScope
   const LinagoraSidebarItemActionScope({
     super.key,
     required LinagoraSidebarActionActivity activity,
+    this.enabled = true,
     required super.child,
   }) : super(notifier: activity);
+
+  /// Whether trailing actions in this row may be activated.
+  final bool enabled;
+
+  static LinagoraSidebarItemActionScope? maybeScopeOf(
+    BuildContext context,
+  ) =>
+      context
+          .dependOnInheritedWidgetOfExactType<
+            LinagoraSidebarItemActionScope
+          >();
 
   /// Returns the nearest row activity, if this action belongs to a sidebar
   /// item trailing slot.
   static LinagoraSidebarActionActivity? maybeOf(BuildContext context) =>
-      context
-          .dependOnInheritedWidgetOfExactType<
-            LinagoraSidebarItemActionScope
-          >()
-          ?.notifier;
+      maybeScopeOf(context)?.notifier;
+
+  @override
+  bool updateShouldNotify(LinagoraSidebarItemActionScope oldWidget) =>
+      enabled != oldWidget.enabled || super.updateShouldNotify(oldWidget);
 }
 
 /// Identifies one child of [LinagoraSidebarItemActions].
