@@ -1,20 +1,25 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:linagora_design_flutter/linagora_design_flutter.dart';
 import 'package:widgetbook/widgetbook.dart';
 import 'package:widgetbook_workspace/components/sidebar/linagora_sidebar_menu_use_case.dart';
 
 void main() {
   testWidgets(
-    'a caption knob edited after one storage reload is silently ignored',
-    _stuckStorageCaption,
+    'uses a caption knob edited after a storage reload',
+    _storageCaptionUpdatesAfterReload,
   );
   testWidgets(
-    'reopening a folders section started collapsed shows it pre-expanded',
-    _folderPreExpansionIgnoresKnob,
+    'does not pre-expand a folders tree configured to start collapsed',
+    _collapsedFoldersDoNotPreExpand,
   );
   testWidgets(
     'nested folders render to the configured depth and hide on collapse',
     _folderTreeDepthAndCollapse,
+  );
+  testWidgets(
+    'aligns Compose with the active navigation row',
+    _composerAlignsWithActiveNavigation,
   );
 }
 
@@ -53,11 +58,9 @@ WidgetbookState _stateWithKnobs(Map<String, String> knobs) {
   );
 }
 
-/// Regression test for the review finding: `_storageStatus` is set by the
-/// reload simulation but never cleared, so it permanently shadows the
-/// "Storage caption" knob after the first reload — editing the knob
-/// afterward silently does nothing.
-Future<void> _stuckStorageCaption(WidgetTester tester) async {
+/// A caption knob changed after the reload takes precedence over the temporary
+/// reload status.
+Future<void> _storageCaptionUpdatesAfterReload(WidgetTester tester) async {
   final state = _stateWithKnobs(const {});
   await _pumpCompleteMenu(tester, state);
 
@@ -72,20 +75,18 @@ Future<void> _stuckStorageCaption(WidgetTester tester) async {
 
   // A user editing the caption knob after that reload expects the row to
   // pick it up, the same as it did before the reload was ever tapped.
-  state.queryParams['knobs'] = FieldCodec.encodeQueryGroup(const {
-    'Storage caption': 'Updated by user',
-  });
-  await _pumpCompleteMenu(tester, state);
+  state.updateQueryField(
+    group: 'knobs',
+    field: 'Storage caption',
+    value: 'Updated by user',
+  );
+  await tester.pump();
 
   expect(find.text('Updated by user'), findsOneWidget);
 }
 
-/// Regression test for the review finding: `_expandedFolderIds` seeds full
-/// tree expansion from the tree-depth knob alone, regardless of "Initially
-/// expand folders". That knob only ever toggles the section header's own
-/// flag — a user who turns it off still finds the tree wide open the moment
-/// they reopen the section.
-Future<void> _folderPreExpansionIgnoresKnob(WidgetTester tester) async {
+/// Reopening a section configured to start collapsed reveals only its root.
+Future<void> _collapsedFoldersDoNotPreExpand(WidgetTester tester) async {
   final state = _stateWithKnobs(const {'Initially expand folders': 'false'});
   await _pumpCompleteMenu(tester, state);
 
@@ -119,4 +120,19 @@ Future<void> _folderTreeDepthAndCollapse(WidgetTester tester) async {
 
   expect(find.text('Nested folder 3'), findsNothing);
   expect(find.text('Nested folder 4'), findsNothing);
+}
+
+Future<void> _composerAlignsWithActiveNavigation(WidgetTester tester) async {
+  await _pumpCompleteMenu(tester, _stateWithKnobs(const {}));
+
+  final compose = tester.getRect(find.byType(FilledButton));
+  final inbox = tester.getRect(
+    find.ancestor(
+      of: find.text('Inbox'),
+      matching: find.byType(LinagoraSidebarItem),
+    ),
+  );
+
+  expect(compose.left, closeTo(inbox.left, 0.01));
+  expect(compose.right, closeTo(inbox.right, 0.01));
 }

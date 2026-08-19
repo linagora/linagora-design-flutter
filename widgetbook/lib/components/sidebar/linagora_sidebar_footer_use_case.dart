@@ -4,6 +4,7 @@ import 'package:widgetbook/widgetbook.dart';
 import 'package:widgetbook_annotation/widgetbook_annotation.dart' as widgetbook;
 
 import 'sidebar_preview_surface.dart';
+import 'sidebar_storage_reload_preview.dart';
 
 @widgetbook.UseCase(name: 'Storage, promotion and version', type: LinagoraSidebarFooter)
 Widget linagoraSidebarFooterUseCase(BuildContext context) {
@@ -39,18 +40,12 @@ class _SidebarFooterPreviewState extends State<_SidebarFooterPreview> {
   var _isReloading = false;
   var _status = '28 GB available';
 
-  Future<void> _reloadStorage() async {
-    setState(() {
-      _isReloading = true;
-      _status = 'Refreshing storage…';
-    });
-    await Future<void>.delayed(const Duration(milliseconds: 750));
-    if (!mounted) return;
-    setState(() {
-      _isReloading = false;
-      _status = 'Storage refreshed';
-    });
-  }
+  Future<void> _reloadStorage() => reloadSidebarStoragePreview(
+    setState: setState,
+    isMounted: () => mounted,
+    setReloading: (isReloading) => _isReloading = isReloading,
+    setStatus: (status) => _status = status,
+  );
 
   @override
   Widget build(BuildContext context) => LinagoraSidebarFooter(

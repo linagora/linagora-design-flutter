@@ -4,6 +4,7 @@ import 'package:widgetbook/widgetbook.dart';
 import 'package:widgetbook_annotation/widgetbook_annotation.dart' as widgetbook;
 
 import 'sidebar_preview_surface.dart';
+import 'sidebar_storage_reload_preview.dart';
 
 @widgetbook.UseCase(name: 'Complete menu', type: LinagoraSidebarMenu)
 Widget linagoraSidebarMenuUseCase(BuildContext context) {
@@ -348,15 +349,7 @@ class _SidebarMenuPreviewState extends State<_SidebarMenuPreview> {
   /// The folder tree is virtualized, so expansion lives here as IDs rather
   /// than as nested widgets. Seeded so the preview opens on the full tree the
   /// depth knob asks for.
-  late final Set<String> _expandedFolderIds = {
-    _personalFoldersId,
-    _projectId,
-    _projectSubfolderId(0),
-    for (var depth = _SidebarMenuFolders.minimumTreeDepth + 1;
-        depth < widget.configuration.folders.projectTreeDepth;
-        depth++)
-      _nestedFolderId(depth),
-  };
+  late final Set<String> _expandedFolderIds = _initialExpandedFolderIds();
 
   static const String _personalFoldersId = 'personal-folders';
   static const String _projectId = 'project';
@@ -364,6 +357,15 @@ class _SidebarMenuPreviewState extends State<_SidebarMenuPreview> {
   static String _projectSubfolderId(int index) => 'project-subfolder-$index';
 
   static String _nestedFolderId(int depth) => 'nested-folder-$depth';
+
+  @override
+  void didUpdateWidget(covariant _SidebarMenuPreview oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.configuration.footer.storage?.caption !=
+        widget.configuration.footer.storage?.caption) {
+      _storageStatus = null;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -681,18 +683,26 @@ class _SidebarMenuPreviewState extends State<_SidebarMenuPreview> {
     ];
   }
 
-  Future<void> _reloadStorage() async {
-    setState(() {
-      _isStorageReloading = true;
-      _storageStatus = 'Refreshing storage…';
-    });
-    await Future<void>.delayed(const Duration(milliseconds: 750));
-    if (!mounted) return;
-    setState(() {
-      _isStorageReloading = false;
-      _storageStatus = 'Storage refreshed';
-    });
+  Set<String> _initialExpandedFolderIds() {
+    final folders = widget.configuration.folders;
+    if (!folders.initiallyExpanded) return {};
+    return {
+      _personalFoldersId,
+      _projectId,
+      _projectSubfolderId(0),
+      for (var depth = _SidebarMenuFolders.minimumTreeDepth + 1;
+          depth < folders.projectTreeDepth;
+          depth++)
+        _nestedFolderId(depth),
+    };
   }
+
+  Future<void> _reloadStorage() => reloadSidebarStoragePreview(
+    setState: setState,
+    isMounted: () => mounted,
+    setReloading: (isReloading) => _isStorageReloading = isReloading,
+    setStatus: (status) => _storageStatus = status,
+  );
 
   bool _isFolderExpanded(String id) => _expandedFolderIds.contains(id);
 
