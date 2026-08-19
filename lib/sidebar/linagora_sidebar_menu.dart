@@ -57,10 +57,23 @@ class LinagoraSidebarMenu extends StatelessWidget {
   /// Keeps the viewport scrollbar flush with the sidebar edge.
   static const double trailingPadding = 0;
 
-  /// End inset for pinned footer content after [trailingPadding] leaves the
-  /// viewport scrollbar at the outer sidebar edge.
+  /// Target inset between the pinned footer and the sidebar frame.
+  ///
+  /// The menu's outer padding already supplies [horizontalPadding] on the
+  /// start and [verticalPadding] at the bottom, while [trailingPadding] keeps
+  /// the scrollbar flush to the end edge. [footerPadding] supplies the
+  /// remaining space so the footer has the 24dp inset specified by Figma on
+  /// all three sides.
+  static const double footerInset = LinagoraSpacing.base * 3;
+
+  /// Additional padding needed to give the pinned footer its own bounds.
   static const EdgeInsetsGeometry footerPadding =
-      EdgeInsetsDirectional.only(end: horizontalPadding);
+      EdgeInsetsDirectional.fromSTEB(
+        footerInset - horizontalPadding,
+        0,
+        footerInset - trailingPadding,
+        footerInset - verticalPadding,
+      );
 
   /// Outer sidebar rhythm. Rows add their own internal content inset.
   static const EdgeInsetsGeometry defaultPadding =
@@ -71,15 +84,15 @@ class LinagoraSidebarMenu extends StatelessWidget {
         verticalPadding,
       );
 
-  /// Keeps the primary action on the same content bounds as rows and footer
-  /// items, clear of the viewport scrollbar at the outer edge.
+  /// Keeps the primary action on the same content bounds as rows, clear of
+  /// the viewport scrollbar at the outer edge.
   static const EdgeInsetsGeometry primaryActionPadding =
       EdgeInsetsDirectional.only(end: scrollbarSpacing);
 
   static const double primaryActionSpacing = LinagoraSpacing.base * 3;
   static const double sectionSpacing = LinagoraSpacing.base * 3;
   static const double footerSpacing = LinagoraSpacing.base * 3;
-  static const double footerItemSpacing = LinagoraSpacing.base * 2;
+  static const double footerItemSpacing = LinagoraSpacing.base * 1.5;
   static const double scrollbarSpacing = LinagoraSpacing.base * 2;
 
   /// Keeps a desktop scrollbar clear of row affordances while the scrollbar

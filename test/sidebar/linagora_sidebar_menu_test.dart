@@ -11,8 +11,8 @@ void main() {
     _removesEmptyRegions,
   );
   testWidgets(
-    'aligns every sidebar region clear of the scrollbar',
-    _alignsContentBounds,
+    'uses Figma-specific bounds and spacing for the footer',
+    _usesFooterBoundsAndSpacing,
   );
   testWidgets(
     'keeps footer content at the bottom of a bounded menu',
@@ -170,10 +170,11 @@ Future<void> _composesRegions(WidgetTester tester) async {
   );
 }
 
-Future<void> _alignsContentBounds(WidgetTester tester) async {
+Future<void> _usesFooterBoundsAndSpacing(WidgetTester tester) async {
   const composeKey = Key('compose');
   const inboxKey = Key('inbox');
   const storageKey = Key('storage');
+  const versionKey = Key('version');
   await pumpSidebar(
     tester,
     const SizedBox(
@@ -181,7 +182,10 @@ Future<void> _alignsContentBounds(WidgetTester tester) async {
       child: LinagoraSidebarMenu(
         primaryAction: SizedBox(key: composeKey, height: 36),
         navigationItems: [SizedBox(key: inboxKey, height: 36)],
-        footerItems: [SizedBox(key: storageKey, height: 36)],
+        footerItems: [
+          SizedBox(key: storageKey, height: 36),
+          SizedBox(key: versionKey, height: 36),
+        ],
       ),
     ),
   );
@@ -189,14 +193,31 @@ Future<void> _alignsContentBounds(WidgetTester tester) async {
   final compose = tester.getRect(find.byKey(composeKey));
   final inbox = tester.getRect(find.byKey(inboxKey));
   final storage = tester.getRect(find.byKey(storageKey));
+  final version = tester.getRect(find.byKey(versionKey));
 
-  // Compose, scrolling rows and pinned footer share the same bounds. The
-  // shared end inset leaves room for an overlay scrollbar without making any
-  // one region appear narrower than the others.
-  for (final bounds in [inbox, storage]) {
-    expect(bounds.left, closeTo(compose.left, 0.01));
-    expect(bounds.right, closeTo(compose.right, 0.01));
-  }
+  // The footer is inset 24dp from the sidebar frame in Figma, independently
+  // of the rows and primary action. Its content is therefore 8dp narrower on
+  // each side than the 16dp-inset scrollable content.
+  expect(inbox.left, closeTo(compose.left, 0.01));
+  expect(inbox.right, closeTo(compose.right, 0.01));
+  expect(
+    storage.left - compose.left,
+    closeTo(
+      LinagoraSidebarMenu.footerInset - LinagoraSidebarMenu.horizontalPadding,
+      0.01,
+    ),
+  );
+  expect(
+    compose.right - storage.right,
+    closeTo(
+      LinagoraSidebarMenu.footerInset - LinagoraSidebarMenu.horizontalPadding,
+      0.01,
+    ),
+  );
+  expect(
+    version.top - storage.bottom,
+    closeTo(LinagoraSidebarMenu.footerItemSpacing, 0.01),
+  );
 }
 
 Future<void> _removesEmptyRegions(WidgetTester tester) async {
@@ -223,7 +244,7 @@ Future<void> _pinsFooter(WidgetTester tester) async {
   final footerBottom = tester.getBottomRight(find.text('Storage')).dy;
   expect(
     menuBottom - footerBottom,
-    closeTo(LinagoraSidebarMenu.verticalPadding, 0.1),
+    closeTo(LinagoraSidebarMenu.footerInset, 0.1),
   );
 }
 
@@ -508,17 +529,25 @@ Future<void> _mirrorsInsetUnderRtl(WidgetTester tester) async {
   final inbox = tester.getRect(find.byKey(inboxKey));
   final storage = tester.getRect(find.byKey(storageKey));
 
-  // The outer padding's bare `end` side and each region's own `end`-only
-  // scrollbar-clearance inset are both directional, so they land on the same
-  // physical side under RTL and keep the total inset symmetric on both
-  // edges — same as in LTR. A regression that swapped either for a
-  // non-directional EdgeInsets would break that symmetry under RTL only.
-  expect(compose.left - menu.left, closeTo(LinagoraSidebarMenu.horizontalPadding, 0.01));
-  expect(menu.right - compose.right, closeTo(LinagoraSidebarMenu.horizontalPadding, 0.01));
-
-  // Every region still shares the same bounds as each other under RTL.
-  for (final bounds in [inbox, storage]) {
-    expect(bounds.left, closeTo(compose.left, 0.01));
-    expect(bounds.right, closeTo(compose.right, 0.01));
-  }
+  // Rows and the primary action retain the menu's 16dp inset. The footer
+  // directional padding adds enough space to give it Figma's independent
+  // 24dp inset from both physical edges under RTL too.
+  expect(
+    compose.left - menu.left,
+    closeTo(LinagoraSidebarMenu.horizontalPadding, 0.01),
+  );
+  expect(
+    menu.right - compose.right,
+    closeTo(LinagoraSidebarMenu.horizontalPadding, 0.01),
+  );
+  expect(inbox.left, closeTo(compose.left, 0.01));
+  expect(inbox.right, closeTo(compose.right, 0.01));
+  expect(
+    storage.left - menu.left,
+    closeTo(LinagoraSidebarMenu.footerInset, 0.01),
+  );
+  expect(
+    menu.right - storage.right,
+    closeTo(LinagoraSidebarMenu.footerInset, 0.01),
+  );
 }
