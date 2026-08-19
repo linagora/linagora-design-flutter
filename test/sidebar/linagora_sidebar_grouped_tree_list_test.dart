@@ -13,6 +13,7 @@ void main() {
     'does not throw when a group has an initial depth of zero',
     _initialDepthZeroGroup,
   );
+  test('rejects duplicate group IDs', _rejectsDuplicateGroupIds);
 }
 
 Future<void> _buildsGroupedTree(WidgetTester tester) async {
@@ -111,6 +112,38 @@ Future<void> _initialDepthZeroGroup(WidgetTester tester) async {
         'LinagoraSidebarSubItem asserts depth > 0 for every entry row',
   );
 }
+
+void _rejectsDuplicateGroupIds() {
+  expect(
+    () => LinagoraSidebarSliverGroupedTreeList<_Node>(
+      groups: const [
+        LinagoraSidebarTreeGroup<_Node>(
+          id: 'personal',
+          header: Text('Personal folders'),
+          roots: [_Node('project')],
+        ),
+        LinagoraSidebarTreeGroup<_Node>(
+          id: 'personal',
+          header: Text('Personal folders (again)'),
+          roots: [_Node('archive')],
+        ),
+      ],
+      adapter: const LinagoraSidebarTreeAdapter<_Node>(
+        childrenOf: _childrenOf,
+        idOf: _idOf,
+        isExpanded: _alwaysExpanded,
+      ),
+      itemBuilder: (context, entry) => Text(entry.data.id),
+    ),
+    throwsAssertionError,
+  );
+}
+
+Iterable<_Node> _childrenOf(_Node node) => node.children;
+
+Object _idOf(_Node node) => node.id;
+
+bool _alwaysExpanded(_Node node) => true;
 
 class _Node {
   const _Node(this.id, {this.children = const []});
