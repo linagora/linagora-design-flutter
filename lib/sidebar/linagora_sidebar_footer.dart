@@ -20,7 +20,8 @@ class LinagoraSidebarFooter extends StatelessWidget {
   final List<Widget?> children;
   final double spacing;
   /// Use [LinagoraSidebarMenu.footerPadding] when this footer is outside a
-  /// [LinagoraSidebarMenu]. The menu applies that end inset itself.
+  /// [LinagoraSidebarMenu]. The menu applies that directional footer inset
+  /// itself.
   final EdgeInsetsGeometry padding;
 
   @override
