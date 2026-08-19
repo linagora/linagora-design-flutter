@@ -19,6 +19,14 @@ void main() {
     'disagrees with it',
     _injectedStyleOverridesAmbientBrightness,
   );
+  testWidgets(
+    'lets an explicit width win over a customised popoverStyle width',
+    _explicitDefaultWidthWinsOverPopoverStyle,
+  );
+  testWidgets(
+    'fires onCancel and exposes closeSemanticLabel from the close button',
+    _closeButtonContract,
+  );
   test('uses the primary confirmation variant by default', _defaultVariant);
   test('clamps popover geometry to a small layout', _clampsPopoverShape);
 }
@@ -192,12 +200,69 @@ Future<void> _injectedStyleOverridesAmbientBrightness(
   );
 }
 
+/// The widget's doc comment for `width` says "Explicit width wins over
+/// popoverStyle", but the implementation detects "unset" by comparing
+/// `width == defaultWidth`. An explicit width equal to the default is
+/// indistinguishable from "left unset", so it silently loses to a
+/// customised `popoverStyle.width` instead of winning as documented.
+Future<void> _explicitDefaultWidthWinsOverPopoverStyle(
+  WidgetTester tester,
+) async {
+  await _pumpPopover(
+    tester,
+    width: LinagoraSidebarConfirmPopover.defaultWidth,
+    popoverStyle: const LinagoraSidebarConfirmPopoverStyle(width: 340),
+  );
+
+  final cardSize = tester.getSize(find.byKey(_cardKey));
+  expect(
+    cardSize.width - _shape(tester).arrowSize,
+    LinagoraSidebarConfirmPopover.defaultWidth,
+  );
+}
+
+/// Pins the close button's current contract — tap fires [onCancel] and its
+/// semantics label matches [closeSemanticLabel] — as a safety net before any
+/// future refactor onto `LinagoraIconButton`.
+Future<void> _closeButtonContract(WidgetTester tester) async {
+  final handle = tester.ensureSemantics();
+  try {
+    var cancelled = false;
+    await _pumpPopover(tester, onCancel: () => cancelled = true);
+
+    expect(
+      tester.getSemantics(find.bySemanticsLabel('Close clear confirmation')),
+      matchesSemantics(
+        label: 'Close clear confirmation',
+        hasTapAction: true,
+        hasFocusAction: true,
+        isButton: true,
+        isFocusable: true,
+      ),
+    );
+
+    await tester.tap(
+      find.ancestor(
+        of: find.byIcon(Icons.close),
+        matching: find.byType(InkResponse),
+      ),
+    );
+    await tester.pump();
+    expect(cancelled, isTrue);
+  } finally {
+    handle.dispose();
+  }
+}
+
 Future<void> _pumpPopover(
   WidgetTester tester, {
   Brightness brightness = Brightness.light,
   LinagoraSidebarConfirmButtonVariant confirmButtonVariant =
       LinagoraSidebarConfirmButtonVariant.primary,
   LinagoraSidebarStyle? style,
+  double? width,
+  LinagoraSidebarConfirmPopoverStyle? popoverStyle,
+  VoidCallback? onCancel,
 }) {
   final background = brightness == Brightness.dark
       ? const Color(0xFF1C1B1F)
@@ -222,10 +287,12 @@ Future<void> _pumpPopover(
                     cancelLabel: 'Cancel',
                     confirmLabel: 'Clean',
                     closeSemanticLabel: 'Close clear confirmation',
-                    onCancel: _noop,
+                    onCancel: onCancel ?? _noop,
                     onConfirm: _noop,
                     confirmButtonVariant: confirmButtonVariant,
                     style: style,
+                    width: width ?? LinagoraSidebarConfirmPopover.defaultWidth,
+                    popoverStyle: popoverStyle,
                   ),
                 ),
               ),
