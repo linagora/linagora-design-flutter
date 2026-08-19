@@ -152,12 +152,17 @@ class LinagoraSidebarConfirmPopover extends StatelessWidget {
     required this.onConfirm,
     required this.closeSemanticLabel,
     this.closeIcon,
-    this.width = defaultWidth,
+    double? width,
     this.maxHeight,
     this.confirmButtonVariant = LinagoraSidebarConfirmButtonVariant.primary,
     this.style,
     this.popoverStyle,
-  }) : assert(width > 0, 'A sidebar confirmation popover needs a width'),
+  }) : width = width ?? defaultWidth,
+       _hasExplicitWidth = width != null,
+       assert(
+         width == null || width > 0,
+         'A sidebar confirmation popover needs a width',
+       ),
        assert(
          maxHeight == null || maxHeight > 0,
          'A sidebar confirmation popover maximum height must be positive',
@@ -174,10 +179,13 @@ class LinagoraSidebarConfirmPopover extends StatelessWidget {
 
   /// Width of the rounded card surface, excluding the side arrow.
   ///
-  /// Explicit width wins over [popoverStyle].
-  ///
-  /// Leaving this at [defaultWidth] permits a custom [popoverStyle] width.
+  /// Supplying this value wins over [popoverStyle]. Omit it to use
+  /// [LinagoraSidebarConfirmPopoverStyle.width].
   final double width;
+
+  // Retain whether [width] was supplied so an explicit [defaultWidth] still
+  // overrides a custom [popoverStyle] width.
+  final bool _hasExplicitWidth;
   final double? maxHeight;
 
   /// Select [LinagoraSidebarConfirmButtonVariant.destructive] explicitly when
@@ -197,7 +205,7 @@ class LinagoraSidebarConfirmPopover extends StatelessWidget {
         this.popoverStyle ?? const LinagoraSidebarConfirmPopoverStyle();
     final textThemeExtension = LinagoraTextThemeExtension.material();
     final colors = LinagoraSysColors.material();
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final isDark = sidebar.brightness == Brightness.dark;
     final isRtl = Directionality.of(context) == TextDirection.rtl;
     final arrowSide = isRtl
         ? LinagoraSidebarPopoverArrowSide.end
@@ -208,7 +216,7 @@ class LinagoraSidebarConfirmPopover extends StatelessWidget {
       arrowOffset: popoverStyle.arrowOffset,
       borderRadius: popoverStyle.cardBorderRadius,
     );
-    final cardWidth = width == defaultWidth ? popoverStyle.width : width;
+    final cardWidth = _hasExplicitWidth ? width : popoverStyle.width;
     final effectiveWidth = cardWidth + popoverStyle.arrowSize;
     final foreground =
         popoverStyle.foregroundColor ??
@@ -228,14 +236,11 @@ class LinagoraSidebarConfirmPopover extends StatelessWidget {
           height: 16 / 13,
           letterSpacing: 0,
         );
-    // The arrow occupies space inside the layout bounds, so only the side it
-    // sits on needs an additional inset before content begins.
-    final startPadding = isRtl
-        ? popoverStyle.horizontalContentInset
-        : popoverStyle.horizontalContentInset + popoverStyle.arrowSize;
-    final endPadding = isRtl
-        ? popoverStyle.horizontalContentInset + popoverStyle.arrowSize
-        : popoverStyle.horizontalContentInset;
+    // The arrow occupies the directional start edge (left in LTR, right in
+    // RTL), so only that side needs an additional inset before content begins.
+    final startPadding =
+        popoverStyle.horizontalContentInset + popoverStyle.arrowSize;
+    final endPadding = popoverStyle.horizontalContentInset;
     final actionsOffset =
         popoverStyle.horizontalContentInset - popoverStyle.actionsEndInset;
 
