@@ -12,6 +12,10 @@ void main() {
     'reopening a folders section started collapsed shows it pre-expanded',
     _folderPreExpansionIgnoresKnob,
   );
+  testWidgets(
+    'nested folders render to the configured depth and hide on collapse',
+    _folderTreeDepthAndCollapse,
+  );
 }
 
 /// Pumps the 'Complete menu' use case through a minimal Widgetbook host —
@@ -95,4 +99,24 @@ Future<void> _folderPreExpansionIgnoresKnob(WidgetTester tester) async {
   // tree the knob said to start collapsed.
   expect(find.text('Personal folders'), findsOneWidget);
   expect(find.text('Project'), findsNothing);
+}
+
+/// Characterization test for the coverage gap flagged in review: the
+/// mutually-recursive folder-flattening builders (`_folderEntries` /
+/// `_projectSubfolders` / `_nestedProjectFolders`) had no test at all. Pins
+/// that nested rows render down to the configured depth, and that collapsing
+/// their parent removes them again — the exact recursion this logic exists
+/// for.
+Future<void> _folderTreeDepthAndCollapse(WidgetTester tester) async {
+  final state = _stateWithKnobs(const {'Project tree depth': '4'});
+  await _pumpCompleteMenu(tester, state);
+
+  expect(find.text('Nested folder 3'), findsOneWidget);
+  expect(find.text('Nested folder 4'), findsOneWidget);
+
+  await tester.tap(find.bySemanticsLabel('Collapse Design'));
+  await tester.pump();
+
+  expect(find.text('Nested folder 3'), findsNothing);
+  expect(find.text('Nested folder 4'), findsNothing);
 }
