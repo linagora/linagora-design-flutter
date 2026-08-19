@@ -42,6 +42,18 @@ void main() {
   testWidgets('keeps a collapsed section down to its header', _collapsedSection);
   testWidgets('keeps the spacing rhythm between regions', _sectionRhythm);
   testWidgets('uses injected layout tokens between regions', _customLayout);
+  testWidgets(
+    'applies an injected scroll physics to the body',
+    _appliesCustomPhysics,
+  );
+  testWidgets(
+    'drops a body overlay when the menu lays out unbounded',
+    _dropsBodyOverlayWhenUnbounded,
+  );
+  testWidgets(
+    'mirrors the outer inset under RTL while keeping regions aligned',
+    _mirrorsInsetUnderRtl,
+  );
 }
 
 Future<void> _customLayout(WidgetTester tester) async {
@@ -433,3 +445,80 @@ List<LinagoraSidebarTreeListEntry<String>> _folderEntries(int count) => [
   for (var index = 0; index < count; index++)
     LinagoraSidebarTreeListEntry(id: index, data: 'Folder $index'),
 ];
+
+Future<void> _appliesCustomPhysics(WidgetTester tester) async {
+  const physics = BouncingScrollPhysics();
+  await pumpSidebar(
+    tester,
+    const SizedBox(
+      height: 300,
+      child: LinagoraSidebarMenu(
+        navigationItems: [SizedBox(height: 600, child: Text('Inbox'))],
+        physics: physics,
+      ),
+    ),
+  );
+
+  expect(
+    tester.widget<CustomScrollView>(find.byType(CustomScrollView)).physics,
+    same(physics),
+  );
+}
+
+/// An unbounded parent leaves nothing for the overlay to sit above: the body
+/// never scrolls, so nothing should drag it either.
+Future<void> _dropsBodyOverlayWhenUnbounded(WidgetTester tester) async {
+  await pumpSidebar(
+    tester,
+    const Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        LinagoraSidebarMenu(
+          navigationItems: [Text('Inbox')],
+          bodyOverlay: LinagoraSidebarAutoScrollOverlay(isDragging: true),
+        ),
+      ],
+    ),
+  );
+
+  expect(tester.takeException(), isNull);
+  expect(find.text('Inbox'), findsOneWidget);
+  expect(find.byType(LinagoraSidebarAutoScrollOverlay), findsNothing);
+}
+
+Future<void> _mirrorsInsetUnderRtl(WidgetTester tester) async {
+  const composeKey = Key('compose');
+  const inboxKey = Key('inbox');
+  const storageKey = Key('storage');
+  await pumpSidebar(
+    tester,
+    const SizedBox(
+      height: 300,
+      child: LinagoraSidebarMenu(
+        primaryAction: SizedBox(key: composeKey, height: 36),
+        navigationItems: [SizedBox(key: inboxKey, height: 36)],
+        footerItems: [SizedBox(key: storageKey, height: 36)],
+      ),
+    ),
+    surface: const SidebarSurface(textDirection: TextDirection.rtl),
+  );
+
+  final menu = tester.getRect(find.byType(LinagoraSidebarMenu));
+  final compose = tester.getRect(find.byKey(composeKey));
+  final inbox = tester.getRect(find.byKey(inboxKey));
+  final storage = tester.getRect(find.byKey(storageKey));
+
+  // The outer padding's bare `end` side and each region's own `end`-only
+  // scrollbar-clearance inset are both directional, so they land on the same
+  // physical side under RTL and keep the total inset symmetric on both
+  // edges — same as in LTR. A regression that swapped either for a
+  // non-directional EdgeInsets would break that symmetry under RTL only.
+  expect(compose.left - menu.left, closeTo(LinagoraSidebarMenu.horizontalPadding, 0.01));
+  expect(menu.right - compose.right, closeTo(LinagoraSidebarMenu.horizontalPadding, 0.01));
+
+  // Every region still shares the same bounds as each other under RTL.
+  for (final bounds in [inbox, storage]) {
+    expect(bounds.left, closeTo(compose.left, 0.01));
+    expect(bounds.right, closeTo(compose.right, 0.01));
+  }
+}
