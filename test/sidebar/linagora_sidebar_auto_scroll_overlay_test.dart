@@ -8,6 +8,10 @@ void main() {
     'stops scrolling once the drag ends mid-animation',
     _stopsScrollingWhenDragEnds,
   );
+  testWidgets(
+    'uses the legacy callback API when no explicit controller is supplied',
+    _legacyCallbackUnderAmbientCoordinator,
+  );
 }
 
 /// `_updateController` only removes its listener when `isDragging` flips to
@@ -69,5 +73,66 @@ Future<void> _stopsScrollingWhenDragEnds(WidgetTester tester) async {
     reason:
         'ending the drag must stop the auto-scroll, but the ScrollController '
         "animation keeps running toward maxScrollExtent regardless of isDragging",
+  );
+}
+
+/// `_controller` prefers the ambient `LinagoraSidebarScrollCoordinator` over
+/// the documented "legacy" `canScrollToStart`/`onScrollToStart` callback API
+/// whenever no explicit `controller` is supplied — even when a product
+/// deliberately used the legacy path and only happens to sit inside a
+/// coordinator ancestor (e.g. nested in a menu that provides one).
+Future<void> _legacyCallbackUnderAmbientCoordinator(WidgetTester tester) async {
+  final ambientController = ScrollController(initialScrollOffset: 500);
+  addTearDown(ambientController.dispose);
+  var legacyScrollToStartCalls = 0;
+
+  await tester.pumpWidget(
+    MaterialApp(
+      home: Scaffold(
+        body: SizedBox(
+          width: 204,
+          height: 200,
+          child: LinagoraSidebarScrollCoordinator(
+            controller: ambientController,
+            child: Stack(
+              children: [
+                ListView(
+                  controller: ambientController,
+                  children: [
+                    for (var index = 0; index < 20; index++)
+                      SizedBox(height: 50, child: Text('Row $index')),
+                  ],
+                ),
+                Positioned.fill(
+                  child: LinagoraSidebarAutoScrollOverlay(
+                    isDragging: true,
+                    canScrollToStart: true,
+                    onScrollToStart: () => legacyScrollToStartCalls++,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    ),
+  );
+  await tester.pump();
+
+  final mouse = await tester.createGesture(kind: PointerDeviceKind.mouse);
+  addTearDown(() => mouse.removePointer());
+  await mouse.addPointer(location: Offset.zero);
+  await tester.pump();
+  await mouse.moveTo(const Offset(100, 5));
+  await tester.pump();
+
+  expect(
+    legacyScrollToStartCalls,
+    greaterThan(0),
+    reason:
+        'a product that supplies canScrollToStart/onScrollToStart expects '
+        'them to drive scrolling when it did not pass an explicit '
+        'controller, but an ambient LinagoraSidebarScrollCoordinator '
+        'silently takes over instead',
   );
 }
