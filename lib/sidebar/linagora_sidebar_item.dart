@@ -186,6 +186,7 @@ class _LinagoraSidebarItemState extends State<LinagoraSidebarItem> {
 
     return LinagoraSidebarItemActionScope(
       activity: _actionActivity,
+      enabled: widget.enabled,
       child: ListenableBuilder(
         listenable: _actionActivity,
         builder: (context, child) {
@@ -351,11 +352,14 @@ class LinagoraSidebarItemAction extends StatelessWidget {
 
   final LinagoraSidebarStyle? style;
 
-  bool get _isInteractive => onTap != null || onPressed != null;
+  bool get _hasCallback => onTap != null || onPressed != null;
 
   @override
   Widget build(BuildContext context) {
     final style = this.style ?? LinagoraSidebarStyle.of(context);
+    final enabled =
+        LinagoraSidebarItemActionScope.maybeScopeOf(context)?.enabled ?? true;
+    final isInteractive = enabled && _hasCallback;
     const shape = StadiumBorder();
     return Builder(
       builder: (actionContext) {
@@ -366,7 +370,7 @@ class LinagoraSidebarItemAction extends StatelessWidget {
           shape: shape,
           clipBehavior: Clip.antiAlias,
           child: InkWell(
-            onTap: _isInteractive ? () => _handlePressed(actionContext) : null,
+            onTap: isInteractive ? () => _handlePressed(actionContext) : null,
             focusNode: focusNode,
             customBorder: shape,
             // Only the visual content is excluded. Excluding the [InkWell] as
@@ -402,7 +406,7 @@ class LinagoraSidebarItemAction extends StatelessWidget {
           ),
         );
 
-        if (!_isInteractive) return action;
+        if (!isInteractive) return action;
         return Semantics(button: true, label: semanticLabel, child: action);
       },
     );
