@@ -146,17 +146,28 @@ Future<void> _composesRegions(WidgetTester tester) async {
     ),
   );
 
-  expect(find.text('Compose'), findsOneWidget);
-  expect(find.text('Inbox'), findsOneWidget);
-  expect(find.text('Sent'), findsOneWidget);
-  expect(find.text('Folders'), findsOneWidget);
-  expect(find.text('Personal folders'), findsOneWidget);
-  expect(find.text('Labels'), findsOneWidget);
-  expect(find.text('Storage'), findsOneWidget);
-  expect(find.text('version 0.13.2'), findsOneWidget);
+  _expectSidebarRegionsVisible();
+  _expectSharedNavigationViewport(tester);
+}
 
-  // One scroll view for the whole body: the sections share the navigation
-  // viewport rather than nesting their own.
+void _expectSidebarRegionsVisible() {
+  for (final text in const [
+    'Compose',
+    'Inbox',
+    'Sent',
+    'Folders',
+    'Personal folders',
+    'Labels',
+    'Storage',
+    'version 0.13.2',
+  ]) {
+    expect(find.text(text), findsOneWidget);
+  }
+}
+
+/// One scroll view means sections share the navigation viewport rather than
+/// nesting their own viewport.
+void _expectSharedNavigationViewport(WidgetTester tester) {
   expect(find.byType(CustomScrollView), findsOneWidget);
   expect(
     tester.widgetList<SliverPadding>(find.byType(SliverPadding)),
@@ -195,29 +206,32 @@ Future<void> _usesFooterBoundsAndSpacing(WidgetTester tester) async {
   final storage = tester.getRect(find.byKey(storageKey));
   final version = tester.getRect(find.byKey(versionKey));
 
-  // The footer is inset 24dp from the sidebar frame in Figma, independently
-  // of the rows and primary action. Its content is therefore 8dp narrower on
-  // each side than the 16dp-inset scrollable content.
-  expect(inbox.left, closeTo(compose.left, 0.01));
-  expect(inbox.right, closeTo(compose.right, 0.01));
-  expect(
-    storage.left - compose.left,
-    closeTo(
-      LinagoraSidebarMenu.footerInset - LinagoraSidebarMenu.horizontalPadding,
-      0.01,
-    ),
+  _expectMatchingHorizontalBounds(inbox, compose);
+  _expectSymmetricHorizontalInset(
+    storage,
+    compose,
+    LinagoraSidebarMenu.footerInset - LinagoraSidebarMenu.horizontalPadding,
   );
-  expect(
-    compose.right - storage.right,
-    closeTo(
-      LinagoraSidebarMenu.footerInset - LinagoraSidebarMenu.horizontalPadding,
-      0.01,
-    ),
+  _expectVerticalGap(
+    storage,
+    version,
+    LinagoraSidebarMenu.footerItemSpacing,
   );
-  expect(
-    version.top - storage.bottom,
-    closeTo(LinagoraSidebarMenu.footerItemSpacing, 0.01),
-  );
+}
+
+void _expectMatchingHorizontalBounds(Rect actual, Rect expected) {
+  expect(actual.left, closeTo(expected.left, 0.01));
+  expect(actual.right, closeTo(expected.right, 0.01));
+}
+
+/// Verifies that [child] is equally narrower than [parent] on both sides.
+void _expectSymmetricHorizontalInset(Rect child, Rect parent, double inset) {
+  expect(child.left - parent.left, closeTo(inset, 0.01));
+  expect(parent.right - child.right, closeTo(inset, 0.01));
+}
+
+void _expectVerticalGap(Rect above, Rect below, double gap) {
+  expect(below.top - above.bottom, closeTo(gap, 0.01));
 }
 
 Future<void> _removesEmptyRegions(WidgetTester tester) async {
@@ -408,12 +422,18 @@ Future<void> _virtualizesTreeSection(WidgetTester tester) async {
   );
 
   expect(tester.takeException(), isNull);
+  _expectTreeToVirtualize(builtRows);
+  _expectFooterToRemainVisible();
+}
+
+void _expectTreeToVirtualize(int builtRows) {
   expect(builtRows, lessThan(200));
   expect(find.text('Folder 0'), findsOneWidget);
   expect(find.text('Folder 199'), findsNothing);
-  // The footer stays put while the tree scrolls between it and the navigation.
-  expect(find.text('Storage'), findsOneWidget);
 }
+
+/// The footer stays put while the tree scrolls between it and the navigation.
+void _expectFooterToRemainVisible() => expect(find.text('Storage'), findsOneWidget);
 
 /// The tree shares the menu's viewport rather than scrolling inside itself, so
 /// the header above it travels with the rows.
@@ -530,24 +550,17 @@ Future<void> _mirrorsInsetUnderRtl(WidgetTester tester) async {
   final storage = tester.getRect(find.byKey(storageKey));
 
   // Rows and the primary action retain the menu's 16dp inset. The footer
-  // directional padding adds enough space to give it Figma's independent
-  // 24dp inset from both physical edges under RTL too.
-  expect(
-    compose.left - menu.left,
-    closeTo(LinagoraSidebarMenu.horizontalPadding, 0.01),
+  // directional padding gives it Figma's independent 24dp inset from both
+  // physical edges under RTL too.
+  _expectSymmetricHorizontalInset(
+    compose,
+    menu,
+    LinagoraSidebarMenu.horizontalPadding,
   );
-  expect(
-    menu.right - compose.right,
-    closeTo(LinagoraSidebarMenu.horizontalPadding, 0.01),
-  );
-  expect(inbox.left, closeTo(compose.left, 0.01));
-  expect(inbox.right, closeTo(compose.right, 0.01));
-  expect(
-    storage.left - menu.left,
-    closeTo(LinagoraSidebarMenu.footerInset, 0.01),
-  );
-  expect(
-    menu.right - storage.right,
-    closeTo(LinagoraSidebarMenu.footerInset, 0.01),
+  _expectMatchingHorizontalBounds(inbox, compose);
+  _expectSymmetricHorizontalInset(
+    storage,
+    menu,
+    LinagoraSidebarMenu.footerInset,
   );
 }
