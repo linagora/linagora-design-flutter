@@ -106,6 +106,10 @@ class LinagoraSidebarSliverGroupedTreeList<T> extends StatelessWidget {
 
     final entry = row.entry!;
     final item = itemBuilder(context, entry);
+    if (entry.depth == 0) {
+      return KeyedSubtree(key: ValueKey<Object>(row.id), child: item);
+    }
+
     return LinagoraSidebarSubItem(
       key: ValueKey<Object>(row.id),
       depth: entry.depth,

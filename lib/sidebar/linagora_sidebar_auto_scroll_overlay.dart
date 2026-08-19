@@ -41,6 +41,8 @@ class LinagoraSidebarAutoScrollOverlay extends StatefulWidget {
 class _LinagoraSidebarAutoScrollOverlayState
     extends State<LinagoraSidebarAutoScrollOverlay> {
   ScrollController? _listenedController;
+  ScrollController? _autoScrollingController;
+  int _scrollAnimationId = 0;
 
   @override
   void didChangeDependencies() {
@@ -51,6 +53,9 @@ class _LinagoraSidebarAutoScrollOverlayState
   @override
   void didUpdateWidget(covariant LinagoraSidebarAutoScrollOverlay oldWidget) {
     super.didUpdateWidget(oldWidget);
+    if (oldWidget.isDragging && !widget.isDragging) {
+      _stopScrolling();
+    }
     if (oldWidget.controller != widget.controller ||
         oldWidget.isDragging != widget.isDragging) {
       _updateController();
@@ -83,8 +88,21 @@ class _LinagoraSidebarAutoScrollOverlayState
     );
   }
 
-  ScrollController? get _controller =>
-      widget.controller ?? LinagoraSidebarScrollCoordinator.maybeOf(context)?.controller;
+  /// An explicitly supplied controller always wins. Otherwise, using any of
+  /// the legacy fields opts into the product-owned callback API instead of
+  /// silently taking control of an ambient menu scroll controller.
+  ScrollController? get _controller {
+    if (widget.controller != null) return widget.controller;
+    if (_usesLegacyCallbacks) return null;
+    return LinagoraSidebarScrollCoordinator.maybeOf(context)?.controller;
+  }
+
+  bool get _usesLegacyCallbacks =>
+      widget.canScrollToStart != null ||
+      widget.canScrollToEnd != null ||
+      widget.onScrollToStart != null ||
+      widget.onScrollToEnd != null ||
+      widget.onStopScrolling != null;
 
   bool get _canScrollToStart {
     final controller = _controller;
@@ -114,6 +132,9 @@ class _LinagoraSidebarAutoScrollOverlayState
 
   void _updateController() {
     final controller = widget.isDragging ? _controller : null;
+    if (!identical(_listenedController, controller)) {
+      _cancelAutoScroll();
+    }
     if (identical(_listenedController, controller)) return;
 
     _listenedController?.removeListener(_onControllerChanged);
@@ -135,13 +156,11 @@ class _LinagoraSidebarAutoScrollOverlayState
       widget.onScrollToStart?.call();
       return;
     }
-    if (!controller.hasClients || !controller.position.hasContentDimensions) return;
+    if (!controller.hasClients || !controller.position.hasContentDimensions) {
+      return;
+    }
 
-    controller.animateTo(
-      controller.position.minScrollExtent,
-      duration: const Duration(seconds: 1),
-      curve: Curves.easeInToLinear,
-    );
+    _animateTo(controller, controller.position.minScrollExtent);
   }
 
   void _scrollToEnd() {
@@ -150,13 +169,11 @@ class _LinagoraSidebarAutoScrollOverlayState
       widget.onScrollToEnd?.call();
       return;
     }
-    if (!controller.hasClients || !controller.position.hasContentDimensions) return;
+    if (!controller.hasClients || !controller.position.hasContentDimensions) {
+      return;
+    }
 
-    controller.animateTo(
-      controller.position.maxScrollExtent,
-      duration: const Duration(seconds: 1),
-      curve: Curves.easeInToLinear,
-    );
+    _animateTo(controller, controller.position.maxScrollExtent);
   }
 
   void _stopScrolling() {
@@ -165,18 +182,46 @@ class _LinagoraSidebarAutoScrollOverlayState
       widget.onStopScrolling?.call();
       return;
     }
-    if (!controller.hasClients || !controller.position.hasContentDimensions) return;
+    _cancelAutoScroll();
+  }
 
-    controller.animateTo(
-      controller.offset,
-      duration: const Duration(milliseconds: 300),
-      curve: Curves.fastOutSlowIn,
-    );
+  void _animateTo(ScrollController controller, double offset) {
+    _cancelAutoScroll();
+    final animationId = ++_scrollAnimationId;
+    _autoScrollingController = controller;
+    controller
+        .animateTo(
+          offset,
+          duration: const Duration(seconds: 1),
+          curve: Curves.easeInToLinear,
+        )
+        .whenComplete(() {
+          if (_scrollAnimationId == animationId) {
+            _autoScrollingController = null;
+          }
+        });
+  }
+
+  void _cancelAutoScroll() {
+    final controller = _autoScrollingController;
+    if (controller == null) return;
+
+    _scrollAnimationId++;
+    _autoScrollingController = null;
+    if (!controller.hasClients || !controller.position.hasContentDimensions) {
+      return;
+    }
+
+    // `jumpTo` interrupts the active ScrollActivity without starting another
+    // animation, so a drag ending while an edge is hovered leaves the list at
+    // its current offset.
+    controller.jumpTo(controller.offset);
   }
 
   @override
   void dispose() {
     _listenedController?.removeListener(_onControllerChanged);
+    _cancelAutoScroll();
     super.dispose();
   }
 }
