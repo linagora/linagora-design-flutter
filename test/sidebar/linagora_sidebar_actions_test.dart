@@ -38,6 +38,10 @@ void main() {
   testWidgets('rejects two disclosure callbacks at once', _headerCallbackAssert);
   testWidgets('confirmation popover mirrors its arrow in RTL', _confirmPopover);
   testWidgets('colours the confirm button from the tokens', _confirmColours);
+  testWidgets(
+    'blocks a trailing action while the row is disabled',
+    _disabledRowBlocksAction,
+  );
 }
 
 Future<void> _menuActionKeepsTrailingVisible(WidgetTester tester) async {
@@ -1067,4 +1071,40 @@ Future<void> _confirmPopover(WidgetTester tester) async {
   );
 
   expect(_arrowSideOf(tester), LinagoraSidebarPopoverArrowSide.end);
+}
+
+/// Pins the intended behaviour, not the current one: `item.enabled = false`
+/// must block a `trailing` action from firing. It does not yet — see PR #103
+/// review — so this currently fails until `enabled` is threaded down to the
+/// trailing action.
+Future<void> _disabledRowBlocksAction(WidgetTester tester) async {
+  var opened = false;
+  await pumpSidebar(
+    tester,
+    LinagoraSidebarItem(
+      label: 'Spam',
+      enabled: false,
+      onTap: _noop,
+      trailing: LinagoraSidebarItemActions(
+        actions: [
+          LinagoraSidebarItemActionEntry(
+            id: 'more-spam',
+            child: LinagoraSidebarMenuAction(
+              semanticLabel: 'More Spam actions',
+              child: const Icon(Icons.more_horiz),
+              onPressed: (_) async {
+                opened = true;
+                return null;
+              },
+            ),
+          ),
+        ],
+      ),
+    ),
+  );
+
+  await tester.tap(find.byType(LinagoraSidebarMenuAction));
+  await tester.pump();
+
+  expect(opened, isFalse);
 }
