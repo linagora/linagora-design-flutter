@@ -11,6 +11,10 @@ void main() {
   testWidgets('hugs a promotion asked to fit its content', _upsellHugs);
   testWidgets('disables the reload action while it is loading', _reloadAction);
   testWidgets('names and rests the reload action when idle', _idleReloadAction);
+  testWidgets(
+    'announces the reload action as disabled while loading',
+    _loadingReloadActionSemantics,
+  );
 }
 
 Future<void> _emptyFooter(WidgetTester tester) async {
@@ -154,4 +158,35 @@ Future<void> _reloadAction(WidgetTester tester) async {
   );
   await tester.tap(find.bySemanticsLabel('Reload storage'));
   expect(taps, 0);
+}
+
+/// A screen-reader user's only signal that the control is mid-refresh is the
+/// disabled announcement — the icon spin is invisible to them.
+Future<void> _loadingReloadActionSemantics(WidgetTester tester) async {
+  var taps = 0;
+  final handle = tester.ensureSemantics();
+
+  await pumpSidebar(
+    tester,
+    LinagoraSidebarStorageReloadAction(
+      isLoading: true,
+      semanticLabel: 'Reload storage',
+      onPressed: () => taps++,
+      iconWidget: const Icon(Icons.refresh),
+    ),
+  );
+
+  expect(
+    tester.getSemantics(find.byType(LinagoraSidebarStorageReloadAction)),
+    containsSemantics(
+      label: 'Reload storage',
+      isButton: true,
+      isEnabled: false,
+      hasTapAction: false,
+    ),
+  );
+
+  await tester.tap(find.bySemanticsLabel('Reload storage'));
+  expect(taps, 0);
+  handle.dispose();
 }
