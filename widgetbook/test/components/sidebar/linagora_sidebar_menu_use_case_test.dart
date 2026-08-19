@@ -8,6 +8,10 @@ void main() {
     'a caption knob edited after one storage reload is silently ignored',
     _stuckStorageCaption,
   );
+  testWidgets(
+    'reopening a folders section started collapsed shows it pre-expanded',
+    _folderPreExpansionIgnoresKnob,
+  );
 }
 
 /// Pumps the 'Complete menu' use case through a minimal Widgetbook host —
@@ -70,4 +74,25 @@ Future<void> _stuckStorageCaption(WidgetTester tester) async {
   await _pumpCompleteMenu(tester, state);
 
   expect(find.text('Updated by user'), findsOneWidget);
+}
+
+/// Regression test for the review finding: `_expandedFolderIds` seeds full
+/// tree expansion from the tree-depth knob alone, regardless of "Initially
+/// expand folders". That knob only ever toggles the section header's own
+/// flag — a user who turns it off still finds the tree wide open the moment
+/// they reopen the section.
+Future<void> _folderPreExpansionIgnoresKnob(WidgetTester tester) async {
+  final state = _stateWithKnobs(const {'Initially expand folders': 'false'});
+  await _pumpCompleteMenu(tester, state);
+
+  // Starts collapsed, as asked: no folder rows at all yet.
+  expect(find.text('Personal folders'), findsNothing);
+
+  await tester.tap(find.bySemanticsLabel('Expand folders'));
+  await tester.pump();
+
+  // Reopening should reveal the top level only, not an already-drilled-down
+  // tree the knob said to start collapsed.
+  expect(find.text('Personal folders'), findsOneWidget);
+  expect(find.text('Project'), findsNothing);
 }
