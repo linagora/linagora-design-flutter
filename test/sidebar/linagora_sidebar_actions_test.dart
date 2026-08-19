@@ -934,6 +934,7 @@ Future<void> _headerGeometry(WidgetTester tester) async {
   expect(details?.globalBounds.size, const Size.square(24));
 }
 
+// Redundant with _confirmVariantSelection in linagora_sidebar_confirm_popover_test.dart (same primary/destructive check).
 Future<void> _confirmColours(WidgetTester tester) async {
   final style = LinagoraSidebarStyle.light();
 
@@ -1199,13 +1200,13 @@ Future<void> _standaloneActionGroup(WidgetTester tester) async {
             onPressed: (_) => completion.future,
           ),
         ),
-        LinagoraSidebarItemActionEntry(
+        const LinagoraSidebarItemActionEntry(
           id: 'clean-spam',
           child: LinagoraSidebarItemAction(
             key: cleanKey,
             semanticLabel: 'Clean Spam',
             onTap: _noop,
-            child: const Text('Clean'),
+            child: Text('Clean'),
           ),
         ),
       ],
