@@ -27,6 +27,18 @@ void main() {
     'fires onCancel and exposes closeSemanticLabel from the close button',
     _closeButtonContract,
   );
+  testWidgets(
+    'fires onCancel and onConfirm when the Cancel and Confirm buttons are tapped',
+    _actionButtonCallbacks,
+  );
+  testWidgets(
+    "gives the arrow's physical side the extra content inset under RTL",
+    _rtlContentInsetMatchesArrowSide,
+  );
+  testWidgets(
+    'applies popoverStyle overrides to the shape and button tokens',
+    _popoverStyleOverridesApply,
+  );
   test('uses the primary confirmation variant by default', _defaultVariant);
   test('clamps popover geometry to a small layout', _clampsPopoverShape);
 }
@@ -254,6 +266,80 @@ Future<void> _closeButtonContract(WidgetTester tester) async {
   }
 }
 
+Future<void> _actionButtonCallbacks(WidgetTester tester) async {
+  var cancelled = false;
+  var confirmed = false;
+  await _pumpPopover(
+    tester,
+    onCancel: () => cancelled = true,
+    onConfirm: () => confirmed = true,
+  );
+
+  await tester.tap(_buttonFinder('Cancel'));
+  await tester.pump();
+  expect(cancelled, isTrue);
+  expect(confirmed, isFalse);
+
+  await tester.tap(_buttonFinder('Clean'));
+  await tester.pump();
+  expect(confirmed, isTrue);
+}
+
+/// The widget's own comment says "the arrow occupies space inside the
+/// layout bounds, so only the side it sits on needs an additional inset
+/// before content begins." Under RTL the arrow moves to the physical right
+/// (`arrowSide` flips to `end`, and `LinagoraSidebarPopoverShape` paints
+/// `end` on the physical right), so the physical-right inset should carry
+/// the extra `arrowSize` clearance and the physical-left inset should not.
+/// `EdgeInsetsDirectional`'s RTL resolution swaps `start`/`end` onto
+/// right/left, but `startPadding`/`endPadding` weren't swapped to match,
+/// so today the extra clearance lands on the side with no arrow.
+Future<void> _rtlContentInsetMatchesArrowSide(WidgetTester tester) async {
+  await _pumpPopover(tester, textDirection: TextDirection.rtl);
+
+  final shape = _shape(tester);
+  expect(shape.arrowSide, LinagoraSidebarPopoverArrowSide.end);
+
+  final padding = tester
+      .widget<Padding>(
+        find.byWidgetPredicate(
+          (w) => w is Padding && w.padding is EdgeInsetsDirectional,
+        ),
+      )
+      .padding as EdgeInsetsDirectional;
+  final resolved = padding.resolve(TextDirection.rtl);
+
+  expect(resolved.right, 20, reason: 'arrow sits on the physical right');
+  expect(resolved.left, 12, reason: 'no arrow sits on the physical left');
+}
+
+Future<void> _popoverStyleOverridesApply(WidgetTester tester) async {
+  const overrideStyle = LinagoraSidebarConfirmPopoverStyle(
+    cardBorderRadius: 4,
+    arrowSize: 6,
+    buttonBorderRadius: 2,
+    cancelBackgroundColor: Color(0xFF112233),
+  );
+  await _pumpPopover(tester, popoverStyle: overrideStyle);
+
+  final shape = _shape(tester);
+  expect(shape.borderRadius, 4);
+  expect(shape.arrowSize, 6);
+
+  const states = <WidgetState>{};
+  expect(
+    _buttonStyle(tester, 'Cancel').backgroundColor?.resolve(states),
+    const Color(0xFF112233),
+  );
+  final buttonShape =
+      _buttonStyle(tester, 'Cancel').shape?.resolve(states)
+          as RoundedRectangleBorder?;
+  expect(
+    buttonShape?.borderRadius,
+    const BorderRadius.all(Radius.circular(2)),
+  );
+}
+
 Future<void> _pumpPopover(
   WidgetTester tester, {
   Brightness brightness = Brightness.light,
@@ -263,6 +349,8 @@ Future<void> _pumpPopover(
   double? width,
   LinagoraSidebarConfirmPopoverStyle? popoverStyle,
   VoidCallback? onCancel,
+  VoidCallback? onConfirm,
+  TextDirection textDirection = TextDirection.ltr,
 }) {
   final background = brightness == Brightness.dark
       ? const Color(0xFF1C1B1F)
@@ -271,28 +359,32 @@ Future<void> _pumpPopover(
     MaterialApp(
       home: Theme(
         data: ThemeData(brightness: brightness),
-        child: Center(
-          child: RepaintBoundary(
-            key: _captureKey,
-            child: ColoredBox(
-              color: background,
-              child: SizedBox(
-                width: 520,
-                height: 320,
-                child: Center(
-                  child: LinagoraSidebarConfirmPopover(
-                    key: _cardKey,
-                    title: _title,
-                    message: _message,
-                    cancelLabel: 'Cancel',
-                    confirmLabel: 'Clean',
-                    closeSemanticLabel: 'Close clear confirmation',
-                    onCancel: onCancel ?? _noop,
-                    onConfirm: _noop,
-                    confirmButtonVariant: confirmButtonVariant,
-                    style: style,
-                    width: width ?? LinagoraSidebarConfirmPopover.defaultWidth,
-                    popoverStyle: popoverStyle,
+        child: Directionality(
+          textDirection: textDirection,
+          child: Center(
+            child: RepaintBoundary(
+              key: _captureKey,
+              child: ColoredBox(
+                color: background,
+                child: SizedBox(
+                  width: 520,
+                  height: 320,
+                  child: Center(
+                    child: LinagoraSidebarConfirmPopover(
+                      key: _cardKey,
+                      title: _title,
+                      message: _message,
+                      cancelLabel: 'Cancel',
+                      confirmLabel: 'Clean',
+                      closeSemanticLabel: 'Close clear confirmation',
+                      onCancel: onCancel ?? _noop,
+                      onConfirm: onConfirm ?? _noop,
+                      confirmButtonVariant: confirmButtonVariant,
+                      style: style,
+                      width:
+                          width ?? LinagoraSidebarConfirmPopover.defaultWidth,
+                      popoverStyle: popoverStyle,
+                    ),
                   ),
                 ),
               ),
