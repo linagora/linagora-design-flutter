@@ -14,6 +14,11 @@ void main() {
     _confirmVariantSelection,
   );
   testWidgets('uses the dark confirmation colour tokens', _darkTokens);
+  testWidgets(
+    "keeps the injected style's brightness tokens when the ambient Theme "
+    'disagrees with it',
+    _injectedStyleOverridesAmbientBrightness,
+  );
   test('uses the primary confirmation variant by default', _defaultVariant);
   test('clamps popover geometry to a small layout', _clampsPopoverShape);
 }
@@ -161,11 +166,38 @@ Future<void> _darkTokens(WidgetTester tester) async {
   expect(_shape(tester).arrowSide, LinagoraSidebarPopoverArrowSide.start);
 }
 
+/// Pins `LinagoraSidebarStyle.brightness`'s documented contract: "Widgets
+/// must use this instead of the ambient Theme when a sidebar style is
+/// injected beneath a differently themed parent." The ambient [Theme] here
+/// stays light while an explicit dark [LinagoraSidebarStyle] is injected, so
+/// every colour token below must resolve to the dark set regardless of the
+/// surrounding app theme.
+Future<void> _injectedStyleOverridesAmbientBrightness(
+  WidgetTester tester,
+) async {
+  await _pumpPopover(tester, style: LinagoraSidebarStyle.dark());
+
+  final colors = LinagoraSysColors.material();
+  final titleStyle = tester.widget<Text>(find.text(_title)).style!;
+  expect(titleStyle.color, colors.onSurfaceDark);
+
+  const states = <WidgetState>{};
+  expect(
+    _buttonStyle(tester, 'Cancel').backgroundColor?.resolve(states),
+    colors.surfaceVariantDark,
+  );
+  expect(
+    _buttonStyle(tester, 'Cancel').foregroundColor?.resolve(states),
+    colors.onSurfaceDark,
+  );
+}
+
 Future<void> _pumpPopover(
   WidgetTester tester, {
   Brightness brightness = Brightness.light,
   LinagoraSidebarConfirmButtonVariant confirmButtonVariant =
       LinagoraSidebarConfirmButtonVariant.primary,
+  LinagoraSidebarStyle? style,
 }) {
   final background = brightness == Brightness.dark
       ? const Color(0xFF1C1B1F)
@@ -193,6 +225,7 @@ Future<void> _pumpPopover(
                     onCancel: _noop,
                     onConfirm: _noop,
                     confirmButtonVariant: confirmButtonVariant,
+                    style: style,
                   ),
                 ),
               ),
