@@ -1,17 +1,31 @@
-## Unreleased
+## 0.3.0 - 2026-08-20
 
 ### Added
 
-* `LinagoraSidebarItem`: left-menu navigation row with leading icon or widget,
-  count badge, expand/collapse chevron, hover-revealed trailing slot, and
-  application-owned `active`, `expanded` and `enabled` state.
-* `LinagoraSidebarBadge`: counter pill capped at the width of `999+`.
-* `LinagoraSidebarStyle`: sidebar design tokens, resolved from the ambient
-  theme brightness, overridable per widget. `copyWith` applies immutable
-  item, section, storage and popover override groups.
+* Sidebar menu system: `LinagoraSidebarMenu`, `LinagoraSidebarItem`,
+  `LinagoraSidebarSubItem`, `LinagoraSidebarSectionHeader`,
+  `LinagoraSidebarPrimaryAction`, `LinagoraSidebarFooter`,
+  `LinagoraSidebarStorage` and `LinagoraSidebarVersion` for composing a
+  navigation sidebar with pinned header and footer regions.
+* `LinagoraSidebarBadge`: counter pill capped at the width of `999+`, plus
+  row support for leading icons/widgets, expand/collapse, hover-revealed
+  trailing content, drag targets, and application-owned active/expanded/
+  enabled state.
+* Virtualized sidebar tree lists, grouped tree lists, tree flattening and
+  drag auto-scroll utilities for large and nested navigation collections.
+* Sidebar action APIs: `LinagoraSidebarItemActions`,
+  `LinagoraSidebarMenuAction`, `LinagoraSidebarPopoverAction` and
+  `LinagoraSidebarConfirmPopover`.
+* `LinagoraSidebarStyle` and `LinagoraSidebarTheme`: brightness-aware sidebar
+  design tokens with immutable item, section, storage and popover overrides.
 * `LinagoraButtonVariant.text`: renders a `TextButton`. Existing exhaustive
   switches over the enum need a new branch.
 * `LinagoraIconButton`: `tapTargetSize` and `visualDensity`.
+
+### Changed
+
+* Raised the minimum supported Flutter SDK to 3.38.0 for
+  `OverlayChildLocation`, used by sidebar popover actions.
 
 ### Fixed
 
