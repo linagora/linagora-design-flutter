@@ -36,6 +36,10 @@ void main() {
     _virtualizesTreeSection,
   );
   testWidgets(
+    'owns horizontal scrolling for a deep tree',
+    _scrollsDeepTreeHorizontally,
+  );
+  testWidgets(
     'scrolls a section header away with its tree rows',
     _scrollsHeaderWithTree,
   );
@@ -45,6 +49,10 @@ void main() {
   testWidgets(
     'applies an injected scroll physics to the body',
     _appliesCustomPhysics,
+  );
+  testWidgets(
+    'restores the body offset from page storage',
+    _restoresBodyScrollOffset,
   );
   testWidgets(
     'drops a body overlay when the menu lays out unbounded',
@@ -237,8 +245,43 @@ void _expectVerticalGap(Rect above, Rect below, double gap) {
 Future<void> _removesEmptyRegions(WidgetTester tester) async {
   await pumpSidebar(tester, const LinagoraSidebarMenu());
 
-  expect(find.byType(Scrollable), findsNothing);
+  expect(find.byType(SingleChildScrollView), findsOneWidget);
   expect(tester.takeException(), isNull);
+}
+
+Future<void> _scrollsDeepTreeHorizontally(WidgetTester tester) async {
+  const overflowWidth = 48.0;
+  await pumpSidebar(
+    tester,
+    const SizedBox(
+      height: 300,
+      child: LinagoraSidebarMenu(
+        treeHorizontalOverflow: overflowWidth,
+        navigationItems: [SizedBox(height: 36)],
+      ),
+    ),
+  );
+
+  final viewport = find.descendant(
+    of: find.byType(LinagoraSidebarMenu),
+    matching: find.byWidgetPredicate(
+      (widget) =>
+          widget is Scrollable && widget.axisDirection == AxisDirection.right,
+    ),
+  );
+  final scrollbar = tester.widget<Scrollbar>(
+    find.descendant(
+      of: find.byType(LinagoraSidebarMenu),
+      matching: find.byType(Scrollbar),
+    ),
+  );
+
+  expect(viewport, findsOneWidget);
+  expect(tester.state<ScrollableState>(viewport).position.maxScrollExtent,
+      overflowWidth);
+  expect(scrollbar.thumbVisibility, isTrue);
+  expect(scrollbar.trackVisibility, isTrue);
+  expect(scrollbar.interactive, isTrue);
 }
 
 Future<void> _pinsFooter(WidgetTester tester) async {
@@ -503,6 +546,65 @@ Future<void> _appliesCustomPhysics(WidgetTester tester) async {
   expect(
     tester.widget<CustomScrollView>(find.byType(CustomScrollView)).physics,
     same(physics),
+  );
+}
+
+Future<void> _restoresBodyScrollOffset(WidgetTester tester) async {
+  final bucket = PageStorageBucket();
+  final scrollController = ScrollController();
+  addTearDown(scrollController.dispose);
+  const scrollViewKey = PageStorageKey<String>('sidebar-menu');
+
+  await pumpSidebar(
+    tester,
+    PageStorage(
+      bucket: bucket,
+      child: _scrollableMenu(
+        scrollViewKey,
+        controller: scrollController,
+      ),
+    ),
+  );
+  await tester.drag(find.byType(CustomScrollView), const Offset(0, -240));
+  await tester.pumpAndSettle();
+  final bodyScrollable = find.descendant(
+    of: find.byType(CustomScrollView),
+    matching: find.byType(Scrollable),
+  );
+  final offset = tester.state<ScrollableState>(bodyScrollable).position.pixels;
+
+  await pumpSidebar(tester, const SizedBox());
+  await pumpSidebar(
+    tester,
+    PageStorage(
+      bucket: bucket,
+      child: _scrollableMenu(
+        scrollViewKey,
+        controller: scrollController,
+      ),
+    ),
+  );
+
+  expect(
+    tester.state<ScrollableState>(bodyScrollable).position.pixels,
+    closeTo(offset, 0.1),
+  );
+}
+
+Widget _scrollableMenu(
+  Key scrollViewKey, {
+  ScrollController? controller,
+}) {
+  return SizedBox(
+    height: 300,
+    child: LinagoraSidebarMenu(
+      controller: controller,
+      scrollViewKey: scrollViewKey,
+      navigationItems: [
+        for (var index = 0; index < 30; index++)
+          SizedBox(height: 36, child: Text('Mailbox $index')),
+      ],
+    ),
   );
 }
 

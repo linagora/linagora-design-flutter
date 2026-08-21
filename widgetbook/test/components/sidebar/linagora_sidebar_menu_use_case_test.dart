@@ -21,6 +21,10 @@ void main() {
     'aligns Compose with the active navigation row',
     _composerAlignsWithActiveNavigation,
   );
+  testWidgets(
+    'shows the menu horizontal scrollbar for a deep folder tree',
+    _deepFolderTreeUsesHorizontalScrollbar,
+  );
 }
 
 /// Pumps the 'Complete menu' use case through a minimal Widgetbook host —
@@ -135,4 +139,34 @@ Future<void> _composerAlignsWithActiveNavigation(WidgetTester tester) async {
 
   expect(compose.left, closeTo(inbox.left, 0.01));
   expect(compose.right, closeTo(inbox.right, 0.01));
+}
+
+Future<void> _deepFolderTreeUsesHorizontalScrollbar(
+  WidgetTester tester,
+) async {
+  await _pumpCompleteMenu(
+    tester,
+    _stateWithKnobs(const {'Project tree depth': '12'}),
+  );
+
+  final viewport = find.descendant(
+    of: find.byType(LinagoraSidebarMenu),
+    matching: find.byWidgetPredicate(
+      (widget) =>
+          widget is Scrollable && widget.axisDirection == AxisDirection.right,
+    ),
+  );
+  final scrollbar = tester.widget<Scrollbar>(
+    find.descendant(
+      of: find.byType(LinagoraSidebarMenu),
+      matching: find.byType(Scrollbar),
+    ),
+  );
+
+  expect(viewport, findsOneWidget);
+  expect(tester.state<ScrollableState>(viewport).position.maxScrollExtent,
+      greaterThan(0));
+  expect(scrollbar.thumbVisibility, isTrue);
+  expect(scrollbar.trackVisibility, isTrue);
+  expect(scrollbar.interactive, isTrue);
 }

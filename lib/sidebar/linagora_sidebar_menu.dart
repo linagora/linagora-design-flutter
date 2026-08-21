@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:linagora_design_flutter/sidebar/linagora_sidebar_scroll_coordinator.dart';
+import 'package:linagora_design_flutter/sidebar/linagora_sidebar_tree_horizontal_scroll_view.dart';
 import 'package:linagora_design_flutter/spacings/linagora_spacing.dart';
 
 /// Layout tokens for the regions composed by [LinagoraSidebarMenu].
@@ -110,8 +111,13 @@ class LinagoraSidebarMenu extends StatelessWidget {
     this.padding = defaultPadding,
     this.layout = const LinagoraSidebarMenuLayout(),
     this.controller,
+    this.scrollViewKey,
     this.physics,
-  });
+    this.treeHorizontalOverflow = 0,
+  }) : assert(
+         treeHorizontalOverflow >= 0,
+         'Sidebar tree overflow width cannot be negative',
+       );
 
   /// The compose, create, or new action at the top of the menu.
   final Widget? primaryAction;
@@ -139,23 +145,41 @@ class LinagoraSidebarMenu extends StatelessWidget {
   /// Controls the scrollable navigation and section region.
   final ScrollController? controller;
 
+  /// Identifies the body scroll view for [PageStorage] restoration.
+  ///
+  /// Supply a stable [PageStorageKey] from the host when this menu can be
+  /// removed and rebuilt, such as a mobile drawer. The host owns the key to
+  /// avoid collisions when multiple sidebars share a page storage bucket.
+  final Key? scrollViewKey;
+
   /// Applies to the scrolling body. An unbounded menu has nothing to scroll
   /// in, so its body never scrolls regardless of what is passed here.
   final ScrollPhysics? physics;
+
+  /// Extra width for visible tree indentation beyond the sidebar viewport.
+  ///
+  /// The menu owns a stable horizontal viewport on every build, including when
+  /// this value is zero. Hosts only need to update this when their visible tree
+  /// shape or expansion changes; the vertical menu position is then preserved
+  /// as deep folders begin or stop overflowing horizontally.
+  final double treeHorizontalOverflow;
 
   bool get _hasBody => navigationItems.isNotEmpty || sections.isNotEmpty;
 
   @override
   Widget build(BuildContext context) {
-    return LinagoraSidebarScrollCoordinator(
-      controller: controller,
-      child: Padding(
-        padding: padding,
-        child: LayoutBuilder(
-          builder: (context, constraints) {
-            if (constraints.hasBoundedHeight) return _boundedLayout();
-            return _unboundedLayout();
-          },
+    return LinagoraSidebarTreeHorizontalScrollView(
+      overflowWidth: treeHorizontalOverflow,
+      child: LinagoraSidebarScrollCoordinator(
+        controller: controller,
+        child: Padding(
+          padding: padding,
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              if (constraints.hasBoundedHeight) return _boundedLayout();
+              return _unboundedLayout();
+            },
+          ),
         ),
       ),
     );
@@ -207,6 +231,7 @@ class LinagoraSidebarMenu extends StatelessWidget {
   /// virtualization has to give the menu a bounded height.
   Widget _body({required bool shrinkWrap}) {
     final body = CustomScrollView(
+      key: scrollViewKey,
       controller: controller,
       shrinkWrap: shrinkWrap,
       physics: shrinkWrap ? const NeverScrollableScrollPhysics() : physics,

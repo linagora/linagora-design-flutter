@@ -177,11 +177,12 @@ class _SidebarMenuFolders {
       ),
       projectTreeDepth: context.knobs.int.slider(
         label: 'Project tree depth',
-        description: 'Deepest indentation level rendered below Project.',
+        description:
+            'Deepest indentation level below Project. Values above 8 show the menu horizontal scrollbar.',
         initialValue: minimumTreeDepth,
         min: minimumTreeDepth,
-        max: 8,
-        divisions: 6,
+        max: 16,
+        divisions: 14,
       ),
     );
   }
@@ -371,8 +372,14 @@ class _SidebarMenuPreviewState extends State<_SidebarMenuPreview> {
   Widget build(BuildContext context) {
     final configuration = widget.configuration;
     final navigation = configuration.navigation;
+    final folders = configuration.folders;
+    final folderEntries = folders.isVisible && _foldersExpanded
+        ? _folderEntries(folders)
+        : const <LinagoraSidebarTreeListEntry<_PreviewFolder>>[];
+
     return LinagoraSidebarMenu(
       controller: _scrollController,
+      treeHorizontalOverflow: _treeHorizontalOverflowFor(folderEntries),
       bodyOverlay: configuration.showDragAutoScroll
           ? const LinagoraSidebarAutoScrollOverlay(isDragging: true)
           : null,
@@ -380,8 +387,7 @@ class _SidebarMenuPreviewState extends State<_SidebarMenuPreview> {
       navigationItems:
           navigation.isVisible ? _navigationItems(navigation) : const [],
       sections: [
-        if (configuration.folders.isVisible)
-          _foldersSection(configuration.folders),
+        if (folders.isVisible) _foldersSection(folders, folderEntries),
         if (configuration.labels.isVisible) _labelsSection(configuration.labels),
       ],
       footerItems: _footerItems(configuration.footer),
@@ -476,7 +482,10 @@ class _SidebarMenuPreviewState extends State<_SidebarMenuPreview> {
   /// The folders live in a sliver tree list, which is the shape a mailbox with
   /// hundreds of folders needs: the rows virtualize against the menu's own
   /// viewport while this header scrolls along with them.
-  LinagoraSidebarMenuSection _foldersSection(_SidebarMenuFolders folders) {
+  LinagoraSidebarMenuSection _foldersSection(
+    _SidebarMenuFolders folders,
+    List<LinagoraSidebarTreeListEntry<_PreviewFolder>> entries,
+  ) {
     return LinagoraSidebarMenuSection(
       header: LinagoraSidebarSectionHeader(
         label: 'Folders',
@@ -501,8 +510,9 @@ class _SidebarMenuPreviewState extends State<_SidebarMenuPreview> {
       ),
       sliver: _foldersExpanded
           ? LinagoraSidebarSliverTreeList<_PreviewFolder>(
-              entries: _folderEntries(folders),
+              entries: entries,
               itemBuilder: _buildFolder,
+              maxIndent: double.infinity,
             )
           : null,
     );
@@ -541,6 +551,19 @@ class _SidebarMenuPreviewState extends State<_SidebarMenuPreview> {
 
     entries.addAll(_projectSubfolders(folders));
     return entries;
+  }
+
+  double _treeHorizontalOverflowFor(
+    List<LinagoraSidebarTreeListEntry<_PreviewFolder>> entries,
+  ) {
+    var maximumDepth = 0;
+    for (final entry in entries) {
+      if (entry.depth > maximumDepth) maximumDepth = entry.depth;
+    }
+
+    final deepestIndent = maximumDepth * LinagoraSidebarSubItem.defaultIndent;
+    final overflow = deepestIndent - LinagoraSidebarTreeList.defaultMaxIndent;
+    return overflow > 0 ? overflow : 0;
   }
 
   List<LinagoraSidebarTreeListEntry<_PreviewFolder>> _projectSubfolders(
