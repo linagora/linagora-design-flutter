@@ -56,4 +56,7 @@ export 'package:linagora_design_flutter/sidebar/linagora_sidebar_style.dart';
 export 'package:linagora_design_flutter/sidebar/linagora_sidebar_sub_item.dart';
 export 'package:linagora_design_flutter/sidebar/linagora_sidebar_tree_list.dart';
 export 'package:linagora_design_flutter/sidebar/linagora_sidebar_tree_flattener.dart';
+export 'package:linagora_design_flutter/sidebar/linagora_sidebar_tree_horizontal_scroll_view.dart';
+export 'package:linagora_design_flutter/sidebar/linagora_sidebar_tree_layout_policy.dart';
+export 'package:linagora_design_flutter/sidebar/linagora_sidebar_tree_projection.dart';
 export 'package:linagora_design_flutter/sidebar/linagora_sidebar_version.dart';
