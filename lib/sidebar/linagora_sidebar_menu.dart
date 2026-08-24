@@ -113,9 +113,9 @@ class LinagoraSidebarMenu extends StatelessWidget {
     this.controller,
     this.scrollViewKey,
     this.physics,
-    this.treeHorizontalOverflow = 0,
+    this.treeHorizontalOverflow,
   }) : assert(
-         treeHorizontalOverflow >= 0,
+         treeHorizontalOverflow == null || treeHorizontalOverflow >= 0,
          'Sidebar tree overflow width cannot be negative',
        );
 
@@ -158,30 +158,34 @@ class LinagoraSidebarMenu extends StatelessWidget {
 
   /// Extra width for visible tree indentation beyond the sidebar viewport.
   ///
-  /// The menu owns a stable horizontal viewport on every build, including when
-  /// this value is zero. Hosts only need to update this when their visible tree
-  /// shape or expansion changes; the vertical menu position is then preserved
-  /// as deep folders begin or stop overflowing horizontally.
-  final double treeHorizontalOverflow;
+  /// Leave this unset to render no horizontal viewport or scrollbar. Set it to
+  /// a non-negative value to opt in to horizontal scrolling. Hosts that can
+  /// change from no overflow to overflow should pass `0` initially so the
+  /// viewport stays stable and preserves the vertical menu position.
+  final double? treeHorizontalOverflow;
 
   bool get _hasBody => navigationItems.isNotEmpty || sections.isNotEmpty;
 
   @override
   Widget build(BuildContext context) {
-    return LinagoraSidebarTreeHorizontalScrollView(
-      overflowWidth: treeHorizontalOverflow,
-      child: LinagoraSidebarScrollCoordinator(
-        controller: controller,
-        child: Padding(
-          padding: padding,
-          child: LayoutBuilder(
-            builder: (context, constraints) {
-              if (constraints.hasBoundedHeight) return _boundedLayout();
-              return _unboundedLayout();
-            },
-          ),
+    final sidebar = LinagoraSidebarScrollCoordinator(
+      controller: controller,
+      child: Padding(
+        padding: padding,
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            if (constraints.hasBoundedHeight) return _boundedLayout();
+            return _unboundedLayout();
+          },
         ),
       ),
+    );
+    final overflowWidth = treeHorizontalOverflow;
+    if (overflowWidth == null) return sidebar;
+
+    return LinagoraSidebarTreeHorizontalScrollView(
+      overflowWidth: overflowWidth,
+      child: sidebar,
     );
   }
 

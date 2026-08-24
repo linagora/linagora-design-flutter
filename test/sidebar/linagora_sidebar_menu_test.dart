@@ -40,6 +40,10 @@ void main() {
     _scrollsDeepTreeHorizontally,
   );
   testWidgets(
+    'does not create horizontal scrolling unless a host opts in',
+    _doesNotCreateHorizontalScrollByDefault,
+  );
+  testWidgets(
     'scrolls a section header away with its tree rows',
     _scrollsHeaderWithTree,
   );
@@ -245,8 +249,27 @@ void _expectVerticalGap(Rect above, Rect below, double gap) {
 Future<void> _removesEmptyRegions(WidgetTester tester) async {
   await pumpSidebar(tester, const LinagoraSidebarMenu());
 
-  expect(find.byType(SingleChildScrollView), findsOneWidget);
+  expect(find.byType(SingleChildScrollView), findsNothing);
   expect(tester.takeException(), isNull);
+}
+
+Future<void> _doesNotCreateHorizontalScrollByDefault(
+  WidgetTester tester,
+) async {
+  await pumpSidebar(
+    tester,
+    const SizedBox(
+      height: 300,
+      child: LinagoraSidebarMenu(
+        navigationItems: [SizedBox(height: 36)],
+      ),
+    ),
+  );
+
+  expect(
+    find.byType(LinagoraSidebarTreeHorizontalScrollView),
+    findsNothing,
+  );
 }
 
 Future<void> _scrollsDeepTreeHorizontally(WidgetTester tester) async {
