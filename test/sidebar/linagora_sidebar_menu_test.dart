@@ -44,6 +44,14 @@ void main() {
     _doesNotCreateHorizontalScrollByDefault,
   );
   testWidgets(
+    'keeps a disabled horizontal viewport when a host opts in with zero overflow',
+    _keepsDisabledHorizontalViewportWithZeroOverflow,
+  );
+  test(
+    'rejects invalid tree horizontal overflow values',
+    _rejectsInvalidTreeHorizontalOverflow,
+  );
+  testWidgets(
     'scrolls a section header away with its tree rows',
     _scrollsHeaderWithTree,
   );
@@ -270,6 +278,66 @@ Future<void> _doesNotCreateHorizontalScrollByDefault(
     find.byType(LinagoraSidebarTreeHorizontalScrollView),
     findsNothing,
   );
+  expect(
+    find.byWidgetPredicate(
+      (widget) =>
+          widget is Scrollable && widget.axisDirection == AxisDirection.right,
+    ),
+    findsNothing,
+  );
+  expect(find.byType(Scrollbar), findsNothing);
+}
+
+Future<void> _keepsDisabledHorizontalViewportWithZeroOverflow(
+  WidgetTester tester,
+) async {
+  await pumpSidebar(
+    tester,
+    const SizedBox(
+      height: 300,
+      child: LinagoraSidebarMenu(
+        treeHorizontalOverflow: 0,
+        navigationItems: [SizedBox(height: 36)],
+      ),
+    ),
+  );
+
+  final viewport = find.descendant(
+    of: find.byType(LinagoraSidebarMenu),
+    matching: find.byWidgetPredicate(
+      (widget) =>
+          widget is Scrollable && widget.axisDirection == AxisDirection.right,
+    ),
+  );
+  final scrollbar = tester.widget<Scrollbar>(
+    find.descendant(
+      of: find.byType(LinagoraSidebarMenu),
+      matching: find.byType(Scrollbar),
+    ),
+  );
+
+  expect(
+    find.byType(LinagoraSidebarTreeHorizontalScrollView),
+    findsOneWidget,
+  );
+  expect(tester.state<ScrollableState>(viewport).position.maxScrollExtent, 0);
+  expect(scrollbar.thumbVisibility, isFalse);
+  expect(scrollbar.trackVisibility, isFalse);
+  expect(scrollbar.interactive, isFalse);
+}
+
+void _rejectsInvalidTreeHorizontalOverflow() {
+  for (final overflowWidth in [
+    -1.0,
+    double.nan,
+    double.infinity,
+    double.negativeInfinity,
+  ]) {
+    expect(
+      () => LinagoraSidebarMenu(treeHorizontalOverflow: overflowWidth),
+      throwsAssertionError,
+    );
+  }
 }
 
 Future<void> _scrollsDeepTreeHorizontally(WidgetTester tester) async {

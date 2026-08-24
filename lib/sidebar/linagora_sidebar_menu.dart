@@ -115,8 +115,10 @@ class LinagoraSidebarMenu extends StatelessWidget {
     this.physics,
     this.treeHorizontalOverflow,
   }) : assert(
-         treeHorizontalOverflow == null || treeHorizontalOverflow >= 0,
-         'Sidebar tree overflow width cannot be negative',
+         treeHorizontalOverflow == null ||
+             (treeHorizontalOverflow >= 0 &&
+                 treeHorizontalOverflow < double.infinity),
+         'Sidebar tree overflow width must be finite and non-negative',
        );
 
   /// The compose, create, or new action at the top of the menu.

@@ -14,6 +14,10 @@ void main() {
     'indents flattened rows in a host-owned viewport',
     _indentsChildContentInSliver,
   );
+  testWidgets(
+    'caps deep indentation in a host-owned viewport',
+    _capsDeepIndentInSliver,
+  );
   test('rejects invalid tree list dimensions', _rejectsInvalidSliverDimensions);
 }
 
@@ -45,6 +49,39 @@ Future<void> _indentsChildContentInSliver(WidgetTester tester) async {
     LinagoraSidebarSubItem.defaultIndent,
   );
   expect(find.byKey(const ValueKey<Object>('project')), findsOneWidget);
+}
+
+Future<void> _capsDeepIndentInSliver(WidgetTester tester) async {
+  await pumpSidebarTreeList(
+    tester,
+    CustomScrollView(
+      slivers: [
+        LinagoraSidebarSliverTreeList<String>(
+          entries: const [
+            LinagoraSidebarTreeListEntry(
+              id: 'personal',
+              data: 'Personal folders',
+            ),
+            LinagoraSidebarTreeListEntry(
+              id: 'archive',
+              data: 'Archive',
+              depth: 20,
+            ),
+          ],
+          itemBuilder: sidebarTreeListFolderItem,
+        ),
+      ],
+    ),
+  );
+
+  final folderLabel = tester.getRect(find.text('Personal folders'));
+  final deepLabel = tester.getRect(find.text('Archive'));
+
+  expect(
+    deepLabel.left - folderLabel.left,
+    LinagoraSidebarTreeList.defaultMaxIndent,
+  );
+  expect(tester.takeException(), isNull);
 }
 
 void _rejectsInvalidSliverDimensions() {

@@ -16,6 +16,26 @@ void main() {
     _testResetsOffsetWhenOverflowDisappears();
     _testKeepsVerticalListPositionWhenOverflowStarts();
     _testCreatesViewportForEveryTargetPlatform();
+    _testRejectsInvalidOverflowWidths();
+  });
+}
+
+void _testRejectsInvalidOverflowWidths() {
+  test('rejects negative or non-finite overflow widths', () {
+    for (final overflowWidth in [
+      -1.0,
+      double.nan,
+      double.infinity,
+      double.negativeInfinity,
+    ]) {
+      expect(
+        () => LinagoraSidebarTreeHorizontalScrollView(
+          overflowWidth: overflowWidth,
+          child: const SizedBox(),
+        ),
+        throwsAssertionError,
+      );
+    }
   });
 }
 

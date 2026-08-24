@@ -13,7 +13,10 @@ class LinagoraSidebarTreeHorizontalScrollView extends StatefulWidget {
     super.key,
     required this.child,
     required this.overflowWidth,
-  }) : assert(overflowWidth >= 0, 'Sidebar overflow width cannot be negative');
+  }) : assert(
+         overflowWidth >= 0 && overflowWidth < double.infinity,
+         'Sidebar overflow width must be finite and non-negative',
+       );
 
   final Widget child;
 
