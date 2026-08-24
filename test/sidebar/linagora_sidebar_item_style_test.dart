@@ -21,6 +21,10 @@ void main() {
   testWidgets('mutes the trailing slot below the label', _trailingIsMuted);
   testWidgets('points the chevron down when expanded', _chevronDirection);
   testWidgets('keeps the chevron beside the label', _chevronHugsLabel);
+  testWidgets(
+    'keeps an indented chevron beside the label',
+    _indentedChevronHugsLabel,
+  );
   testWidgets('insets the badge from the row edge', _badgeHugsTheRowEdge);
   testWidgets('prefers leading over icon', _leadingWins);
   testWidgets('allows a leading icon colour override', _iconColorOverride);
@@ -475,6 +479,34 @@ Future<void> _chevronHugsLabel(WidgetTester tester) async {
   expect(chevron.width, style.chevronSize);
   expect(chevron.right, lessThan(badge.left));
 }
+Future<void> _indentedChevronHugsLabel(WidgetTester tester) async {
+  await tester.pumpWidget(
+    const MaterialApp(
+      home: Scaffold(
+        body: SizedBox(
+          width: 204,
+          child: LinagoraSidebarSubItem(
+            child: LinagoraSidebarItem(
+              label: 'Personal folders',
+              icon: Icons.folder_outlined,
+              expanded: true,
+              badgeLabel: '5',
+            ),
+          ),
+        ),
+      ),
+    ),
+  );
+
+  final label = tester.getRect(find.text('Personal folders'));
+  final chevron = tester.getRect(find.byIcon(Icons.keyboard_arrow_down));
+  final badge = tester.getRect(find.byType(LinagoraSidebarBadge));
+  final style = LinagoraSidebarStyle.light();
+
+  expect(chevron.left - label.right, closeTo(style.itemSpacing, 1));
+  expect(chevron.right, lessThanOrEqualTo(badge.left));
+}
+
 
 Future<void> _badgeHugsTheRowEdge(WidgetTester tester) async {
   await _pumpExpandedFolderRow(tester);

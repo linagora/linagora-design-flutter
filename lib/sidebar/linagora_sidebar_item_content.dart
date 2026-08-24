@@ -205,6 +205,8 @@ class _SidebarItemRow extends StatelessWidget {
                       item: item,
                       style: style,
                       foregroundColor: foregroundColor,
+                      expandControl: expandControl,
+                      expandControlOverhang: _expandControlOverhang,
                     ),
                   ),
                 ],
@@ -212,16 +214,6 @@ class _SidebarItemRow extends StatelessWidget {
             ),
           ),
         ),
-        if (expandControl != null) ...[
-          SizedBox(
-            width: math.max(
-              0,
-              style.itemSpacing -
-                  _expandControlOverhang,
-            ),
-          ),
-          expandControl,
-        ],
         if (trailing != null) ...[
           SizedBox(width: style.itemSpacing),
           _SidebarItemTrailing(style: style, child: trailing!),
@@ -289,7 +281,7 @@ class _SidebarItemExpandControl extends StatelessWidget {
   }
 }
 
-/// The label is translated with the leading content while controls and badges
+/// The label and chevron are translated with the leading content while badges
 /// remain anchored in the row's trailing slot.
 class _SidebarItemLabel extends StatelessWidget {
   const _SidebarItemLabel({
