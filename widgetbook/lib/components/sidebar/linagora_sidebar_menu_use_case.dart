@@ -133,6 +133,7 @@ class _SidebarMenuFolders {
     required this.showSearch,
     required this.showAdd,
     required this.initiallyExpanded,
+    required this.enableHorizontalScroll,
     required this.projectSubfolderCount,
     required this.projectTreeDepth,
   });
@@ -143,6 +144,7 @@ class _SidebarMenuFolders {
         showSearch = true,
         showAdd = true,
         initiallyExpanded = true,
+        enableHorizontalScroll = false,
         projectSubfolderCount = 1,
         projectTreeDepth = minimumTreeDepth;
 
@@ -167,6 +169,12 @@ class _SidebarMenuFolders {
         label: 'Initially expand folders',
         initialValue: true,
       ),
+      enableHorizontalScroll: context.knobs.boolean(
+        label: 'Enable folder horizontal scrolling',
+        description:
+            'Lets only the folder tree pan horizontally for deep nesting.',
+        initialValue: false,
+      ),
       projectSubfolderCount: context.knobs.int.slider(
         label: 'Project subfolder count',
         description: 'Number of child sidebar items shown beneath Project.',
@@ -178,7 +186,7 @@ class _SidebarMenuFolders {
       projectTreeDepth: context.knobs.int.slider(
         label: 'Project tree depth',
         description:
-            'Deepest indentation level below Project. Values above 8 show the menu horizontal scrollbar.',
+            'Deepest indentation level below Project.',
         initialValue: minimumTreeDepth,
         min: minimumTreeDepth,
         max: 16,
@@ -195,6 +203,7 @@ class _SidebarMenuFolders {
   final bool showSearch;
   final bool showAdd;
   final bool initiallyExpanded;
+  final bool enableHorizontalScroll;
   final int projectSubfolderCount;
   final int projectTreeDepth;
 }
@@ -379,7 +388,6 @@ class _SidebarMenuPreviewState extends State<_SidebarMenuPreview> {
 
     return LinagoraSidebarMenu(
       controller: _scrollController,
-      treeHorizontalOverflow: _treeHorizontalOverflowFor(folderEntries),
       bodyOverlay: configuration.showDragAutoScroll
           ? const LinagoraSidebarAutoScrollOverlay(isDragging: true)
           : null,
@@ -513,6 +521,7 @@ class _SidebarMenuPreviewState extends State<_SidebarMenuPreview> {
               entries: entries,
               itemBuilder: _buildFolder,
               maxIndent: double.infinity,
+              enableHorizontalScroll: folders.enableHorizontalScroll,
             )
           : null,
     );
@@ -551,19 +560,6 @@ class _SidebarMenuPreviewState extends State<_SidebarMenuPreview> {
 
     entries.addAll(_projectSubfolders(folders));
     return entries;
-  }
-
-  double _treeHorizontalOverflowFor(
-    List<LinagoraSidebarTreeListEntry<_PreviewFolder>> entries,
-  ) {
-    var maximumDepth = 0;
-    for (final entry in entries) {
-      if (entry.depth > maximumDepth) maximumDepth = entry.depth;
-    }
-
-    final deepestIndent = maximumDepth * LinagoraSidebarSubItem.defaultIndent;
-    final overflow = deepestIndent - LinagoraSidebarTreeList.defaultMaxIndent;
-    return overflow > 0 ? overflow : 0;
   }
 
   List<LinagoraSidebarTreeListEntry<_PreviewFolder>> _projectSubfolders(

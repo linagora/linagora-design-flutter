@@ -22,8 +22,8 @@ Widget linagoraSidebarTreeListUseCase(BuildContext context) {
       description: 'Deepest nesting level shown in the preview tree.',
       initialValue: 3,
       min: 1,
-      max: 8,
-      divisions: 7,
+      max: 16,
+      divisions: 15,
     ),
     showNestedFolderIcons: context.knobs.boolean(
       label: 'Show nested folder icons',
@@ -31,6 +31,11 @@ Widget linagoraSidebarTreeListUseCase(BuildContext context) {
     ),
     showSelectedFolder: context.knobs.boolean(
       label: 'Show selected folder',
+      initialValue: false,
+    ),
+    enableHorizontalScroll: context.knobs.boolean(
+      label: 'Enable horizontal scrolling',
+      description: 'Lets only the folder tree pan horizontally when it is deep.',
       initialValue: false,
     ),
   );
@@ -43,6 +48,7 @@ class _SidebarTreeListPreview extends StatefulWidget {
     required this.maximumDepth,
     required this.showNestedFolderIcons,
     required this.showSelectedFolder,
+    required this.enableHorizontalScroll,
   });
 
   final double width;
@@ -50,6 +56,7 @@ class _SidebarTreeListPreview extends StatefulWidget {
   final int maximumDepth;
   final bool showNestedFolderIcons;
   final bool showSelectedFolder;
+  final bool enableHorizontalScroll;
 
   @override
   State<_SidebarTreeListPreview> createState() =>
@@ -73,6 +80,8 @@ class _SidebarTreeListPreviewState extends State<_SidebarTreeListPreview> {
         key: const PageStorageKey('sidebar-tree-list-preview'),
         entries: _visibleEntries,
         itemBuilder: _buildItem,
+        maxIndent: double.infinity,
+        enableHorizontalScroll: widget.enableHorizontalScroll,
       ),
     );
   }

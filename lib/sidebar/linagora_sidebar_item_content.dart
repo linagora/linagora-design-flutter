@@ -120,39 +120,49 @@ class _SidebarItemRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final indent = LinagoraSidebarIndent.of(context);
+    final offset = Directionality.of(context) == TextDirection.rtl
+        ? -indent
+        : indent;
+
     return ConstrainedBox(
       // Minimum, not fixed: the row grows with the text scale.
       constraints: BoxConstraints(minHeight: style.itemMinHeight),
       child: Padding(
-        // Indent content only, preserving the full-width row background.
+        // Keep the row's layout width stable. A large tree indent is painted
+        // inside this viewport instead of shrinking the row until it overflows.
         padding: EdgeInsetsDirectional.only(
-          start:
-              style.itemHorizontalPadding + LinagoraSidebarIndent.of(context),
+          start: style.itemHorizontalPadding,
           end: style.itemHorizontalPadding,
         ),
-        child: Row(
-          children: [
-            if (_hasLeading) ...[
-              _SidebarItemLeading(
-                leading: item.leading,
-                icon: item.icon,
-                color: item.iconColor ?? foregroundColor,
-                size: style.itemIconSize,
-              ),
-              SizedBox(width: style.itemSpacing),
-            ],
-            Expanded(
-              child: _SidebarItemLabel(
-                item: item,
-                style: style,
-                foregroundColor: foregroundColor,
-              ),
+        child: ClipRect(
+          child: Transform.translate(
+            offset: Offset(offset, 0),
+            child: Row(
+              children: [
+                if (_hasLeading) ...[
+                  _SidebarItemLeading(
+                    leading: item.leading,
+                    icon: item.icon,
+                    color: item.iconColor ?? foregroundColor,
+                    size: style.itemIconSize,
+                  ),
+                  SizedBox(width: style.itemSpacing),
+                ],
+                Expanded(
+                  child: _SidebarItemLabel(
+                    item: item,
+                    style: style,
+                    foregroundColor: foregroundColor,
+                  ),
+                ),
+                if (trailing != null) ...[
+                  SizedBox(width: style.itemSpacing),
+                  _SidebarItemTrailing(style: style, child: trailing!),
+                ],
+              ],
             ),
-            if (trailing != null) ...[
-              SizedBox(width: style.itemSpacing),
-              _SidebarItemTrailing(style: style, child: trailing!),
-            ],
-          ],
+          ),
         ),
       ),
     );

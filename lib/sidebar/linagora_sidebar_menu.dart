@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:linagora_design_flutter/sidebar/linagora_sidebar_scroll_coordinator.dart';
-import 'package:linagora_design_flutter/sidebar/linagora_sidebar_tree_horizontal_scroll_view.dart';
 import 'package:linagora_design_flutter/spacings/linagora_spacing.dart';
 
 /// Layout tokens for the regions composed by [LinagoraSidebarMenu].
@@ -113,13 +112,7 @@ class LinagoraSidebarMenu extends StatelessWidget {
     this.controller,
     this.scrollViewKey,
     this.physics,
-    this.treeHorizontalOverflow,
-  }) : assert(
-         treeHorizontalOverflow == null ||
-             (treeHorizontalOverflow >= 0 &&
-                 treeHorizontalOverflow < double.infinity),
-         'Sidebar tree overflow width must be finite and non-negative',
-       );
+  });
 
   /// The compose, create, or new action at the top of the menu.
   final Widget? primaryAction;
@@ -158,14 +151,6 @@ class LinagoraSidebarMenu extends StatelessWidget {
   /// in, so its body never scrolls regardless of what is passed here.
   final ScrollPhysics? physics;
 
-  /// Extra width for visible tree indentation beyond the sidebar viewport.
-  ///
-  /// Leave this unset to render no horizontal viewport or scrollbar. Set it to
-  /// a non-negative value to opt in to horizontal scrolling. Hosts that can
-  /// change from no overflow to overflow should pass `0` initially so the
-  /// viewport stays stable and preserves the vertical menu position.
-  final double? treeHorizontalOverflow;
-
   bool get _hasBody => navigationItems.isNotEmpty || sections.isNotEmpty;
 
   @override
@@ -182,13 +167,7 @@ class LinagoraSidebarMenu extends StatelessWidget {
         ),
       ),
     );
-    final overflowWidth = treeHorizontalOverflow;
-    if (overflowWidth == null) return sidebar;
-
-    return LinagoraSidebarTreeHorizontalScrollView(
-      overflowWidth: overflowWidth,
-      child: sidebar,
-    );
+    return sidebar;
   }
 
   Widget _boundedLayout() {

@@ -1,6 +1,9 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 import 'package:linagora_design_flutter/sidebar/linagora_sidebar_sub_item.dart';
 import 'package:linagora_design_flutter/sidebar/linagora_sidebar_tree_flattener.dart';
+import 'package:linagora_design_flutter/sidebar/linagora_sidebar_tree_horizontal_scroll_view.dart';
 import 'package:linagora_design_flutter/sidebar/linagora_sidebar_tree_list.dart';
 
 /// A product-owned category row followed by one expanded tree of items.
@@ -39,6 +42,7 @@ class LinagoraSidebarSliverGroupedTreeList<T> extends StatelessWidget {
     required this.itemBuilder,
     this.indent = LinagoraSidebarSubItem.defaultIndent,
     this.maxIndent = LinagoraSidebarTreeList.defaultMaxIndent,
+    this.enableHorizontalScroll = false,
   }) : assert(indent >= 0, 'A sidebar tree list indent cannot be negative'),
        assert(
          maxIndent >= 0,
@@ -55,21 +59,31 @@ class LinagoraSidebarSliverGroupedTreeList<T> extends StatelessWidget {
   final double indent;
   final double maxIndent;
 
+  /// Lets this grouped tree's rows pan horizontally for deep indentation.
+  ///
+  /// Disabled by default so its host keeps a fixed cross-axis width and clips
+  /// any content beyond it.
+  final bool enableHorizontalScroll;
+
   @override
   Widget build(BuildContext context) {
     _requireUniqueGroupIds(groups);
     final rows = _buildRows();
     final indexById = _indexRows(rows);
 
-    return SliverList(
-      delegate: SliverChildBuilderDelegate(
-        (context, index) => _buildRow(context, rows[index]),
-        childCount: rows.length,
-        findChildIndexCallback: (key) {
-          if (key is! ValueKey<Object>) return null;
-          return indexById[key.value];
-        },
-      ),
+    final delegate = SliverChildBuilderDelegate(
+      (context, index) => _buildRow(context, rows[index]),
+      childCount: rows.length,
+      findChildIndexCallback: (key) {
+        if (key is! ValueKey<Object>) return null;
+        return indexById[key.value];
+      },
+    );
+    if (!enableHorizontalScroll) return SliverList(delegate: delegate);
+
+    return LinagoraSidebarTreeHorizontalScrollView.sliver(
+      delegate: delegate,
+      overflowWidth: _horizontalOverflow(rows),
     );
   }
 
@@ -117,6 +131,20 @@ class LinagoraSidebarSliverGroupedTreeList<T> extends StatelessWidget {
       maxIndent: maxIndent,
       child: item,
     );
+  }
+
+  double _horizontalOverflow(
+    List<_LinagoraSidebarGroupedTreeRow<T>> rows,
+  ) {
+    var maximumDepth = 0;
+    for (final row in rows) {
+      final depth = row.entry?.depth;
+      if (depth != null && depth > maximumDepth) maximumDepth = depth;
+    }
+
+    final deepestIndent = math.min(maximumDepth * indent, maxIndent);
+    final overflow = deepestIndent - LinagoraSidebarTreeList.defaultMaxIndent;
+    return overflow > 0 ? overflow : 0;
   }
 
   static bool _hasUniqueGroupIds<T>(List<LinagoraSidebarTreeGroup<T>> groups) {

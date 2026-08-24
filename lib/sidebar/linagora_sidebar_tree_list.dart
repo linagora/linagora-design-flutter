@@ -1,5 +1,8 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 import 'package:linagora_design_flutter/sidebar/linagora_sidebar_sub_item.dart';
+import 'package:linagora_design_flutter/sidebar/linagora_sidebar_tree_horizontal_scroll_view.dart';
 
 /// Builds one row from a visible [LinagoraSidebarTreeListEntry].
 typedef LinagoraSidebarTreeListItemBuilder<T> = Widget Function(
@@ -62,6 +65,7 @@ class LinagoraSidebarTreeList<T> extends StatelessWidget {
     this.cacheExtent,
     this.indent = LinagoraSidebarSubItem.defaultIndent,
     this.maxIndent = defaultMaxIndent,
+    this.enableHorizontalScroll = false,
   }) : assert(indent >= 0, 'A sidebar tree list indent cannot be negative'),
        assert(
          maxIndent >= 0,
@@ -94,16 +98,27 @@ class LinagoraSidebarTreeList<T> extends StatelessWidget {
 
   /// Maximum accumulated content indentation for a nested row.
   ///
-  /// Folder protocols allow arbitrary depths, but a fixed-width sidebar must
-  /// preserve enough room for row content. Increase this when the host sidebar
-  /// is wider, lower it for a more compact hierarchy, or pass
-  /// [double.infinity] when the host guarantees a bounded depth and wants
-  /// every level to stay distinguishable.
+  /// Folder protocols allow arbitrary depths. Increase this when the host
+  /// sidebar is wider, lower it for a more compact hierarchy, or pass
+  /// [double.infinity] to keep every level distinguishable. Content past the
+  /// tree's cross-axis boundary is clipped.
   final double maxIndent;
+
+  /// Lets deep rows pan horizontally instead of clipping at the tree's
+  /// cross-axis boundary.
+  ///
+  /// Disabled by default so a tree remains within its sidebar width.
+  final bool enableHorizontalScroll;
 
   late final _SidebarTreeListRows<T> _rows = _SidebarTreeListRows(
     entries: entries,
     itemBuilder: itemBuilder,
+    indent: indent,
+    maxIndent: maxIndent,
+  );
+
+  double get _horizontalOverflow => _treeHorizontalOverflow(
+    entries: entries,
     indent: indent,
     maxIndent: maxIndent,
   );
@@ -113,13 +128,19 @@ class LinagoraSidebarTreeList<T> extends StatelessWidget {
     // [key] identifies this widget and must not be repeated on the list it
     // builds: a GlobalKey would then be claimed twice and throw. A
     // PageStorageKey still reaches the scroll position from up here.
-    return ListView.custom(
+    final tree = ListView.custom(
       controller: controller,
       padding: padding,
       physics: physics,
       primary: primary,
       cacheExtent: cacheExtent,
       childrenDelegate: _rows.delegate,
+    );
+    if (!enableHorizontalScroll) return tree;
+
+    return LinagoraSidebarTreeHorizontalScrollView(
+      overflowWidth: _horizontalOverflow,
+      child: tree,
     );
   }
 }
@@ -144,6 +165,7 @@ class LinagoraSidebarSliverTreeList<T> extends StatelessWidget {
     required this.itemBuilder,
     this.indent = LinagoraSidebarSubItem.defaultIndent,
     this.maxIndent = LinagoraSidebarTreeList.defaultMaxIndent,
+    this.enableHorizontalScroll = false,
   }) : assert(indent >= 0, 'A sidebar tree list indent cannot be negative'),
        assert(
          maxIndent >= 0,
@@ -167,6 +189,13 @@ class LinagoraSidebarSliverTreeList<T> extends StatelessWidget {
   /// Maximum accumulated content indentation for a nested row.
   final double maxIndent;
 
+  /// Lets only this tree's rows pan horizontally when their indentation is
+  /// deeper than [LinagoraSidebarTreeList.defaultMaxIndent].
+  ///
+  /// Disabled by default so a host [CustomScrollView] keeps its cross-axis
+  /// bounds and clips any content beyond them.
+  final bool enableHorizontalScroll;
+
   late final _SidebarTreeListRows<T> _rows = _SidebarTreeListRows(
     entries: entries,
     itemBuilder: itemBuilder,
@@ -174,8 +203,37 @@ class LinagoraSidebarSliverTreeList<T> extends StatelessWidget {
     maxIndent: maxIndent,
   );
 
+  double get _horizontalOverflow => _treeHorizontalOverflow(
+    entries: entries,
+    indent: indent,
+    maxIndent: maxIndent,
+  );
+
   @override
-  Widget build(BuildContext context) => SliverList(delegate: _rows.delegate);
+  Widget build(BuildContext context) {
+    final delegate = _rows.delegate;
+    if (!enableHorizontalScroll) return SliverList(delegate: delegate);
+
+    return LinagoraSidebarTreeHorizontalScrollView.sliver(
+      delegate: delegate,
+      overflowWidth: _horizontalOverflow,
+    );
+  }
+}
+
+double _treeHorizontalOverflow<T>({
+  required List<LinagoraSidebarTreeListEntry<T>> entries,
+  required double indent,
+  required double maxIndent,
+}) {
+  var maximumDepth = 0;
+  for (final entry in entries) {
+    if (entry.depth > maximumDepth) maximumDepth = entry.depth;
+  }
+
+  final deepestIndent = math.min(maximumDepth * indent, maxIndent);
+  final overflow = deepestIndent - LinagoraSidebarTreeList.defaultMaxIndent;
+  return overflow > 0 ? overflow : 0;
 }
 
 /// The row plumbing shared by the box and sliver tree lists: the same keys,
@@ -199,7 +257,7 @@ class _SidebarTreeListRows<T> {
   /// because assertions do not protect release-mode applications.
   final Map<Object, int> _indexById;
 
-  SliverChildDelegate get delegate => SliverChildBuilderDelegate(
+  SliverChildBuilderDelegate get delegate => SliverChildBuilderDelegate(
     _buildEntry,
     childCount: entries.length,
     findChildIndexCallback: _findEntryIndex,

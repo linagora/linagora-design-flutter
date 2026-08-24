@@ -7,7 +7,14 @@ import 'linagora_sidebar_tree_list_test_utils.dart';
 void main() {
   testWidgets('indents flattened child content without shrinking its row', _indentsChildContent);
   testWidgets('indents custom depths from the trailing edge in right-to-left locales', _indentsRightToLeft);
-  testWidgets('caps deep indentation to preserve row content', _capsDeepIndent);
+  testWidgets(
+    'keeps unbounded indentation while clipping deep row content',
+    _keepsUnboundedDeepIndent,
+  );
+  testWidgets(
+    'scrolls only a deep tree when horizontal scrolling is enabled',
+    _scrollsDeepTreeHorizontally,
+  );
   testWidgets('lets the application control visible descendants', _usesApplicationExpansion);
   test('rejects invalid tree list dimensions', _rejectsInvalidDimensions);
 }
@@ -84,13 +91,11 @@ Future<void> _indentsRightToLeft(WidgetTester tester) async {
   );
 }
 
-/// Folder protocols allow unbounded nesting while the sidebar keeps a fixed
-/// width. Uncapped, `depth * indent` pushed the leading icon out of a 204px row
-/// and it overflowed, so the indent has to flatten instead of growing.
-Future<void> _capsDeepIndent(WidgetTester tester) async {
+Future<void> _keepsUnboundedDeepIndent(WidgetTester tester) async {
   await pumpSidebarTreeList(
     tester,
     LinagoraSidebarTreeList<String>(
+      maxIndent: double.infinity,
       entries: const [
         LinagoraSidebarTreeListEntry(id: 'personal', data: 'Personal folders'),
         LinagoraSidebarTreeListEntry(
@@ -108,8 +113,43 @@ Future<void> _capsDeepIndent(WidgetTester tester) async {
 
   expect(
     deepLabel.left - folderLabel.left,
-    LinagoraSidebarTreeList.defaultMaxIndent,
+    20 * LinagoraSidebarSubItem.defaultIndent,
   );
+  expect(find.byType(LinagoraSidebarTreeHorizontalScrollView), findsNothing);
+  expect(tester.takeException(), isNull);
+}
+
+Future<void> _scrollsDeepTreeHorizontally(WidgetTester tester) async {
+  await pumpSidebarTreeList(
+    tester,
+    LinagoraSidebarTreeList<String>(
+      enableHorizontalScroll: true,
+      maxIndent: double.infinity,
+      entries: const [
+        LinagoraSidebarTreeListEntry(id: 'personal', data: 'Personal folders'),
+        LinagoraSidebarTreeListEntry(
+          id: 'archive',
+          data: 'Archive',
+          depth: 20,
+        ),
+      ],
+      itemBuilder: sidebarTreeListFolderItem,
+    ),
+  );
+
+  final viewport = find.byWidgetPredicate(
+    (widget) => widget is Scrollable && widget.axisDirection == AxisDirection.right,
+  );
+  final archiveLeft = tester.getRect(find.text('Archive')).left;
+
+  expect(find.byType(LinagoraSidebarTreeHorizontalScrollView), findsOneWidget);
+  expect(tester.state<ScrollableState>(viewport).position.maxScrollExtent,
+      greaterThan(0));
+
+  await tester.drag(find.text('Personal folders'), const Offset(-64, 0));
+  await tester.pumpAndSettle();
+
+  expect(tester.getRect(find.text('Archive')).left, lessThan(archiveLeft));
   expect(tester.takeException(), isNull);
 }
 

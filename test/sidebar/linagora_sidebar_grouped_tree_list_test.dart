@@ -14,8 +14,12 @@ void main() {
     _initialDepthZeroGroup,
   );
   testWidgets(
-    'caps deep indentation for grouped trees',
-    _capsDeepIndentForGroupedTree,
+    'keeps unbounded indentation for grouped trees',
+    _keepsUnboundedGroupedIndent,
+  );
+  testWidgets(
+    'scrolls only grouped tree rows when horizontal scrolling is enabled',
+    _scrollsGroupedTreeHorizontally,
   );
   test('rejects duplicate group IDs', _rejectsDuplicateGroupIds);
 }
@@ -117,7 +121,7 @@ Future<void> _initialDepthZeroGroup(WidgetTester tester) async {
   );
 }
 
-Future<void> _capsDeepIndentForGroupedTree(WidgetTester tester) async {
+Future<void> _keepsUnboundedGroupedIndent(WidgetTester tester) async {
   var deepNode = const _Node('20');
   for (var depth = 19; depth >= 0; depth--) {
     deepNode = _Node('$depth', children: [deepNode]);
@@ -137,6 +141,7 @@ Future<void> _capsDeepIndentForGroupedTree(WidgetTester tester) async {
       child: CustomScrollView(
         slivers: [
           LinagoraSidebarSliverGroupedTreeList<_Node>(
+            maxIndent: double.infinity,
             groups: groups,
             adapter: const LinagoraSidebarTreeAdapter<_Node>(
               childrenOf: _childrenOf,
@@ -159,9 +164,57 @@ Future<void> _capsDeepIndentForGroupedTree(WidgetTester tester) async {
 
   expect(
     deepLeft - rootLeft,
-    LinagoraSidebarTreeList.defaultMaxIndent -
-        LinagoraSidebarSubItem.defaultIndent,
+    20 * LinagoraSidebarSubItem.defaultIndent,
   );
+  expect(find.byType(LinagoraSidebarTreeHorizontalScrollView), findsNothing);
+  expect(tester.takeException(), isNull);
+}
+
+Future<void> _scrollsGroupedTreeHorizontally(WidgetTester tester) async {
+  const groups = [
+    LinagoraSidebarTreeGroup<_Node>(
+      id: 'personal',
+      header: Text('Personal folders'),
+      roots: [_Node('Archive')],
+      initialDepth: 20,
+    ),
+  ];
+
+  await pumpSidebar(
+    tester,
+    SizedBox(
+      height: 300,
+      child: CustomScrollView(
+        slivers: [
+          const SliverToBoxAdapter(child: Text('Inbox')),
+          LinagoraSidebarSliverGroupedTreeList<_Node>(
+            groups: groups,
+            adapter: const LinagoraSidebarTreeAdapter<_Node>(
+              childrenOf: _childrenOf,
+              idOf: _idOf,
+              isExpanded: _alwaysExpanded,
+            ),
+            itemBuilder: (context, entry) => LinagoraSidebarItem(
+              label: entry.data.id,
+              icon: Icons.folder_outlined,
+            ),
+            maxIndent: double.infinity,
+            enableHorizontalScroll: true,
+          ),
+          const SliverToBoxAdapter(child: Text('Storage')),
+        ],
+      ),
+    ),
+  );
+
+  final inboxLeft = tester.getRect(find.text('Inbox')).left;
+  final archiveLeft = tester.getRect(find.text('Archive')).left;
+
+  await tester.drag(find.text('Personal folders'), const Offset(-64, 0));
+  await tester.pump();
+
+  expect(tester.getRect(find.text('Archive')).left, lessThan(archiveLeft));
+  expect(tester.getRect(find.text('Inbox')).left, inboxLeft);
   expect(tester.takeException(), isNull);
 }
 

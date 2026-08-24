@@ -22,8 +22,8 @@ void main() {
     _composerAlignsWithActiveNavigation,
   );
   testWidgets(
-    'shows the menu horizontal scrollbar for a deep folder tree',
-    _deepFolderTreeUsesHorizontalScrollbar,
+    'confines deep folder horizontal scrolling to the folder tree',
+    _deepFolderTreeScrollsHorizontally,
   );
 }
 
@@ -141,32 +141,27 @@ Future<void> _composerAlignsWithActiveNavigation(WidgetTester tester) async {
   expect(compose.right, closeTo(inbox.right, 0.01));
 }
 
-Future<void> _deepFolderTreeUsesHorizontalScrollbar(
+Future<void> _deepFolderTreeScrollsHorizontally(
   WidgetTester tester,
 ) async {
   await _pumpCompleteMenu(
     tester,
-    _stateWithKnobs(const {'Project tree depth': '12'}),
+    _stateWithKnobs(const {
+      'Project tree depth': '12',
+      'Enable folder horizontal scrolling': 'true',
+    }),
   );
 
-  final viewport = find.descendant(
-    of: find.byType(LinagoraSidebarMenu),
-    matching: find.byWidgetPredicate(
-      (widget) =>
-          widget is Scrollable && widget.axisDirection == AxisDirection.right,
-    ),
-  );
-  final scrollbar = tester.widget<Scrollbar>(
-    find.descendant(
-      of: find.byType(LinagoraSidebarMenu),
-      matching: find.byType(Scrollbar),
-    ),
-  );
+  final inboxLeft = tester.getRect(find.text('Inbox')).left;
+  final nestedFolderLeft = tester.getRect(find.text('Nested folder 12')).left;
 
-  expect(viewport, findsOneWidget);
-  expect(tester.state<ScrollableState>(viewport).position.maxScrollExtent,
-      greaterThan(0));
-  expect(scrollbar.thumbVisibility, isTrue);
-  expect(scrollbar.trackVisibility, isTrue);
-  expect(scrollbar.interactive, isTrue);
+  await tester.drag(find.text('Personal folders'), const Offset(-64, 0));
+  await tester.pump();
+
+  expect(
+    tester.getRect(find.text('Nested folder 12')).left,
+    lessThan(nestedFolderLeft),
+  );
+  expect(tester.getRect(find.text('Inbox')).left, inboxLeft);
+  expect(tester.takeException(), isNull);
 }
