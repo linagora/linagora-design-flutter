@@ -22,8 +22,8 @@ Widget linagoraSidebarTreeListUseCase(BuildContext context) {
       description: 'Deepest nesting level shown in the preview tree.',
       initialValue: 3,
       min: 1,
-      max: 8,
-      divisions: 7,
+      max: 16,
+      divisions: 15,
     ),
     showNestedFolderIcons: context.knobs.boolean(
       label: 'Show nested folder icons',
@@ -73,6 +73,7 @@ class _SidebarTreeListPreviewState extends State<_SidebarTreeListPreview> {
         key: const PageStorageKey('sidebar-tree-list-preview'),
         entries: _visibleEntries,
         itemBuilder: _buildItem,
+        maxIndent: double.infinity,
       ),
     );
   }

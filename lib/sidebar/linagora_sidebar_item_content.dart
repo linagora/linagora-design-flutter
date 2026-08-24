@@ -118,131 +118,145 @@ class _SidebarItemRow extends StatelessWidget {
 
   bool get _hasLeading => item.leading != null || item.icon != null;
 
+  bool get _hasExpandToggle =>
+      item.onExpandToggle != null || item.onExpandTogglePressed != null;
+
+  double get _expandControlOverhang {
+    if (!_hasExpandToggle || !item.enabled) return 0;
+    return LinagoraSidebarControl.overhang(style.chevronSize);
+  }
+
   @override
   Widget build(BuildContext context) {
+    final indent = LinagoraSidebarIndent.of(context);
+    final offset = Directionality.of(context) == TextDirection.rtl
+        ? -indent
+        : indent;
+    final expandControl = item.expanded == null
+        ? null
+        : _SidebarItemExpandControl(item: item, style: style);
+
     return ConstrainedBox(
       // Minimum, not fixed: the row grows with the text scale.
       constraints: BoxConstraints(minHeight: style.itemMinHeight),
       child: Padding(
-        // Indent content only, preserving the full-width row background.
+        // Keep the row's layout width stable. A large tree indent is painted
+        // inside this viewport instead of shrinking the row until it overflows.
         padding: EdgeInsetsDirectional.only(
-          start:
-              style.itemHorizontalPadding + LinagoraSidebarIndent.of(context),
+          start: style.itemHorizontalPadding,
           end: style.itemHorizontalPadding,
         ),
-        child: Row(
-          children: [
-            if (_hasLeading) ...[
-              _SidebarItemLeading(
-                leading: item.leading,
-                icon: item.icon,
-                color: item.iconColor ?? foregroundColor,
-                size: style.itemIconSize,
-              ),
-              SizedBox(width: style.itemSpacing),
-            ],
-            Expanded(
-              child: _SidebarItemLabel(
-                item: item,
-                style: style,
-                foregroundColor: foregroundColor,
+        child: indent == 0
+            ? _unindentedContent(expandControl)
+            : _indentedContent(Offset(offset, 0), expandControl),
+      ),
+    );
+  }
+
+  Widget _unindentedContent(Widget? expandControl) {
+    return Row(
+      children: [
+        if (_hasLeading) ...[
+          _SidebarItemLeading(
+            leading: item.leading,
+            icon: item.icon,
+            color: item.iconColor ?? foregroundColor,
+            size: style.itemIconSize,
+          ),
+          SizedBox(width: style.itemSpacing),
+        ],
+        Expanded(
+          child: _SidebarItemLabel(
+            item: item,
+            style: style,
+            foregroundColor: foregroundColor,
+            expandControl: expandControl,
+            expandControlOverhang: _expandControlOverhang,
+          ),
+        ),
+        if (trailing != null) ...[
+          SizedBox(width: style.itemSpacing),
+          _SidebarItemTrailing(style: style, child: trailing!),
+        ],
+      ],
+    );
+  }
+
+  Widget _indentedContent(Offset offset, Widget? expandControl) {
+    return Row(
+      children: [
+        Expanded(
+          child: ClipRect(
+            child: Transform.translate(
+              offset: offset,
+              child: Row(
+                children: [
+                  if (_hasLeading) ...[
+                    _SidebarItemLeading(
+                      leading: item.leading,
+                      icon: item.icon,
+                      color: item.iconColor ?? foregroundColor,
+                      size: style.itemIconSize,
+                    ),
+                    SizedBox(width: style.itemSpacing),
+                  ],
+                  Expanded(
+                    child: _SidebarItemLabel(
+                      item: item,
+                      style: style,
+                      foregroundColor: foregroundColor,
+                    ),
+                  ),
+                ],
               ),
             ),
-            if (trailing != null) ...[
-              SizedBox(width: style.itemSpacing),
-              _SidebarItemTrailing(style: style, child: trailing!),
-            ],
-          ],
+          ),
         ),
-      ),
+        if (expandControl != null) ...[
+          SizedBox(
+            width: math.max(
+              0,
+              style.itemSpacing -
+                  _expandControlOverhang,
+            ),
+          ),
+          expandControl,
+        ],
+        if (trailing != null) ...[
+          SizedBox(width: style.itemSpacing),
+          _SidebarItemTrailing(style: style, child: trailing!),
+        ],
+      ],
     );
   }
 }
 
-/// The label and, for a tree node, its chevron. The text takes only the width
-/// it needs so the chevron stays beside it while `trailing` keeps the far
-/// right.
-class _SidebarItemLabel extends StatelessWidget {
-  const _SidebarItemLabel({
+class _SidebarItemExpandControl extends StatelessWidget {
+  const _SidebarItemExpandControl({
     required this.item,
     required this.style,
-    required this.foregroundColor,
   });
 
   final LinagoraSidebarItem item;
   final LinagoraSidebarStyle style;
-  final Color foregroundColor;
-
-  /// How far a tappable chevron's box extends past its glyph on each side. A
-  /// decorative one is a bare glyph and overhangs nothing.
-  double get _chevronOverhang {
-    if (!_hasExpandToggle || !item.enabled) return 0;
-    return LinagoraSidebarControl.overhang(style.chevronSize);
-  }
 
   bool get _hasExpandToggle =>
       item.onExpandToggle != null || item.onExpandTogglePressed != null;
 
   @override
   Widget build(BuildContext context) {
-    final supporting = _supporting();
-    if (supporting == null) return _title();
+    final expanded = item.expanded!;
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        _title(),
-        const SizedBox(height: LinagoraSidebarItem.supportingSpacing),
-        DefaultTextStyle.merge(
-          style: LinagoraTextTheme.material().bodySmall?.copyWith(
-            color: foregroundColor,
-          ),
-          child: supporting,
-        ),
-      ],
-    );
-  }
-
-  Widget _title() {
-    final expanded = item.expanded;
-
-    return Row(
-      children: [
-        // [_SidebarItemRow] gives this label the bounded width left after its
-        // leading and trailing slots. Flex only the single-line title: the
-        // surrounding Column must stay height-intrinsic so supporting content
-        // can make the row grow instead of overflowing.
-        Flexible(
-          child: Text(
-            item.label,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-            textHeightBehavior: LinagoraSidebarStyle.middleAligned,
-            style: style.labelTextStyle.copyWith(color: foregroundColor),
-          ),
-        ),
-        if (expanded != null) ...[
-          // A tappable chevron grows its box to a usable touch target, so the
-          // gap shrinks by the overhang to keep the visual spacing at
-          // [itemSpacing]. Clamped: a style with a spacing smaller than the
-          // overhang would otherwise ask for a negative width.
-          SizedBox(width: math.max(0, style.itemSpacing - _chevronOverhang)),
-          Builder(
-            builder: (BuildContext controlContext) => LinagoraSidebarControl(
-              icon: LinagoraSidebarControl.disclosureIcon(expanded),
-              iconSize: style.chevronSize,
-              color: style.trailingForeground,
-              onTap: item.enabled && _hasExpandToggle
-                  ? () => _handleExpandToggle(controlContext)
-                  : null,
-              semanticLabel: item.expandToggleLabel,
-              // The row already publishes expansion, so the toggle stays quiet
-              // about it rather than announcing the same state twice.
-            ),
-          ),
-        ],
-      ],
+    return Builder(
+      builder: (BuildContext controlContext) => LinagoraSidebarControl(
+        icon: LinagoraSidebarControl.disclosureIcon(expanded),
+        iconSize: style.chevronSize,
+        color: style.trailingForeground,
+        onTap: item.enabled && _hasExpandToggle
+            ? () => _handleExpandToggle(controlContext)
+            : null,
+        semanticLabel: item.expandToggleLabel,
+      ),
     );
   }
 
@@ -272,6 +286,71 @@ class _SidebarItemLabel extends StatelessWidget {
     if (completed && shouldReveal && context.mounted) {
       LinagoraSidebarScrollCoordinator.scheduleReveal(context);
     }
+  }
+}
+
+/// The label is translated with the leading content while controls and badges
+/// remain anchored in the row's trailing slot.
+class _SidebarItemLabel extends StatelessWidget {
+  const _SidebarItemLabel({
+    required this.item,
+    required this.style,
+    required this.foregroundColor,
+    this.expandControl,
+    this.expandControlOverhang = 0,
+  });
+
+  final LinagoraSidebarItem item;
+  final LinagoraSidebarStyle style;
+  final Color foregroundColor;
+  final Widget? expandControl;
+  final double expandControlOverhang;
+
+  @override
+  Widget build(BuildContext context) {
+    final supporting = _supporting();
+    if (supporting == null) return _title();
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        _title(),
+        const SizedBox(height: LinagoraSidebarItem.supportingSpacing),
+        DefaultTextStyle.merge(
+          style: LinagoraTextTheme.material().bodySmall?.copyWith(
+            color: foregroundColor,
+          ),
+          child: supporting,
+        ),
+      ],
+    );
+  }
+
+  Widget _title() {
+    final title = Text(
+      item.label,
+      maxLines: 1,
+      overflow: TextOverflow.ellipsis,
+      textHeightBehavior: LinagoraSidebarStyle.middleAligned,
+      style: style.labelTextStyle.copyWith(color: foregroundColor),
+    );
+    final control = expandControl;
+    if (control == null) return title;
+
+    return Row(
+      children: [
+        Flexible(child: title),
+        SizedBox(
+          width: math.max(
+            0,
+            style.itemSpacing -
+                expandControlOverhang,
+          ),
+        ),
+        control,
+      ],
+    );
   }
 
   Widget? _supporting() {
