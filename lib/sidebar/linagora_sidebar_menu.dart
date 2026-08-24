@@ -110,6 +110,7 @@ class LinagoraSidebarMenu extends StatelessWidget {
     this.padding = defaultPadding,
     this.layout = const LinagoraSidebarMenuLayout(),
     this.controller,
+    this.scrollViewKey,
     this.physics,
   });
 
@@ -138,6 +139,13 @@ class LinagoraSidebarMenu extends StatelessWidget {
 
   /// Controls the scrollable navigation and section region.
   final ScrollController? controller;
+
+  /// Identifies the body scroll view for [PageStorage] restoration.
+  ///
+  /// Supply a stable [PageStorageKey] from the host when this menu can be
+  /// removed and rebuilt, such as a mobile drawer. The host owns the key to
+  /// avoid collisions when multiple sidebars share a page storage bucket.
+  final Key? scrollViewKey;
 
   /// Applies to the scrolling body. An unbounded menu has nothing to scroll
   /// in, so its body never scrolls regardless of what is passed here.
@@ -207,6 +215,7 @@ class LinagoraSidebarMenu extends StatelessWidget {
   /// virtualization has to give the menu a bounded height.
   Widget _body({required bool shrinkWrap}) {
     final body = CustomScrollView(
+      key: scrollViewKey,
       controller: controller,
       shrinkWrap: shrinkWrap,
       physics: shrinkWrap ? const NeverScrollableScrollPhysics() : physics,

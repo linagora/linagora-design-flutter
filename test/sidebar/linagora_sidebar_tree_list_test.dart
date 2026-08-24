@@ -7,7 +7,22 @@ import 'linagora_sidebar_tree_list_test_utils.dart';
 void main() {
   testWidgets('indents flattened child content without shrinking its row', _indentsChildContent);
   testWidgets('indents custom depths from the trailing edge in right-to-left locales', _indentsRightToLeft);
-  testWidgets('caps deep indentation to preserve row content', _capsDeepIndent);
+  testWidgets(
+    'keeps unbounded indentation while clipping deep row content',
+    (tester) => _verifyUnboundedDeepIndent(tester, TextDirection.ltr),
+  );
+  testWidgets(
+    'keeps unbounded indentation from the trailing edge under RTL',
+    (tester) => _verifyUnboundedDeepIndent(tester, TextDirection.rtl),
+  );
+  testWidgets(
+    'caps deep indentation when a maximum is supplied',
+    _capsDeepIndent,
+  );
+  testWidgets(
+    'keeps deep row controls and badges inside the sidebar',
+    _keepsDeepRowAffordancesVisible,
+  );
   testWidgets('lets the application control visible descendants', _usesApplicationExpansion);
   test('rejects invalid tree list dimensions', _rejectsInvalidDimensions);
 }
@@ -53,63 +68,146 @@ Future<void> _indentsChildContent(WidgetTester tester) async {
 
 Future<void> _indentsRightToLeft(WidgetTester tester) async {
   const indent = 12.0;
-  await pumpSidebarTreeList(
+  await _pumpNestedFolderTreeList(
+    tester,
+    const _NestedFolderTreeListConfiguration(
+      nestedFolderDepth: 1,
+      indent: indent,
+      textDirection: TextDirection.rtl,
+    ),
+  );
+
+  _expectNestedFolderIndent(
+    tester,
+    indent,
+    TextDirection.rtl,
+  );
+}
+
+Future<void> _verifyUnboundedDeepIndent(
+  WidgetTester tester,
+  TextDirection textDirection,
+) async {
+  await _pumpNestedFolderTreeList(
+    tester,
+    _NestedFolderTreeListConfiguration(
+      nestedFolderDepth: 20,
+      maxIndent: double.infinity,
+      textDirection: textDirection,
+    ),
+  );
+
+  _expectNestedFolderIndent(
+    tester,
+    20 * LinagoraSidebarSubItem.defaultIndent,
+    textDirection,
+  );
+  expect(tester.takeException(), isNull);
+}
+
+Future<void> _capsDeepIndent(WidgetTester tester) async {
+  const maxIndent = 32.0;
+  await _pumpNestedFolderTreeList(
+    tester,
+    const _NestedFolderTreeListConfiguration(
+      nestedFolderDepth: 20,
+      maxIndent: maxIndent,
+    ),
+  );
+
+  _expectNestedFolderIndent(tester, maxIndent, TextDirection.ltr);
+  expect(tester.takeException(), isNull);
+}
+
+Future<void> _pumpNestedFolderTreeList(
+  WidgetTester tester,
+  _NestedFolderTreeListConfiguration configuration,
+) {
+  return pumpSidebarTreeList(
     tester,
     Directionality(
-      textDirection: TextDirection.rtl,
+      textDirection: configuration.textDirection,
       child: LinagoraSidebarTreeList<String>(
-        indent: indent,
-        entries: const [
-          LinagoraSidebarTreeListEntry(
+        indent: configuration.indent,
+        maxIndent: configuration.maxIndent,
+        entries: [
+          const LinagoraSidebarTreeListEntry(
             id: 'personal',
             data: 'Personal folders',
           ),
           LinagoraSidebarTreeListEntry(
-            id: 'project',
-            data: 'Project',
-            depth: 1,
+            id: 'nested-folder',
+            data: 'Archive',
+            depth: configuration.nestedFolderDepth,
           ),
         ],
         itemBuilder: sidebarTreeListFolderItem,
       ),
     ),
   );
-
-  final folderLabel = tester.getRect(find.text('Personal folders'));
-  final childLabel = tester.getRect(find.text('Project'));
-
-  expect(
-    folderLabel.right - childLabel.right,
-    indent,
-  );
 }
 
-/// Folder protocols allow unbounded nesting while the sidebar keeps a fixed
-/// width. Uncapped, `depth * indent` pushed the leading icon out of a 204px row
-/// and it overflowed, so the indent has to flatten instead of growing.
-Future<void> _capsDeepIndent(WidgetTester tester) async {
+class _NestedFolderTreeListConfiguration {
+  const _NestedFolderTreeListConfiguration({
+    required this.nestedFolderDepth,
+    this.indent = LinagoraSidebarSubItem.defaultIndent,
+    this.maxIndent = LinagoraSidebarTreeList.defaultMaxIndent,
+    this.textDirection = TextDirection.ltr,
+  });
+
+  final int nestedFolderDepth;
+  final double indent;
+  final double maxIndent;
+  final TextDirection textDirection;
+}
+
+void _expectNestedFolderIndent(
+  WidgetTester tester,
+  double expectedIndent,
+  TextDirection textDirection,
+) {
+  final folderLabel = tester.getRect(find.text('Personal folders'));
+  final nestedFolderLabelRect = tester.getRect(find.text('Archive'));
+  final actualIndent = textDirection == TextDirection.rtl
+      ? folderLabel.right - nestedFolderLabelRect.right
+      : nestedFolderLabelRect.left - folderLabel.left;
+
+  expect(actualIndent, expectedIndent);
+}
+
+Future<void> _keepsDeepRowAffordancesVisible(WidgetTester tester) async {
+  const label = 'A long nested folder name that must not hide controls';
+  var expandTaps = 0;
   await pumpSidebarTreeList(
     tester,
     LinagoraSidebarTreeList<String>(
+      maxIndent: double.infinity,
       entries: const [
-        LinagoraSidebarTreeListEntry(id: 'personal', data: 'Personal folders'),
         LinagoraSidebarTreeListEntry(
           id: 'archive',
-          data: 'Archive',
+          data: label,
           depth: 20,
         ),
       ],
-      itemBuilder: sidebarTreeListFolderItem,
+      itemBuilder: (context, entry) => LinagoraSidebarItem(
+        label: entry.data,
+        icon: Icons.folder_outlined,
+        badgeLabel: '12',
+        expanded: false,
+        onExpandToggle: () => expandTaps++,
+        expandToggleLabel: 'Expand folder',
+      ),
     ),
   );
 
-  final folderLabel = tester.getRect(find.text('Personal folders'));
-  final deepLabel = tester.getRect(find.text('Archive'));
+  final row = sidebarTreeListRowRect(tester, label);
+  final badge = tester.getRect(find.byType(LinagoraSidebarBadge));
+  final control = tester.getRect(find.byType(LinagoraSidebarControl));
 
-  expect(
-    deepLabel.left - folderLabel.left,
-    LinagoraSidebarTreeList.defaultMaxIndent,
-  );
+  expect(row.contains(badge.center), isTrue);
+  expect(row.contains(control.center), isTrue);
+  await tester.tap(find.byType(LinagoraSidebarControl));
+  expect(expandTaps, 1);
   expect(tester.takeException(), isNull);
 }
 

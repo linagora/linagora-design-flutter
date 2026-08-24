@@ -94,11 +94,10 @@ class LinagoraSidebarTreeList<T> extends StatelessWidget {
 
   /// Maximum accumulated content indentation for a nested row.
   ///
-  /// Folder protocols allow arbitrary depths, but a fixed-width sidebar must
-  /// preserve enough room for row content. Increase this when the host sidebar
-  /// is wider, lower it for a more compact hierarchy, or pass
-  /// [double.infinity] when the host guarantees a bounded depth and wants
-  /// every level to stay distinguishable.
+  /// Folder protocols allow arbitrary depths. Increase this when the host
+  /// sidebar is wider, lower it for a more compact hierarchy, or pass
+  /// [double.infinity] to keep every level distinguishable. Content past the
+  /// tree's cross-axis boundary is clipped.
   final double maxIndent;
 
   late final _SidebarTreeListRows<T> _rows = _SidebarTreeListRows(
@@ -199,7 +198,7 @@ class _SidebarTreeListRows<T> {
   /// because assertions do not protect release-mode applications.
   final Map<Object, int> _indexById;
 
-  SliverChildDelegate get delegate => SliverChildBuilderDelegate(
+  SliverChildBuilderDelegate get delegate => SliverChildBuilderDelegate(
     _buildEntry,
     childCount: entries.length,
     findChildIndexCallback: _findEntryIndex,

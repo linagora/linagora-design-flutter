@@ -13,6 +13,10 @@ void main() {
     'does not throw when a group has an initial depth of zero',
     _initialDepthZeroGroup,
   );
+  testWidgets(
+    'keeps unbounded indentation for grouped trees',
+    _keepsUnboundedGroupedIndent,
+  );
   test('rejects duplicate group IDs', _rejectsDuplicateGroupIds);
 }
 
@@ -111,6 +115,54 @@ Future<void> _initialDepthZeroGroup(WidgetTester tester) async {
         'LinagoraSidebarTreeGroup.initialDepth allows 0, but '
         'LinagoraSidebarSubItem asserts depth > 0 for every entry row',
   );
+}
+
+Future<void> _keepsUnboundedGroupedIndent(WidgetTester tester) async {
+  var deepNode = const _Node('20');
+  for (var depth = 19; depth >= 0; depth--) {
+    deepNode = _Node('$depth', children: [deepNode]);
+  }
+  final groups = [
+    LinagoraSidebarTreeGroup<_Node>(
+      id: 'personal',
+      header: const Text('Personal folders'),
+      roots: [deepNode],
+    ),
+  ];
+
+  await pumpSidebar(
+    tester,
+    SizedBox(
+      height: 300,
+      child: CustomScrollView(
+        slivers: [
+          LinagoraSidebarSliverGroupedTreeList<_Node>(
+            maxIndent: double.infinity,
+            groups: groups,
+            adapter: const LinagoraSidebarTreeAdapter<_Node>(
+              childrenOf: _childrenOf,
+              idOf: _idOf,
+              isExpanded: _alwaysExpanded,
+            ),
+            itemBuilder: (context, entry) => LinagoraSidebarItem(
+              label: entry.data.id,
+              icon: Icons.folder_outlined,
+            ),
+          ),
+        ],
+      ),
+    ),
+  );
+
+  final rootLeft = tester.getRect(find.text('0')).left;
+  await tester.scrollUntilVisible(find.text('20'), 72);
+  final deepLeft = tester.getRect(find.text('20')).left;
+
+  expect(
+    deepLeft - rootLeft,
+    20 * LinagoraSidebarSubItem.defaultIndent,
+  );
+  expect(tester.takeException(), isNull);
 }
 
 void _rejectsDuplicateGroupIds() {

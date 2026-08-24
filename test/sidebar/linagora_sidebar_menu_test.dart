@@ -47,6 +47,10 @@ void main() {
     _appliesCustomPhysics,
   );
   testWidgets(
+    'restores the body offset from page storage',
+    _restoresBodyScrollOffset,
+  );
+  testWidgets(
     'drops a body overlay when the menu lays out unbounded',
     _dropsBodyOverlayWhenUnbounded,
   );
@@ -237,7 +241,7 @@ void _expectVerticalGap(Rect above, Rect below, double gap) {
 Future<void> _removesEmptyRegions(WidgetTester tester) async {
   await pumpSidebar(tester, const LinagoraSidebarMenu());
 
-  expect(find.byType(Scrollable), findsNothing);
+  expect(find.byType(SingleChildScrollView), findsNothing);
   expect(tester.takeException(), isNull);
 }
 
@@ -503,6 +507,67 @@ Future<void> _appliesCustomPhysics(WidgetTester tester) async {
   expect(
     tester.widget<CustomScrollView>(find.byType(CustomScrollView)).physics,
     same(physics),
+  );
+}
+
+Future<void> _restoresBodyScrollOffset(WidgetTester tester) async {
+  final bucket = PageStorageBucket();
+  final initialScrollController = ScrollController();
+  final restoredScrollController = ScrollController();
+  addTearDown(initialScrollController.dispose);
+  addTearDown(restoredScrollController.dispose);
+  const scrollViewKey = PageStorageKey<String>('sidebar-menu');
+
+  await pumpSidebar(
+    tester,
+    PageStorage(
+      bucket: bucket,
+      child: _scrollableMenu(
+        scrollViewKey,
+        controller: initialScrollController,
+      ),
+    ),
+  );
+  await tester.drag(find.byType(CustomScrollView), const Offset(0, -240));
+  await tester.pumpAndSettle();
+  final bodyScrollable = find.descendant(
+    of: find.byType(CustomScrollView),
+    matching: find.byType(Scrollable),
+  );
+  final offset = tester.state<ScrollableState>(bodyScrollable).position.pixels;
+
+  await pumpSidebar(tester, const SizedBox());
+  await pumpSidebar(
+    tester,
+    PageStorage(
+      bucket: bucket,
+      child: _scrollableMenu(
+        scrollViewKey,
+        controller: restoredScrollController,
+      ),
+    ),
+  );
+
+  expect(
+    tester.state<ScrollableState>(bodyScrollable).position.pixels,
+    closeTo(offset, 0.1),
+  );
+}
+
+Widget _scrollableMenu(
+  Key scrollViewKey, {
+  ScrollController? controller,
+}) {
+  return SizedBox(
+    height: 300,
+    child: LinagoraSidebarMenu(
+      controller: controller,
+      scrollViewKey: scrollViewKey,
+      navigationItems: [
+        for (var index = 0; index < 30; index++)
+          SizedBox(height: 36, child: Text('Mailbox $index')),
+      ],
+    ),
   );
 }
 
