@@ -186,39 +186,73 @@ class _SidebarItemRow extends StatelessWidget {
     return Row(
       children: [
         Expanded(
-          child: ClipRect(
-            child: Transform.translate(
-              offset: offset,
-              child: Row(
-                children: [
-                  if (_hasLeading) ...[
-                    _SidebarItemLeading(
-                      leading: item.leading,
-                      icon: item.icon,
-                      color: item.iconColor ?? foregroundColor,
-                      size: style.itemIconSize,
-                    ),
-                    SizedBox(width: style.itemSpacing),
-                  ],
-                  Expanded(
-                    child: _SidebarItemLabel(
-                      item: item,
-                      style: style,
-                      foregroundColor: foregroundColor,
-                      expandControl: expandControl,
-                      expandControlOverhang: _expandControlOverhang,
-                    ),
+          child: expandControl == null || _expandControlOverhang == 0
+              ? _translatedIndentedContent(
+                  offset,
+                  expandControl: expandControl,
+                )
+              : LayoutBuilder(
+                  builder: (context, constraints) => Stack(
+                    children: [
+                      _translatedIndentedContent(
+                        offset,
+                        reserveExpandControl: true,
+                      ),
+                      _SidebarItemPositionedExpandControl(
+                        item: item,
+                        style: style,
+                        control: expandControl,
+                        contentWidth: constraints.maxWidth,
+                        leadingWidth: _hasLeading
+                            ? style.itemIconSize + style.itemSpacing
+                            : 0,
+                        contentOffset: offset,
+                        expandControlOverhang: _expandControlOverhang,
+                      ),
+                    ],
                   ),
-                ],
-              ),
-            ),
-          ),
+                ),
         ),
         if (trailing != null) ...[
           SizedBox(width: style.itemSpacing),
           _SidebarItemTrailing(style: style, child: trailing!),
         ],
       ],
+    );
+  }
+
+  Widget _translatedIndentedContent(
+    Offset offset, {
+    Widget? expandControl,
+    bool reserveExpandControl = false,
+  }) {
+    return ClipRect(
+      child: Transform.translate(
+        offset: offset,
+        child: Row(
+          children: [
+            if (_hasLeading) ...[
+              _SidebarItemLeading(
+                leading: item.leading,
+                icon: item.icon,
+                color: item.iconColor ?? foregroundColor,
+                size: style.itemIconSize,
+              ),
+              SizedBox(width: style.itemSpacing),
+            ],
+            Expanded(
+              child: _SidebarItemLabel(
+                item: item,
+                style: style,
+                foregroundColor: foregroundColor,
+                expandControl: expandControl,
+                expandControlOverhang: _expandControlOverhang,
+                reserveExpandControl: reserveExpandControl,
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }
@@ -281,8 +315,9 @@ class _SidebarItemExpandControl extends StatelessWidget {
   }
 }
 
-/// The label and chevron are translated with the leading content while badges
-/// remain anchored in the row's trailing slot.
+/// The label moves with the leading content while badges stay anchored in the
+/// row's trailing slot. An interactive chevron follows the label until it
+/// reaches the row edge, where it remains available instead of being clipped.
 class _SidebarItemLabel extends StatelessWidget {
   const _SidebarItemLabel({
     required this.item,
@@ -290,6 +325,7 @@ class _SidebarItemLabel extends StatelessWidget {
     required this.foregroundColor,
     this.expandControl,
     this.expandControlOverhang = 0,
+    this.reserveExpandControl = false,
   });
 
   final LinagoraSidebarItem item;
@@ -297,6 +333,7 @@ class _SidebarItemLabel extends StatelessWidget {
   final Color foregroundColor;
   final Widget? expandControl;
   final double expandControlOverhang;
+  final bool reserveExpandControl;
 
   @override
   Widget build(BuildContext context) {
@@ -328,19 +365,20 @@ class _SidebarItemLabel extends StatelessWidget {
       style: style.labelTextStyle.copyWith(color: foregroundColor),
     );
     final control = expandControl;
-    if (control == null) return title;
+    if (control == null && !reserveExpandControl) return title;
 
+    final double gap = math.max(
+      0,
+      style.itemSpacing - expandControlOverhang,
+    );
     return Row(
       children: [
         Flexible(child: title),
-        SizedBox(
-          width: math.max(
-            0,
-            style.itemSpacing -
-                expandControlOverhang,
-          ),
-        ),
-        control,
+        SizedBox(width: gap),
+        control ??
+            SizedBox(
+              width: style.chevronSize + expandControlOverhang * 2,
+            ),
       ],
     );
   }
@@ -352,6 +390,65 @@ class _SidebarItemLabel extends StatelessWidget {
     final text = item.supportingText;
     if (text == null) return null;
     return Text(text, maxLines: 1, overflow: TextOverflow.ellipsis);
+  }
+}
+
+class _SidebarItemPositionedExpandControl extends StatelessWidget {
+  const _SidebarItemPositionedExpandControl({
+    required this.item,
+    required this.style,
+    required this.control,
+    required this.contentWidth,
+    required this.leadingWidth,
+    required this.contentOffset,
+    required this.expandControlOverhang,
+  });
+
+  final LinagoraSidebarItem item;
+  final LinagoraSidebarStyle style;
+  final Widget control;
+  final double contentWidth;
+  final double leadingWidth;
+  final Offset contentOffset;
+  final double expandControlOverhang;
+
+  @override
+  Widget build(BuildContext context) {
+    final double gap = math.max(
+      0,
+      style.itemSpacing - expandControlOverhang,
+    );
+    final controlWidth = style.chevronSize + expandControlOverhang * 2;
+    final double labelWidth = math.max(0, contentWidth - leadingWidth);
+    final double maxTitleWidth = math.max(0, labelWidth - gap - controlWidth);
+    final painter = TextPainter(
+      text: TextSpan(text: item.label, style: style.labelTextStyle),
+      textDirection: Directionality.of(context),
+      textScaler: MediaQuery.textScalerOf(context),
+      maxLines: 1,
+      ellipsis: '\u2026',
+    );
+    try {
+      painter.layout();
+      final double titleWidth = math.min(painter.width, maxTitleWidth);
+      final availableOffset = math.max(
+        0,
+        labelWidth - titleWidth - gap - controlWidth,
+      );
+      final visibleOffset = math.min(
+        contentOffset.dx.abs(),
+        availableOffset,
+      );
+      return PositionedDirectional(
+        start: leadingWidth + titleWidth + gap + visibleOffset,
+        top: 0,
+        bottom: 0,
+        width: controlWidth,
+        child: Center(child: control),
+      );
+    } finally {
+      painter.dispose();
+    }
   }
 }
 
