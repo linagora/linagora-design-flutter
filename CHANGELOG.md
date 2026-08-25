@@ -1,3 +1,12 @@
+## 0.3.1 - 2026-08-25
+
+### Fixed
+
+* Sidebar tree items at deep nesting levels now remain visible and keep their
+  expand/collapse controls accessible.
+* Sidebar tree expand/collapse chevrons now stay aligned with their labels at
+  every indentation level.
+
 ## 0.3.0 - 2026-08-20
 
 ### Added
