@@ -39,12 +39,7 @@ class WidgetbookApp extends StatelessWidget {
       darkTheme: ThemeData.light(),
       addons: [
         GitHubAddon('widgetbook'),
-        ViewportAddon(
-          [
-            IosViewports.iPhone13,
-            IosViewports.iPad,
-          ],
-        ),
+        ViewportAddon(Viewports.all),
         InspectorAddon(),
         ThemeAddon(
           themes: [
