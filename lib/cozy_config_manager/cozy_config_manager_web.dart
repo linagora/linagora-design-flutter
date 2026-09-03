@@ -21,7 +21,7 @@ class CozyConfigManager {
 
   CozyConfigManager._internal();
 
-  Future<void> injectCozyScript([String cozyBridgeVersion = '0.16.1']) async {
+  Future<void> injectCozyScript([String cozyBridgeVersion = '1.3.0']) async {
     if (_isCozyScriptInjected) {
       return;
     }
@@ -30,13 +30,19 @@ class CozyConfigManager {
 
     final HTMLScriptElement script = HTMLScriptElement();
     script.src =
-        'https://cdn.jsdelivr.net/npm/cozy-external-bridge@$cozyBridgeVersion/dist/embedded/bundle.js';
+        'https://cdn.jsdelivr.net/npm/cozy-external-bridge@$cozyBridgeVersion/dist/bundle.js';
     final onloadListener = script.onLoad.listen((_) => completer.complete());
+    // Without this the caller awaits forever when the bundle fails to load.
+    final onErrorListener = script.onError.listen((_) {
+      debugPrint('Failed to load cozy bridge script: ${script.src}');
+      completer.complete();
+    });
     document.head?.append(script);
     _isCozyScriptInjected = true;
 
     await completer.future;
     onloadListener.cancel();
+    onErrorListener.cancel();
   }
 
   Future<bool> get isInsideCozy async {
