@@ -7,6 +7,7 @@ import 'package:widgetbook_workspace/components/chat/message_bubble_use_case.dar
 import 'package:widgetbook_workspace/components/event/linagora_event_info_row_use_case.dart';
 import 'package:widgetbook_workspace/components/contact_component/matrix_contact_use_case.dart';
 import 'package:widgetbook_workspace/components/contact_component/phonebook_contact_use_case.dart';
+import 'package:widgetbook_workspace/components/event/event_activity_badge_use_case.dart';
 import 'package:widgetbook_workspace/components/event/linagora_event_date_icon_use_case.dart';
 import 'package:widgetbook_workspace/components/list_item/linagora_setting_item_use_case.dart';
 import 'package:widgetbook_workspace/components/list_item/session_device_list_item_use_case.dart';
@@ -43,6 +44,7 @@ class WidgetbookApp extends StatelessWidget {
         GitHubAddon('widgetbook'),
         ViewportAddon(
           [
+            MacosViewports.desktop,
             IosViewports.iPhone13,
             IosViewports.iPad,
             MacosViewports.desktop,
@@ -124,6 +126,19 @@ class WidgetbookApp extends StatelessWidget {
         WidgetbookFolder(
           name: 'Event',
           children: [
+            WidgetbookComponent(
+              name: 'Event activity badge',
+              useCases: [
+                WidgetbookUseCase(
+                  name: 'All states',
+                  builder: (context) => eventActivityBadgeStatesUseCase(context),
+                ),
+                WidgetbookUseCase(
+                  name: 'Custom',
+                  builder: (context) => eventActivityBadgeCustomUseCase(context),
+                ),
+              ],
+            ),
             WidgetbookComponent(
               name: 'Linagora event info row',
               useCases: [
