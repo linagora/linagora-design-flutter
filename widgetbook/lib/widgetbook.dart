@@ -8,6 +8,7 @@ import 'package:widgetbook_workspace/components/contact_component/matrix_contact
 import 'package:widgetbook_workspace/components/contact_component/phonebook_contact_use_case.dart';
 import 'package:widgetbook_workspace/components/event/event_conference_actions_use_case.dart';
 import 'package:widgetbook_workspace/components/event/linagora_event_date_icon_use_case.dart';
+import 'package:widgetbook_workspace/components/event/event_activity_badge_use_case.dart';
 import 'package:widgetbook_workspace/components/list_item/linagora_setting_item_use_case.dart';
 import 'package:widgetbook_workspace/components/list_item/session_device_list_item_use_case.dart';
 import 'package:widgetbook_workspace/components/sidebar/linagora_sidebar_item_use_case.dart';
@@ -313,6 +314,19 @@ class WidgetbookApp extends StatelessWidget {
                   name: 'Custom',
                   builder: (context) =>
                       eventConferenceActionsCustomUseCase(context),
+                ),
+              ],
+            ),
+            WidgetbookComponent(
+              name: 'Event activity badge',
+              useCases: [
+                WidgetbookUseCase(
+                  name: 'All states',
+                  builder: (context) => eventActivityBadgeStatesUseCase(context),
+                ),
+                WidgetbookUseCase(
+                  name: 'Custom',
+                  builder: (context) => eventActivityBadgeCustomUseCase(context),
                 ),
               ],
             ),
