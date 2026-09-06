@@ -6,6 +6,7 @@ import 'package:widgetbook_workspace/components/buttons/linagora_button_use_case
 import 'package:widgetbook_workspace/components/chat/message_bubble_use_case.dart';
 import 'package:widgetbook_workspace/components/contact_component/matrix_contact_use_case.dart';
 import 'package:widgetbook_workspace/components/contact_component/phonebook_contact_use_case.dart';
+import 'package:widgetbook_workspace/components/event/event_conference_actions_use_case.dart';
 import 'package:widgetbook_workspace/components/event/linagora_event_date_icon_use_case.dart';
 import 'package:widgetbook_workspace/components/list_item/linagora_setting_item_use_case.dart';
 import 'package:widgetbook_workspace/components/list_item/session_device_list_item_use_case.dart';
@@ -301,6 +302,20 @@ class WidgetbookApp extends StatelessWidget {
         WidgetbookFolder(
           name: 'Event',
           children: [
+            WidgetbookComponent(
+              name: 'Event conference actions',
+              useCases: [
+                WidgetbookUseCase(
+                  name: 'Default',
+                  builder: (context) => eventConferenceActionsUseCase(context),
+                ),
+                WidgetbookUseCase(
+                  name: 'Custom',
+                  builder: (context) =>
+                      eventConferenceActionsCustomUseCase(context),
+                ),
+              ],
+            ),
             WidgetbookComponent(
               name: 'Linagora event date icon',
               useCases: [
