@@ -8,4 +8,7 @@ class LinagoraDesignImages {
 
   static const String svgBytesClose = '$_assetPrefix/images/close.svg.vec';
   static const String calendarTodayIcon = 'assets/images/calendar_today.svg';
+  static const String videoConferenceIcon =
+      'assets/images/video_conference_icon.svg';
+  static const String copyLinkIcon = 'assets/images/copy_link_icon.svg';
 }
