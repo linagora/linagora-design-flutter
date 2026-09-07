@@ -9,6 +9,7 @@ import 'package:widgetbook_workspace/components/contact_component/phonebook_cont
 import 'package:widgetbook_workspace/components/event/event_conference_actions_use_case.dart';
 import 'package:widgetbook_workspace/components/event/linagora_event_date_icon_use_case.dart';
 import 'package:widgetbook_workspace/components/event/event_activity_badge_use_case.dart';
+import 'package:widgetbook_workspace/components/event/linagora_event_info_row_use_case.dart';
 import 'package:widgetbook_workspace/components/list_item/linagora_setting_item_use_case.dart';
 import 'package:widgetbook_workspace/components/list_item/session_device_list_item_use_case.dart';
 import 'package:widgetbook_workspace/components/sidebar/linagora_sidebar_item_use_case.dart';
@@ -336,6 +337,25 @@ class WidgetbookApp extends StatelessWidget {
                 WidgetbookUseCase(
                   name: 'Default',
                   builder: (context) => linagoraEventDateIconUseCase(context),
+                ),
+              ],
+            ),
+            WidgetbookComponent(
+              name: 'Linagora event info row',
+              useCases: [
+                WidgetbookUseCase(
+                  name: 'Event card rows',
+                  builder: (context) => linagoraEventInfoRowUseCase(context),
+                ),
+                WidgetbookUseCase(
+                  name: 'Playground',
+                  builder: (context) =>
+                      linagoraEventInfoRowPlaygroundUseCase(context),
+                ),
+                WidgetbookUseCase(
+                  name: 'Participants toggle',
+                  builder: (context) =>
+                      linagoraEventInfoRowParticipantsUseCase(context),
                 ),
               ],
             ),
