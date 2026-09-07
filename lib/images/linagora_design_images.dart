@@ -3,7 +3,9 @@
 class LinagoraDesignImages {
   const LinagoraDesignImages._();
 
-  static const String _assetPrefix = 'packages/linagora_design_flutter/assets';
+  static const String packageName = 'linagora_design_flutter';
+  static const String _assetPrefix = 'packages/$packageName/assets';
 
   static const String svgBytesClose = '$_assetPrefix/images/close.svg.vec';
+  static const String calendarTodayIcon = 'assets/images/calendar_today.svg';
 }
