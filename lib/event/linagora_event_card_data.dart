@@ -59,6 +59,10 @@ class LinagoraEventValue {
   /// A value secondary to the one beside it, such as an email address.
   const LinagoraEventValue.muted(this.text, {this.onTap})
     : emphasis = LinagoraEventInfoEmphasis.muted;
+
+  /// A value that is itself a destination, such as a URL inside a location.
+  const LinagoraEventValue.link(this.text, {this.onTap})
+    : emphasis = LinagoraEventInfoEmphasis.link;
 }
 
 /// One line of values inside a detail row.

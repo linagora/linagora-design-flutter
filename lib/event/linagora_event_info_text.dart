@@ -14,6 +14,10 @@ enum LinagoraEventInfoEmphasis {
 
   /// w400 at 64% ink. For a value secondary to the one beside it.
   muted,
+
+  /// w500 in the link blue. For a value that is itself a destination, such as
+  /// a URL inside a location. Pair it with an `onTap`.
+  link,
 }
 
 /// Ink colours shared by the event info rows.
@@ -131,6 +135,7 @@ class LinagoraEventInfoText extends StatelessWidget {
   static FontWeight _weightFor(LinagoraEventInfoEmphasis emphasis) {
     return switch (emphasis) {
       LinagoraEventInfoEmphasis.strong => FontWeight.w600,
+      LinagoraEventInfoEmphasis.link => FontWeight.w500,
       LinagoraEventInfoEmphasis.normal ||
       LinagoraEventInfoEmphasis.muted => FontWeight.w400,
     };
@@ -139,6 +144,7 @@ class LinagoraEventInfoText extends StatelessWidget {
   static Color _colorFor(LinagoraEventInfoEmphasis emphasis) {
     return switch (emphasis) {
       LinagoraEventInfoEmphasis.muted => LinagoraEventInfoColors.secondary,
+      LinagoraEventInfoEmphasis.link => LinagoraEventInfoColors.link,
       LinagoraEventInfoEmphasis.normal ||
       LinagoraEventInfoEmphasis.strong => LinagoraEventInfoColors.content,
     };

@@ -107,6 +107,19 @@ const _treatments = <_Treatment>[
     letterSpacing: 0.25,
     color: LinagoraEventInfoColors.secondary,
   ),
+  _Treatment(
+    description: 'paints a link value in the link blue at w500',
+    widget: LinagoraEventInfoText(
+      'https://meet.example.invalid/room',
+      emphasis: LinagoraEventInfoEmphasis.link,
+    ),
+    text: 'https://meet.example.invalid/room',
+    fontSize: 14,
+    fontWeight: FontWeight.w500,
+    height: LinagoraEventInfoText.lineHeight / 14,
+    letterSpacing: 0.25,
+    color: LinagoraEventInfoColors.link,
+  ),
 ];
 
 Future<void> _colourOverride(WidgetTester tester) async {
