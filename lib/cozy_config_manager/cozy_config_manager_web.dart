@@ -25,18 +25,37 @@ class CozyConfigManager {
     if (_isCozyScriptInjected) {
       return;
     }
-
-    final completer = Completer<void>();
-
-    final HTMLScriptElement script = HTMLScriptElement();
-    script.src =
-        'https://cdn.jsdelivr.net/npm/cozy-external-bridge@$cozyBridgeVersion/dist/embedded/bundle.js';
-    final onloadListener = script.onLoad.listen((_) => completer.complete());
-    document.head?.append(script);
     _isCozyScriptInjected = true;
 
-    await completer.future;
+    // The bundle moved from dist/embedded/bundle.js (<1.x) to dist/bundle.js
+    // (1.x+); fall back to the old path so older versions still load.
+    final loaded = await _loadScript(
+      'https://cdn.jsdelivr.net/npm/cozy-external-bridge@$cozyBridgeVersion/dist/bundle.js',
+    );
+    if (!loaded) {
+      await _loadScript(
+        'https://cdn.jsdelivr.net/npm/cozy-external-bridge@$cozyBridgeVersion/dist/embedded/bundle.js',
+      );
+    }
+  }
+
+  Future<bool> _loadScript(String src) async {
+    final completer = Completer<bool>();
+
+    final HTMLScriptElement script = HTMLScriptElement();
+    script.src = src;
+    final onloadListener = script.onLoad.listen((_) => completer.complete(true));
+    // Without this the caller awaits forever when the bundle fails to load.
+    final onErrorListener = script.onError.listen((_) {
+      debugPrint('Failed to load cozy bridge script: ${script.src}');
+      completer.complete(false);
+    });
+    document.head?.append(script);
+
+    final loaded = await completer.future;
     onloadListener.cancel();
+    onErrorListener.cancel();
+    return loaded;
   }
 
   Future<bool> get isInsideCozy async {

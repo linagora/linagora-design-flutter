@@ -1,3 +1,11 @@
+## Unreleased
+
+### Fixed
+
+* Cozy external bridge script now falls back to its pre-1.x bundle path
+  (`dist/embedded/bundle.js`) when the 1.x path (`dist/bundle.js`) fails to
+  load, and the default pinned version reverts to `0.16.1`.
+
 ## 0.3.1 - 2026-08-25
 
 ### Fixed
