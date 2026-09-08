@@ -97,6 +97,13 @@ class LinagoraEventInfoText extends StatelessWidget {
   final int? maxLines;
   final TextOverflow overflow;
 
+  /// Makes the value act on a tap, the way an email address opens a contact
+  /// sheet. Null leaves it as plain, non-interactive text.
+  ///
+  /// The treatment is unchanged: an actionable value carries the emphasis it
+  /// was given, so a product decides for itself whether to colour it.
+  final VoidCallback? onTap;
+
   const LinagoraEventInfoText(
     this.text, {
     super.key,
@@ -105,6 +112,7 @@ class LinagoraEventInfoText extends StatelessWidget {
     this.style,
     this.maxLines,
     this.overflow = TextOverflow.clip,
+    this.onTap,
   });
 
   /// The body treatment for [emphasis].
@@ -139,11 +147,25 @@ class LinagoraEventInfoText extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final resolved = textStyle(emphasis: emphasis, color: color);
-    return Text(
+    final label = Text(
       text,
       maxLines: maxLines,
       overflow: overflow,
       style: style == null ? resolved : resolved.merge(style),
+    );
+
+    final onTap = this.onTap;
+    if (onTap == null) return label;
+
+    // Wrapping the text rather than styling a span keeps the value's metrics
+    // and lets it wrap exactly as the plain treatment does.
+    return MouseRegion(
+      cursor: SystemMouseCursors.click,
+      child: GestureDetector(
+        onTap: onTap,
+        behavior: HitTestBehavior.opaque,
+        child: Semantics(button: true, child: label),
+      ),
     );
   }
 }

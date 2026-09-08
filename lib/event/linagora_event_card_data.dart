@@ -42,17 +42,22 @@ class LinagoraEventValue {
   final String text;
   final LinagoraEventInfoEmphasis emphasis;
 
+  /// Makes the value act on a tap, the way an email address opens a contact
+  /// sheet or a location opens a map. Null leaves it as plain text.
+  final VoidCallback? onTap;
+
   const LinagoraEventValue(
     this.text, {
     this.emphasis = LinagoraEventInfoEmphasis.normal,
+    this.onTap,
   });
 
   /// A value the reader scans for, such as a date or an organiser's name.
-  const LinagoraEventValue.strong(this.text)
+  const LinagoraEventValue.strong(this.text, {this.onTap})
     : emphasis = LinagoraEventInfoEmphasis.strong;
 
   /// A value secondary to the one beside it, such as an email address.
-  const LinagoraEventValue.muted(this.text)
+  const LinagoraEventValue.muted(this.text, {this.onTap})
     : emphasis = LinagoraEventInfoEmphasis.muted;
 }
 

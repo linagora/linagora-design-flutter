@@ -34,6 +34,12 @@ void main() {
     _selectionSettlesOnlyTheChosenResponse,
   );
   testWidgets('reports a response tap', _reportsResponseTap);
+  testWidgets('reports a tap on an actionable value', _reportsValueTap);
+  testWidgets(
+    'reports a tap on a value in an extra line',
+    _reportsExtraLineValueTap,
+  );
+  testWidgets('leaves a plain value inert', _plainValueIsInert);
   test('rejects a negative border radius', _rejectsNegativeRadius);
 }
 
@@ -563,5 +569,83 @@ void _rejectsNegativeRadius() {
   expect(
     () => LinagoraEventCard(borderRadius: -1),
     throwsAssertionError,
+  );
+}
+
+Future<void> _reportsValueTap(WidgetTester tester) async {
+  var taps = 0;
+
+  await tester.pumpWidget(
+    _host(
+      _card(
+        details: [
+          LinagoraEventDetail(
+            label: 'Who',
+            values: [
+              LinagoraEventValue.muted(
+                'alex.martin@example.invalid',
+                onTap: () => taps++,
+              ),
+            ],
+          ),
+        ],
+      ),
+    ),
+  );
+
+  await tester.tap(find.text('alex.martin@example.invalid'));
+
+  expect(taps, 1);
+}
+
+Future<void> _reportsExtraLineValueTap(WidgetTester tester) async {
+  var taps = 0;
+
+  await tester.pumpWidget(
+    _host(
+      _card(
+        details: [
+          LinagoraEventDetail(
+            label: 'Who',
+            values: const [LinagoraEventValue.strong('Alex Martin')],
+            lines: [
+              LinagoraEventLine([
+                LinagoraEventValue.muted(
+                  'jordan.blake@example.invalid',
+                  onTap: () => taps++,
+                ),
+              ]),
+            ],
+          ),
+        ],
+      ),
+    ),
+  );
+
+  await tester.tap(find.text('jordan.blake@example.invalid'));
+
+  expect(taps, 1, reason: 'an extra line carries its own value actions');
+}
+
+Future<void> _plainValueIsInert(WidgetTester tester) async {
+  await tester.pumpWidget(
+    _host(
+      _card(
+        details: const [
+          LinagoraEventDetail(
+            label: 'Where',
+            values: [LinagoraEventValue('Villa Good Tech')],
+          ),
+        ],
+      ),
+    ),
+  );
+
+  expect(
+    find.ancestor(
+      of: find.text('Villa Good Tech'),
+      matching: find.byType(GestureDetector),
+    ),
+    findsNothing,
   );
 }

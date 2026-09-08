@@ -430,8 +430,7 @@ class LinagoraEventCard extends StatelessWidget {
 
     final firstLine = LinagoraEventInfoRun(
       children: [
-        for (final value in detail.values)
-          LinagoraEventInfoText(value.text, emphasis: value.emphasis),
+        for (final value in detail.values) _buildValue(value),
         if (detail.indicator != null) detail.indicator!,
         // A single-line row keeps its link in the run, where the design puts
         // it. Extra lines push it onto its own line below them instead.
@@ -449,13 +448,18 @@ class LinagoraEventCard extends StatelessWidget {
         firstLine,
         for (final line in detail.lines)
           LinagoraEventInfoRun(
-            children: [
-              for (final value in line.values)
-                LinagoraEventInfoText(value.text, emphasis: value.emphasis),
-            ],
+            children: [for (final value in line.values) _buildValue(value)],
           ),
         if (link != null) link,
       ],
+    );
+  }
+
+  static Widget _buildValue(LinagoraEventValue value) {
+    return LinagoraEventInfoText(
+      value.text,
+      emphasis: value.emphasis,
+      onTap: value.onTap,
     );
   }
 

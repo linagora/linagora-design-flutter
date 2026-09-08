@@ -14,6 +14,8 @@ void main() {
   testWidgets('renders a link in the link blue at w500', _linkTreatment);
   testWidgets('reports a link tap', _linkTap);
   testWidgets('disables a link with no callback', _linkDisabled);
+  testWidgets('reports a tap on an actionable value', _valueTap);
+  testWidgets('keeps its treatment while actionable', _valueTapTreatment);
   testWidgets('carries emphasis into a rich span', _richSpanEmphasis);
   test('keeps the link and button blues distinct', _linkAndButtonBluesDiffer);
 }
@@ -208,5 +210,44 @@ void _linkAndButtonBluesDiffer() {
     LinagoraEventInfoColors.link,
     isNot(LinagoraEventInfoColors.buttonLabel),
     reason: 'inline links and button labels use different blues',
+  );
+}
+
+Future<void> _valueTap(WidgetTester tester) async {
+  var taps = 0;
+
+  await tester.pumpWidget(
+    _host(
+      LinagoraEventInfoText(
+        'alex.martin@example.invalid',
+        emphasis: LinagoraEventInfoEmphasis.muted,
+        onTap: () => taps++,
+      ),
+    ),
+  );
+
+  await tester.tap(find.text('alex.martin@example.invalid'));
+
+  expect(taps, 1);
+}
+
+Future<void> _valueTapTreatment(WidgetTester tester) async {
+  await tester.pumpWidget(
+    _host(
+      LinagoraEventInfoText(
+        'Alex Martin',
+        emphasis: LinagoraEventInfoEmphasis.strong,
+        onTap: () {},
+      ),
+    ),
+  );
+
+  final style = _styleOf(tester, 'Alex Martin');
+
+  expect(style.fontWeight, FontWeight.w600);
+  expect(
+    style.color,
+    LinagoraEventInfoColors.content,
+    reason: 'an actionable value keeps the emphasis it was given',
   );
 }
