@@ -13,6 +13,20 @@ class LinagoraEventDate {
   const LinagoraEventDate({required this.month, required this.day});
 }
 
+/// An already-localised event date and its optional clock-time run.
+class LinagoraEventDateTime {
+  final String date;
+  final String? time;
+
+  const LinagoraEventDateTime({required this.date, this.time});
+
+  static const LinagoraEventDateTime empty = LinagoraEventDateTime(date: '');
+
+  bool get isEmpty => date.isEmpty && time == null;
+
+  String get joined => time == null ? date : '$date $time';
+}
+
 /// Everything an event card renders, independent of its layout and styling.
 class LinagoraEventCardData {
   final LinagoraEventDate? date;
@@ -49,6 +63,9 @@ class LinagoraEventCardData {
 /// Something the reader can do, rendered as a link or a button depending on
 /// where the card places it.
 class LinagoraEventAction {
+  /// Stable identity used when labels are localised or shared by actions.
+  final Object? id;
+
   final String label;
 
   /// A null callback disables the control and keeps it visible.
@@ -62,11 +79,46 @@ class LinagoraEventAction {
   final String? tooltip;
 
   const LinagoraEventAction({
+    this.id,
     required this.label,
     this.onPressed,
     this.icon,
     this.iconColor,
     this.tooltip,
+  });
+}
+
+/// A person rendered in the participant section of an event card.
+class LinagoraEventParticipant {
+  final String? name;
+  final String? address;
+  final VoidCallback? onAddressTap;
+
+  const LinagoraEventParticipant({
+    this.name,
+    this.address,
+    this.onAddressTap,
+  });
+
+  bool get isEmpty =>
+      (name == null || name!.isEmpty) &&
+      (address == null || address!.isEmpty);
+
+  List<LinagoraEventValue> get values => [
+    if (name?.isNotEmpty == true) LinagoraEventValue.strong(name!),
+    if (address?.isNotEmpty == true)
+      LinagoraEventValue.muted(address!, onTap: onAddressTap),
+  ];
+}
+
+/// Localised labels used by the participant section.
+class LinagoraEventParticipantLabels {
+  final String label;
+  final String organizerLabel;
+
+  const LinagoraEventParticipantLabels({
+    required this.label,
+    required this.organizerLabel,
   });
 }
 
@@ -111,6 +163,8 @@ class LinagoraEventLine {
 /// carries: a row with no [label] starts at the value column, and a row with
 /// no [action] simply omits the link.
 class LinagoraEventDetail {
+  static const String defaultDateTimeSeparator = '\u00B7';
+
   final String? label;
   final List<LinagoraEventValue> values;
 
@@ -149,6 +203,53 @@ class LinagoraEventDetail {
          expansion == null || action == null,
          'An expandable detail cannot also carry an action',
        );
+
+  /// Builds the standard date/time run used by an event's `When` row.
+  factory LinagoraEventDetail.when({
+    required String label,
+    required LinagoraEventDateTime dateTime,
+    String separator = defaultDateTimeSeparator,
+    Widget? indicator,
+  }) {
+    final time = dateTime.time;
+
+    return LinagoraEventDetail(
+      label: label,
+      values: [
+        if (dateTime.date.isNotEmpty)
+          LinagoraEventValue.strong(dateTime.date),
+        if (time != null) ...[
+          if (dateTime.date.isNotEmpty && separator.isNotEmpty)
+            LinagoraEventValue(separator),
+          LinagoraEventValue(time),
+        ],
+      ],
+      indicator: indicator,
+    );
+  }
+
+  /// Builds the standard organiser and attendee section.
+  factory LinagoraEventDetail.participants({
+    required LinagoraEventParticipantLabels labels,
+    LinagoraEventParticipant? organizer,
+    List<LinagoraEventParticipant> attendees = const [],
+    required LinagoraEventDetailExpansion expansion,
+  }) {
+    return LinagoraEventDetail(
+      label: labels.label,
+      values: organizer == null
+          ? const []
+          : [
+              ...organizer.values,
+              LinagoraEventValue('- ${labels.organizerLabel}'),
+            ],
+      lines: [
+        for (final attendee in attendees)
+          if (!attendee.isEmpty) LinagoraEventLine(attendee.values),
+      ],
+      expansion: expansion,
+    );
+  }
 
   /// Whether the row would render nothing at all.
   bool get isEmpty =>
@@ -201,6 +302,11 @@ class LinagoraEventAttending {
   /// stops responding to taps.
   final String? selectedResponse;
 
+  /// Stable identity of the answer already given.
+  ///
+  /// Takes precedence over [selectedResponse] when both are supplied.
+  final Object? selectedResponseId;
+
   /// A borderless action beside the pills, such as `Propose a new time`.
   final LinagoraEventAction? secondaryAction;
 
@@ -208,13 +314,18 @@ class LinagoraEventAttending {
     this.label,
     this.responses = const [],
     this.selectedResponse,
+    this.selectedResponseId,
     this.secondaryAction,
   });
 
   bool get isEmpty => responses.isEmpty && secondaryAction == null;
 
-  bool isSelected(LinagoraEventAction response) =>
-      selectedResponse != null && selectedResponse == response.label;
+  bool isSelected(LinagoraEventAction response) {
+    if (selectedResponseId != null) {
+      return response.id != null && selectedResponseId == response.id;
+    }
+    return selectedResponse != null && selectedResponse == response.label;
+  }
 }
 
 /// A notice under the detail rows, such as an ineligibility message.
@@ -246,6 +357,26 @@ class LinagoraEventConference {
     this.onCopyLink,
     this.copyTooltip,
   });
+
+  /// Builds conference controls without making the design system open or
+  /// copy links itself.
+  factory LinagoraEventConference.fromLink({
+    required String link,
+    required String label,
+    ValueChanged<String>? onOpenLink,
+    ValueChanged<String>? onCopyLink,
+    String? copyTooltip,
+  }) {
+    return LinagoraEventConference(
+      join: LinagoraEventAction(
+        id: link,
+        label: label,
+        onPressed: onOpenLink == null ? null : () => onOpenLink(link),
+      ),
+      onCopyLink: onCopyLink == null ? null : () => onCopyLink(link),
+      copyTooltip: copyTooltip,
+    );
+  }
 
   bool get isEmpty => join == null && onCopyLink == null;
 }
