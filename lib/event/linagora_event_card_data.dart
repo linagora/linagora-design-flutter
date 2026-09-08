@@ -13,6 +13,37 @@ class LinagoraEventDate {
   const LinagoraEventDate({required this.month, required this.day});
 }
 
+/// Everything an event card renders, independent of its layout and styling.
+class LinagoraEventCardData {
+  final LinagoraEventDate? date;
+  final String? activity;
+  final String? actorName;
+  final EventActivityBadgeState activityState;
+  final String? title;
+  final LinagoraEventAction? moreInformation;
+  final LinagoraEventConference? conference;
+  final List<LinagoraEventDetail> details;
+  final LinagoraEventAttending? attending;
+  final List<LinagoraEventAction> actions;
+  final LinagoraEventStatus? status;
+  final LinagoraEventAction? calendarAction;
+
+  const LinagoraEventCardData({
+    this.date,
+    this.activity,
+    this.actorName,
+    this.activityState = EventActivityBadgeState.created,
+    this.title,
+    this.moreInformation,
+    this.conference,
+    this.details = const [],
+    this.attending,
+    this.actions = const [],
+    this.status,
+    this.calendarAction,
+  });
+}
+
 /// Something the reader can do, rendered as a link or a button depending on
 /// where the card places it.
 class LinagoraEventAction {
@@ -94,17 +125,62 @@ class LinagoraEventDetail {
   /// a line of its own.
   final List<LinagoraEventLine> lines;
 
+  /// Lets the card own expansion of [lines] without involving product state.
+  ///
+  /// [action] must be null while expansion is configured because the row has
+  /// one trailing action slot, which expansion uses for its toggle.
+  final LinagoraEventDetailExpansion? expansion;
+
   const LinagoraEventDetail({
     this.label,
     this.values = const [],
     this.action,
     this.indicator,
     this.lines = const [],
-  });
+    this.expansion,
+  }) : assert(
+         expansion == null || action == null,
+         'An expandable detail cannot also carry an action',
+       );
 
   /// Whether the row would render nothing at all.
   bool get isEmpty =>
       values.isEmpty && action == null && indicator == null && lines.isEmpty;
+}
+
+/// Presentation-only expansion configuration for an event detail's lines.
+class LinagoraEventDetailExpansion {
+  /// Lines kept visible while the detail is collapsed.
+  final int collapsedLineCount;
+
+  /// Expansion is offered only when the detail carries more lines than this.
+  final int collapseThreshold;
+
+  final String expandLabel;
+  final String collapseLabel;
+  final bool initiallyExpanded;
+
+  /// Changes to this value reset the detail to [initiallyExpanded].
+  final Object? identity;
+
+  final ValueChanged<bool>? onChanged;
+
+  const LinagoraEventDetailExpansion({
+    required this.expandLabel,
+    required this.collapseLabel,
+    this.collapsedLineCount = 5,
+    this.collapseThreshold = 6,
+    this.initiallyExpanded = false,
+    this.identity,
+    this.onChanged,
+  }) : assert(
+         collapsedLineCount >= 0,
+         'Collapsed line count cannot be negative',
+       ),
+       assert(
+         collapseThreshold >= collapsedLineCount,
+         'Collapse threshold cannot be below the collapsed line count',
+       );
 }
 
 /// The invitation response block.

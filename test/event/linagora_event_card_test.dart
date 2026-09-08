@@ -40,7 +40,21 @@ void main() {
     _reportsExtraLineValueTap,
   );
   testWidgets('leaves a plain value inert', _plainValueIsInert);
+  testWidgets('renders content from a card data object', _rendersFromData);
+  testWidgets(
+    'expands and collapses detail lines inside the card',
+    _expandsAndCollapsesDetailLines,
+  );
+  testWidgets(
+    'shows every detail line below the collapse threshold',
+    _showsLinesBelowCollapseThreshold,
+  );
+  testWidgets(
+    'resets detail expansion when its identity changes',
+    _resetsExpansionForNewIdentity,
+  );
   test('rejects a negative border radius', _rejectsNegativeRadius);
+  test('rejects invalid detail expansion configuration', _invalidExpansion);
 }
 
 const _date = LinagoraEventDate(month: 'Jun', day: '16');
@@ -647,5 +661,160 @@ Future<void> _plainValueIsInert(WidgetTester tester) async {
       matching: find.byType(GestureDetector),
     ),
     findsNothing,
+  );
+}
+
+Future<void> _rendersFromData(WidgetTester tester) async {
+  await tester.pumpWidget(
+    _host(
+      LinagoraEventCard.fromData(
+        const LinagoraEventCardData(
+          date: _date,
+          actorName: 'Alex Martin',
+          activity: 'has invited you in to a meeting',
+          title: 'Data-driven event',
+          details: _details,
+          attending: _attending,
+        ),
+        layout: LinagoraEventCardLayout.regular,
+      ),
+    ),
+  );
+
+  expect(find.text('Data-driven event'), findsOneWidget);
+  expect(find.textContaining('Alex Martin'), findsOneWidget);
+  expect(find.text('When'), findsOneWidget);
+  expect(find.text('Attending?'), findsOneWidget);
+}
+
+Future<void> _expandsAndCollapsesDetailLines(WidgetTester tester) async {
+  final changes = <bool>[];
+
+  await tester.pumpWidget(
+    _host(
+      LinagoraEventCard(
+        layout: LinagoraEventCardLayout.regular,
+        details: [
+          LinagoraEventDetail(
+            label: 'Who',
+            values: const [LinagoraEventValue.strong('Organizer')],
+            lines: _participantLines('Attendee', 7),
+            expansion: LinagoraEventDetailExpansion(
+              expandLabel: 'See all participants',
+              collapseLabel: 'Hide',
+              onChanged: changes.add,
+            ),
+          ),
+        ],
+      ),
+    ),
+  );
+
+  expect(find.text('Attendee 4'), findsOneWidget);
+  expect(find.text('Attendee 5'), findsNothing);
+  expect(find.text('See all participants'), findsOneWidget);
+
+  await tester.tap(find.text('See all participants'));
+  await tester.pump();
+
+  expect(find.text('Attendee 6'), findsOneWidget);
+  expect(find.text('Hide'), findsOneWidget);
+  expect(changes, [true]);
+
+  await tester.tap(find.text('Hide'));
+  await tester.pump();
+
+  expect(find.text('Attendee 5'), findsNothing);
+  expect(find.text('See all participants'), findsOneWidget);
+  expect(changes, [true, false]);
+}
+
+Future<void> _showsLinesBelowCollapseThreshold(WidgetTester tester) async {
+  await tester.pumpWidget(
+    _host(
+      LinagoraEventCard(
+        layout: LinagoraEventCardLayout.regular,
+        details: [
+          LinagoraEventDetail(
+            label: 'Who',
+            lines: _participantLines('Attendee', 6),
+            expansion: const LinagoraEventDetailExpansion(
+              expandLabel: 'See all participants',
+              collapseLabel: 'Hide',
+            ),
+          ),
+        ],
+      ),
+    ),
+  );
+
+  expect(find.text('Attendee 5'), findsOneWidget);
+  expect(find.text('See all participants'), findsNothing);
+  expect(find.text('Hide'), findsNothing);
+}
+
+Future<void> _resetsExpansionForNewIdentity(WidgetTester tester) async {
+  await tester.pumpWidget(_host(_expandableCard('first')));
+
+  await tester.tap(find.text('See all participants'));
+  await tester.pump();
+  expect(find.text('Attendee 6'), findsOneWidget);
+
+  await tester.pumpWidget(_host(_expandableCard('second')));
+  await tester.pump();
+
+  expect(find.text('Attendee 5'), findsNothing);
+  expect(find.text('See all participants'), findsOneWidget);
+}
+
+LinagoraEventCard _expandableCard(Object identity) {
+  return LinagoraEventCard(
+    layout: LinagoraEventCardLayout.regular,
+    details: [
+      LinagoraEventDetail(
+        label: 'Who',
+        lines: _participantLines('Attendee', 7),
+        expansion: LinagoraEventDetailExpansion(
+          expandLabel: 'See all participants',
+          collapseLabel: 'Hide',
+          identity: identity,
+        ),
+      ),
+    ],
+  );
+}
+
+List<LinagoraEventLine> _participantLines(String prefix, int count) => [
+  for (var index = 0; index < count; index++)
+    LinagoraEventLine([LinagoraEventValue('$prefix $index')]),
+];
+
+void _invalidExpansion() {
+  expect(
+    () => LinagoraEventDetailExpansion(
+      expandLabel: 'See all',
+      collapseLabel: 'Hide',
+      collapsedLineCount: -1,
+    ),
+    throwsAssertionError,
+  );
+  expect(
+    () => LinagoraEventDetailExpansion(
+      expandLabel: 'See all',
+      collapseLabel: 'Hide',
+      collapsedLineCount: 5,
+      collapseThreshold: 4,
+    ),
+    throwsAssertionError,
+  );
+  expect(
+    () => LinagoraEventDetail(
+      action: const LinagoraEventAction(label: 'Action'),
+      expansion: const LinagoraEventDetailExpansion(
+        expandLabel: 'See all',
+        collapseLabel: 'Hide',
+      ),
+    ),
+    throwsAssertionError,
   );
 }

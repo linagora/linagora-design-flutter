@@ -112,6 +112,31 @@ class LinagoraEventCard extends StatelessWidget {
        assert(compactBreakpoint >= 0, 'Compact breakpoint cannot be negative'),
        assert(prefixWidth >= 0, 'Prefix width cannot be negative');
 
+  LinagoraEventCard.fromData(
+    LinagoraEventCardData data, {
+    super.key,
+    this.layout = LinagoraEventCardLayout.adaptive,
+    this.compactBreakpoint = defaultCompactBreakpoint,
+    this.backgroundColor = defaultBackgroundColor,
+    this.borderRadius = defaultBorderRadius,
+    this.padding,
+    this.prefixWidth = LinagoraEventInfoRow.defaultPrefixWidth,
+  }) : date = data.date,
+       activity = data.activity,
+       actorName = data.actorName,
+       activityState = data.activityState,
+       title = data.title,
+       moreInformation = data.moreInformation,
+       conference = data.conference,
+       details = data.details,
+       attending = data.attending,
+       actions = data.actions,
+       status = data.status,
+       calendarAction = data.calendarAction,
+       assert(borderRadius >= 0, 'Border radius cannot be negative'),
+       assert(compactBreakpoint >= 0, 'Compact breakpoint cannot be negative'),
+       assert(prefixWidth >= 0, 'Prefix width cannot be negative');
+
   @override
   Widget build(BuildContext context) {
     return switch (layout) {
@@ -418,40 +443,19 @@ class LinagoraEventCard extends StatelessWidget {
   }
 
   Widget _buildDetailContent(LinagoraEventDetail detail) {
-    final action = detail.action;
-    final link = action == null
-        ? null
-        : LinagoraEventInfoLink(
-            label: action.label,
-            onPressed: action.onPressed,
-            icon: action.icon,
-            tooltip: action.tooltip,
-          );
+    final expansion = detail.expansion;
+    if (expansion != null) {
+      return _ExpandableEventDetailContent(
+        detail: detail,
+        expansion: expansion,
+      );
+    }
 
-    final firstLine = LinagoraEventInfoRun(
-      children: [
-        for (final value in detail.values) _buildValue(value),
-        if (detail.indicator != null) detail.indicator!,
-        // A single-line row keeps its link in the run, where the design puts
-        // it. Extra lines push it onto its own line below them instead.
-        if (link != null && detail.lines.isEmpty) link,
-      ],
-    );
-
-    if (detail.lines.isEmpty) return firstLine;
-
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      crossAxisAlignment: CrossAxisAlignment.start,
-      spacing: LinagoraEventInfoRun.defaultSpacing,
-      children: [
-        firstLine,
-        for (final line in detail.lines)
-          LinagoraEventInfoRun(
-            children: [for (final value in line.values) _buildValue(value)],
-          ),
-        if (link != null) link,
-      ],
+    return _EventDetailContent(
+      values: detail.values,
+      lines: detail.lines,
+      action: detail.action,
+      indicator: detail.indicator,
     );
   }
 
@@ -505,6 +509,125 @@ class LinagoraEventCard extends StatelessWidget {
   /// children keep exactly one gap between them.
   static Iterable<Widget> _sections(List<Widget?> children) =>
       children.whereType<Widget>();
+}
+
+class _ExpandableEventDetailContent extends StatefulWidget {
+  final LinagoraEventDetail detail;
+  final LinagoraEventDetailExpansion expansion;
+
+  const _ExpandableEventDetailContent({
+    required this.detail,
+    required this.expansion,
+  });
+
+  @override
+  State<_ExpandableEventDetailContent> createState() =>
+      _ExpandableEventDetailContentState();
+}
+
+class _ExpandableEventDetailContentState
+    extends State<_ExpandableEventDetailContent> {
+  late bool _expanded;
+
+  @override
+  void initState() {
+    super.initState();
+    _expanded = widget.expansion.initiallyExpanded;
+  }
+
+  @override
+  void didUpdateWidget(covariant _ExpandableEventDetailContent oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.expansion.identity != widget.expansion.identity ||
+        oldWidget.expansion.initiallyExpanded !=
+            widget.expansion.initiallyExpanded) {
+      _expanded = widget.expansion.initiallyExpanded;
+    }
+  }
+
+  void _toggle() {
+    final expanded = !_expanded;
+    setState(() => _expanded = expanded);
+    widget.expansion.onChanged?.call(expanded);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final detail = widget.detail;
+    final expansion = widget.expansion;
+    final collapsible = detail.lines.length > expansion.collapseThreshold;
+    final lines = _expanded || !collapsible
+        ? detail.lines
+        : detail.lines.take(expansion.collapsedLineCount).toList();
+
+    return _EventDetailContent(
+      values: detail.values,
+      lines: lines,
+      indicator: detail.indicator,
+      action: collapsible
+          ? LinagoraEventAction(
+              label: _expanded
+                  ? expansion.collapseLabel
+                  : expansion.expandLabel,
+              onPressed: _toggle,
+            )
+          : null,
+    );
+  }
+}
+
+class _EventDetailContent extends StatelessWidget {
+  final List<LinagoraEventValue> values;
+  final List<LinagoraEventLine> lines;
+  final LinagoraEventAction? action;
+  final Widget? indicator;
+
+  const _EventDetailContent({
+    required this.values,
+    required this.lines,
+    this.action,
+    this.indicator,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final action = this.action;
+    final link = action == null
+        ? null
+        : LinagoraEventInfoLink(
+            label: action.label,
+            onPressed: action.onPressed,
+            icon: action.icon,
+            tooltip: action.tooltip,
+          );
+    final firstLineChildren = <Widget>[
+      for (final value in values) LinagoraEventCard._buildValue(value),
+      if (indicator != null) indicator!,
+      // A single-line row keeps its link in the run, where the design puts
+      // it. Extra lines push it onto its own line below them instead.
+      if (link != null && lines.isEmpty) link,
+    ];
+    final firstLine = LinagoraEventInfoRun(children: firstLineChildren);
+
+    if (lines.isEmpty) return firstLine;
+
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      spacing: LinagoraEventInfoRun.defaultSpacing,
+      children: [
+        if (firstLineChildren.isNotEmpty) firstLine,
+        for (final line in lines)
+          LinagoraEventInfoRun(
+            children: [
+              for (final value in line.values)
+                LinagoraEventCard._buildValue(value),
+            ],
+          ),
+        if (link != null) link,
+      ],
+    );
+  }
 }
 
 /// Spacing that changes between the regular and compact arrangements.

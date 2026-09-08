@@ -12,9 +12,18 @@ import 'package:widgetbook_annotation/widgetbook_annotation.dart' as widgetbook;
 Widget linagoraEventCardUseCase(BuildContext context) {
   return const _Frame(
     child: _InteractiveEventCard(
-      content: _CardContent(
+      content: LinagoraEventCardData(
+        date: _date,
+        activity: _activity,
+        actorName: _actorName,
+        title: _title,
+        moreInformation: _moreInformation,
+        conference: _conference,
+        details: _details,
+        attending: _attending,
         actions: [_mailToAttendees],
         status: _notInvitedStatus,
+        calendarAction: _calendarAction,
       ),
     ),
   );
@@ -35,7 +44,7 @@ Widget linagoraEventCardPlaygroundUseCase(BuildContext context) {
     child: _InteractiveEventCard(
       layout: layout.layout,
       prefixWidth: layout.prefixWidth,
-      content: _CardContent(
+      content: LinagoraEventCardData(
         date: header.showDate ? _date : null,
         activity: header.showActivity ? header.activity : null,
         actorName: header.showActor ? _actorName : null,
@@ -53,42 +62,10 @@ Widget linagoraEventCardPlaygroundUseCase(BuildContext context) {
   );
 }
 
-/// Everything the card renders, so the interactive wrapper can carry it in
-/// one argument instead of restating the card's own parameter list.
-class _CardContent {
-  final LinagoraEventDate? date;
-  final String? activity;
-  final String? actorName;
-  final EventActivityBadgeState activityState;
-  final String? title;
-  final LinagoraEventAction? moreInformation;
-  final LinagoraEventConference? conference;
-  final List<LinagoraEventDetail> details;
-  final LinagoraEventAttending? attending;
-  final List<LinagoraEventAction> actions;
-  final LinagoraEventStatus? status;
-  final LinagoraEventAction? calendarAction;
-
-  const _CardContent({
-    this.date = _date,
-    this.activity = _activity,
-    this.actorName = _actorName,
-    this.activityState = EventActivityBadgeState.created,
-    this.title = _title,
-    this.moreInformation = _moreInformation,
-    this.conference = _conference,
-    this.details = _details,
-    this.attending = _attending,
-    this.actions = const [],
-    this.status,
-    this.calendarAction = _calendarAction,
-  });
-}
-
 /// Holds the state the card is too stateless to own: the answer the reader
-/// gave, and whether the participant list is open.
+/// gave. Participant expansion belongs to the reusable card detail.
 class _InteractiveEventCard extends StatefulWidget {
-  final _CardContent content;
+  final LinagoraEventCardData content;
   final LinagoraEventCardLayout layout;
   final double prefixWidth;
 
@@ -104,12 +81,8 @@ class _InteractiveEventCard extends StatefulWidget {
 
 class _InteractiveEventCardState extends State<_InteractiveEventCard> {
   String? _response;
-  bool _participantsExpanded = false;
 
   void _select(String label) => setState(() => _response = label);
-
-  void _toggleParticipants() =>
-      setState(() => _participantsExpanded = !_participantsExpanded);
 
   @override
   Widget build(BuildContext context) {
@@ -144,19 +117,18 @@ class _InteractiveEventCardState extends State<_InteractiveEventCard> {
       label: detail.label,
       values: detail.values,
       indicator: detail.indicator,
-      lines: _participantsExpanded
-          ? [
-              for (final participant in _participants)
-                LinagoraEventLine([
-                  if (participant.hasName)
-                    LinagoraEventValue.strong(participant.name!),
-                  LinagoraEventValue.muted(participant.email),
-                ]),
-            ]
-          : const [],
-      action: LinagoraEventAction(
-        label: _participantsExpanded ? 'Hide' : _seeAllParticipants,
-        onPressed: _toggleParticipants,
+      lines: [
+        for (final participant in _participants)
+          LinagoraEventLine([
+            if (participant.hasName)
+              LinagoraEventValue.strong(participant.name!),
+            LinagoraEventValue.muted(participant.email),
+          ]),
+      ],
+      expansion: const LinagoraEventDetailExpansion(
+        expandLabel: _seeAllParticipants,
+        collapseLabel: 'Hide',
+        collapsedLineCount: 0,
       ),
     );
   }
