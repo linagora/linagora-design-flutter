@@ -31,6 +31,10 @@ void main() {
     'keeps the conference clear of a full-width badge',
     _headerKeepsItsGap,
   );
+  testWidgets(
+    'renders every conference control it is given',
+    _rendersEveryConference,
+  );
   testWidgets('goes compact under the breakpoint', _adaptiveGoesCompact);
   testWidgets(
     'fits a pinned regular layout into a narrow card',
@@ -46,6 +50,10 @@ void main() {
     _pillHeightSurvivesDesktopDensity,
   );
   testWidgets('reports a tap on an actionable value', _reportsValueTap);
+  testWidgets(
+    'keeps adjacent detail values contiguous when their spacing is zero',
+    _keepsDetailValuesContiguous,
+  );
   testWidgets(
     'reports a tap on a value in an extra line',
     _reportsExtraLineValueTap,
@@ -549,6 +557,8 @@ LinagoraButton _responseButton(WidgetTester tester, String label) {
 Future<void> _selectionSettlesOnlyTheChosenResponse(
   WidgetTester tester,
 ) async {
+  var selectedTaps = 0;
+  var availableTaps = 0;
   await tester.pumpWidget(
     _host(
       _card(
@@ -558,8 +568,14 @@ Future<void> _selectionSettlesOnlyTheChosenResponse(
           responses: [
             // Both carry a callback, so a settled pill can only come from the
             // selection rather than from a missing one.
-            LinagoraEventAction(label: 'Yes', onPressed: () {}),
-            LinagoraEventAction(label: 'No', onPressed: () {}),
+            LinagoraEventAction(
+              label: 'Yes',
+              onPressed: () => selectedTaps++,
+            ),
+            LinagoraEventAction(
+              label: 'No',
+              onPressed: () => availableTaps++,
+            ),
           ],
         ),
       ),
@@ -568,6 +584,91 @@ Future<void> _selectionSettlesOnlyTheChosenResponse(
 
   expect(_responseButton(tester, 'Yes').onPressed, isNull);
   expect(_responseButton(tester, 'No').onPressed, isNotNull);
+  _expectDisabledResponsePalette(tester, 'Yes');
+
+  await tester.tap(find.text('Yes'));
+  await tester.tap(find.text('No'));
+  await tester.pump();
+
+  expect(selectedTaps, 0);
+  expect(availableTaps, 1);
+}
+
+void _expectDisabledResponsePalette(WidgetTester tester, String label) {
+  final button = tester.widget<FilledButton>(
+    find.ancestor(
+      of: find.text(label),
+      matching: find.byType(FilledButton),
+    ),
+  );
+  const disabledStates = {WidgetState.disabled};
+  expect(
+    button.style?.backgroundColor?.resolve(disabledStates),
+    LinagoraButton.disabledContainerColor,
+  );
+  expect(
+    button.style?.foregroundColor?.resolve(disabledStates),
+    LinagoraButton.disabledContentColor,
+  );
+}
+
+Future<void> _rendersEveryConference(WidgetTester tester) async {
+  var firstJoins = 0;
+  var secondJoins = 0;
+  await tester.pumpWidget(
+    _host(
+      LinagoraEventCard(
+        conference: LinagoraEventConference(
+          join: LinagoraEventAction(
+            label: 'Join OpenPaaS',
+            onPressed: () => firstJoins++,
+          ),
+        ),
+        additionalConferences: [
+          LinagoraEventConference(
+            join: LinagoraEventAction(
+              label: 'Join Google Meet',
+              onPressed: () => secondJoins++,
+            ),
+          ),
+        ],
+      ),
+    ),
+  );
+
+  await tester.tap(find.text('Join OpenPaaS'));
+  await tester.tap(find.text('Join Google Meet'));
+  await tester.pump();
+
+  expect(firstJoins, 1);
+  expect(secondJoins, 1);
+}
+
+Future<void> _keepsDetailValuesContiguous(WidgetTester tester) async {
+  await tester.pumpWidget(
+    _host(
+      const LinagoraEventCard(
+        details: [
+          LinagoraEventDetail(
+            label: 'Where',
+            valueSpacing: 0,
+            values: [
+              LinagoraEventValue('Room ('),
+              LinagoraEventValue.link('meet.example.invalid'),
+              LinagoraEventValue('), floor 2'),
+            ],
+          ),
+        ],
+      ),
+    ),
+  );
+
+  final prefix = tester.getRect(find.text('Room ('));
+  final link = tester.getRect(find.text('meet.example.invalid'));
+  final suffix = tester.getRect(find.text('), floor 2'));
+
+  expect(link.left, closeTo(prefix.right, 0.01));
+  expect(suffix.left, closeTo(link.right, 0.01));
 }
 
 Future<void> _reportsResponseTap(WidgetTester tester) async {
@@ -685,6 +786,14 @@ Future<void> _rendersFromData(WidgetTester tester) async {
           actorName: 'Alex Martin',
           activity: 'has invited you in to a meeting',
           title: 'Data-driven event',
+          conference: LinagoraEventConference(
+            join: LinagoraEventAction(label: 'Join primary conference'),
+          ),
+          additionalConferences: [
+            LinagoraEventConference(
+              join: LinagoraEventAction(label: 'Join backup conference'),
+            ),
+          ],
           details: _details,
           attending: _attending,
         ),
@@ -695,6 +804,8 @@ Future<void> _rendersFromData(WidgetTester tester) async {
 
   expect(find.text('Data-driven event'), findsOneWidget);
   expect(find.textContaining('Alex Martin'), findsOneWidget);
+  expect(find.text('Join primary conference'), findsOneWidget);
+  expect(find.text('Join backup conference'), findsOneWidget);
   expect(find.text('When'), findsOneWidget);
   expect(find.text('Attending?'), findsOneWidget);
 }
@@ -802,6 +913,10 @@ List<LinagoraEventLine> _participantLines(String prefix, int count) => [
 ];
 
 void _invalidExpansion() {
+  expect(
+    () => LinagoraEventDetail(valueSpacing: -1),
+    throwsAssertionError,
+  );
   expect(
     () => LinagoraEventDetailExpansion(
       expandLabel: 'See all',

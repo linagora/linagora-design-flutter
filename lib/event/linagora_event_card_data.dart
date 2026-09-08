@@ -22,6 +22,7 @@ class LinagoraEventCardData {
   final String? title;
   final LinagoraEventAction? moreInformation;
   final LinagoraEventConference? conference;
+  final List<LinagoraEventConference> additionalConferences;
   final List<LinagoraEventDetail> details;
   final LinagoraEventAttending? attending;
   final List<LinagoraEventAction> actions;
@@ -36,6 +37,7 @@ class LinagoraEventCardData {
     this.title,
     this.moreInformation,
     this.conference,
+    this.additionalConferences = const [],
     this.details = const [],
     this.attending,
     this.actions = const [],
@@ -112,6 +114,9 @@ class LinagoraEventDetail {
   final String? label;
   final List<LinagoraEventValue> values;
 
+  /// Horizontal gap between values in the same line.
+  final double valueSpacing;
+
   /// A link at the end of the value run, such as `See in Map`.
   final LinagoraEventAction? action;
 
@@ -134,11 +139,13 @@ class LinagoraEventDetail {
   const LinagoraEventDetail({
     this.label,
     this.values = const [],
+    this.valueSpacing = 8,
     this.action,
     this.indicator,
     this.lines = const [],
     this.expansion,
-  }) : assert(
+  }) : assert(valueSpacing >= 0, 'Value spacing cannot be negative'),
+       assert(
          expansion == null || action == null,
          'An expandable detail cannot also carry an action',
        );

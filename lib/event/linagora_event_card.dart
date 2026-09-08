@@ -59,6 +59,9 @@ class LinagoraEventCard extends StatelessWidget {
 
   final LinagoraEventConference? conference;
 
+  /// Conference controls rendered after [conference].
+  final List<LinagoraEventConference> additionalConferences;
+
   /// The labelled rows. Rows that would render nothing are dropped.
   final List<LinagoraEventDetail> details;
 
@@ -97,6 +100,7 @@ class LinagoraEventCard extends StatelessWidget {
     this.title,
     this.moreInformation,
     this.conference,
+    this.additionalConferences = const [],
     this.details = const [],
     this.attending,
     this.actions = const [],
@@ -128,6 +132,7 @@ class LinagoraEventCard extends StatelessWidget {
        title = data.title,
        moreInformation = data.moreInformation,
        conference = data.conference,
+       additionalConferences = data.additionalConferences,
        details = data.details,
        attending = data.attending,
        actions = data.actions,
@@ -367,8 +372,28 @@ class LinagoraEventCard extends StatelessWidget {
 
   Widget? _buildConference() {
     final conference = this.conference;
-    if (conference == null || conference.isEmpty) return null;
+    final conferences = [
+      if (conference != null && !conference.isEmpty) conference,
+      ...additionalConferences.where((conference) => !conference.isEmpty),
+    ];
+    if (conferences.isEmpty) return null;
 
+    if (conferences.length == 1) {
+      return _buildConferenceActions(conferences.single);
+    }
+
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      spacing: 8,
+      children: [
+        for (final conference in conferences)
+          _buildConferenceActions(conference),
+      ],
+    );
+  }
+
+  Widget _buildConferenceActions(LinagoraEventConference conference) {
     final join = conference.join;
     return EventConferenceActions(
       showVideoButton: join != null,
@@ -462,6 +487,7 @@ class LinagoraEventCard extends StatelessWidget {
 
     return _EventDetailContent(
       values: detail.values,
+      valueSpacing: detail.valueSpacing,
       lines: detail.lines,
       action: detail.action,
       indicator: detail.indicator,
@@ -571,6 +597,7 @@ class _ExpandableEventDetailContentState
 
     return _EventDetailContent(
       values: detail.values,
+      valueSpacing: detail.valueSpacing,
       lines: lines,
       indicator: detail.indicator,
       action: collapsible
@@ -587,12 +614,14 @@ class _ExpandableEventDetailContentState
 
 class _EventDetailContent extends StatelessWidget {
   final List<LinagoraEventValue> values;
+  final double valueSpacing;
   final List<LinagoraEventLine> lines;
   final LinagoraEventAction? action;
   final Widget? indicator;
 
   const _EventDetailContent({
     required this.values,
+    required this.valueSpacing,
     required this.lines,
     this.action,
     this.indicator,
@@ -616,7 +645,10 @@ class _EventDetailContent extends StatelessWidget {
       // it. Extra lines push it onto its own line below them instead.
       if (link != null && lines.isEmpty) link,
     ];
-    final firstLine = LinagoraEventInfoRun(children: firstLineChildren);
+    final firstLine = LinagoraEventInfoRun(
+      spacing: valueSpacing,
+      children: firstLineChildren,
+    );
 
     if (lines.isEmpty) return firstLine;
 
@@ -628,6 +660,7 @@ class _EventDetailContent extends StatelessWidget {
         if (firstLineChildren.isNotEmpty) firstLine,
         for (final line in lines)
           LinagoraEventInfoRun(
+            spacing: valueSpacing,
             children: [
               for (final value in line.values)
                 LinagoraEventCard._buildValue(value),
@@ -711,6 +744,8 @@ class _EventPillButton extends StatelessWidget {
       tooltip: action.tooltip,
       backgroundColor: LinagoraEventInfoColors.link,
       foregroundColor: const Color(0xFFFFFFFF),
+      disabledBackgroundColor: LinagoraButton.disabledContainerColor,
+      disabledForegroundColor: LinagoraButton.disabledContentColor,
       borderRadius: radius,
       minimumHeight: height,
       padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 10),
