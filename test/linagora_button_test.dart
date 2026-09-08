@@ -32,6 +32,11 @@ void main() {
   testWidgets('rounds the container to a given radius', _borderRadius);
   testWidgets('holds a minimum height and grows past it', _minimumHeight);
   testWidgets('shrinks to its label at zero minimum height', _inlineLink);
+  testWidgets(
+    'keeps its height under the desktop density default',
+    _ignoresAmbientDensity,
+  );
+  testWidgets('takes an explicit density when asked', _explicitDensity);
   testWidgets('tints an icon widget with the icon colour', _tintsIconWidget);
   testWidgets('dims an icon widget when disabled', _dimsIconWidget);
   testWidgets('shows a tooltip when provided', _tooltip);
@@ -482,9 +487,50 @@ void _rejectsWidthAndConstraintsTogether() {
   );
 }
 
-Future<void> _pump(WidgetTester tester, Widget button) {
+/// A button pinned to an exact height, the shape the design specifies.
+const _pill = LinagoraButton(
+  label: 'Yes',
+  onPressed: _noop,
+  minimumHeight: LinagoraButton.mediumHeight,
+  padding: LinagoraButton.mediumPadding,
+);
+
+/// Desktop and web resolve [VisualDensity.adaptivePlatformDensity] to
+/// [VisualDensity.compact], which takes 8px off a button that does not pin its
+/// own density.
+Future<void> _ignoresAmbientDensity(WidgetTester tester) async {
+  await _pump(tester, _pill, density: VisualDensity.compact);
+
+  expect(tester.getSize(_button).height, LinagoraButton.mediumHeight);
+}
+
+Future<void> _explicitDensity(WidgetTester tester) async {
+  await _pump(
+    tester,
+    const LinagoraButton(
+      label: 'Yes',
+      onPressed: _noop,
+      minimumHeight: LinagoraButton.mediumHeight,
+      padding: LinagoraButton.mediumPadding,
+      visualDensity: VisualDensity.compact,
+    ),
+    density: VisualDensity.standard,
+  );
+
+  expect(
+    tester.getSize(_button).height,
+    LinagoraButton.mediumHeight + VisualDensity.compact.baseSizeAdjustment.dy,
+  );
+}
+
+Future<void> _pump(
+  WidgetTester tester,
+  Widget button, {
+  VisualDensity? density,
+}) {
   return tester.pumpWidget(
     MaterialApp(
+      theme: density == null ? null : ThemeData(visualDensity: density),
       home: Scaffold(body: Center(child: button)),
     ),
   );

@@ -151,6 +151,14 @@ class LinagoraButton extends StatelessWidget {
   /// this key lets a product independently target the interactive region.
   final Key? buttonKey;
 
+  /// How much the tap target tightens around its content.
+  ///
+  /// Defaults to [VisualDensity.standard] rather than the ambient theme's,
+  /// because the design specifies absolute heights and the desktop and web
+  /// platform default — [VisualDensity.compact] — takes 8px off every one of
+  /// them. Pass the theme's own density to opt a button back into it.
+  final VisualDensity visualDensity;
+
   const LinagoraButton({
     super.key,
     required this.label,
@@ -180,6 +188,7 @@ class LinagoraButton extends StatelessWidget {
     this.textStyle,
     this.tooltip,
     this.buttonKey,
+    this.visualDensity = VisualDensity.standard,
   }) : assert(iconSpacing >= 0, 'Icon spacing cannot be negative'),
        assert(width == null || width >= 0, 'Button width cannot be negative'),
        assert(
@@ -321,6 +330,7 @@ class LinagoraButton extends StatelessWidget {
           ? WidgetStatePropertyAll(BorderSide(color: primary))
           : null,
       tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+      visualDensity: visualDensity,
       backgroundColor: _backgroundProperty(),
       foregroundColor: _foregroundProperty(),
       overlayColor: _overlayProperty(),

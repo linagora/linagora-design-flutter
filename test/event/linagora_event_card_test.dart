@@ -34,6 +34,10 @@ void main() {
     _selectionSettlesOnlyTheChosenResponse,
   );
   testWidgets('reports a response tap', _reportsResponseTap);
+  testWidgets(
+    'holds the response pill height on a desktop density',
+    _pillHeightSurvivesDesktopDensity,
+  );
   testWidgets('reports a tap on an actionable value', _reportsValueTap);
   testWidgets(
     'reports a tap on a value in an extra line',
@@ -80,8 +84,9 @@ const _attending = LinagoraEventAttending(
   secondaryAction: LinagoraEventAction(label: 'Propose a new time'),
 );
 
-Widget _host(Widget child, {double width = 1000}) {
+Widget _host(Widget child, {double width = 1000, VisualDensity? density}) {
   return MaterialApp(
+    theme: density == null ? null : ThemeData(visualDensity: density),
     home: Scaffold(
       body: SingleChildScrollView(
         child: SizedBox(width: width, child: child),
@@ -816,5 +821,16 @@ void _invalidExpansion() {
       ),
     ),
     throwsAssertionError,
+  );
+}
+
+/// Desktop and web resolve the ambient density to [VisualDensity.compact],
+/// which would otherwise take 8px off every pill the design sizes exactly.
+Future<void> _pillHeightSurvivesDesktopDensity(WidgetTester tester) async {
+  await tester.pumpWidget(_host(_card(), density: VisualDensity.compact));
+
+  expect(
+    tester.getSize(find.widgetWithText(LinagoraButton, 'Yes')).height,
+    40,
   );
 }
