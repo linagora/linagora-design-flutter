@@ -20,6 +20,50 @@ enum LinagoraEventInfoEmphasis {
   link,
 }
 
+/// The type scale an event card's rows are set at.
+///
+/// The compact card steps the row typography up one size — the labels and
+/// values only; the title and the activity badge keep their own sizes.
+enum LinagoraEventInfoScale {
+  /// Label 12, body 14.
+  regular(labelFontSize: 12, bodyFontSize: 14),
+
+  /// Label 14, body 16.
+  compact(labelFontSize: 14, bodyFontSize: 16);
+
+  final double labelFontSize;
+  final double bodyFontSize;
+
+  const LinagoraEventInfoScale({
+    required this.labelFontSize,
+    required this.bodyFontSize,
+  });
+}
+
+/// The scale the event text widgets adopt when they set none of their own.
+///
+/// Reaches rows nested inside a stateful wrapper or a builder, the same way
+/// [LinagoraEventInfoPrefixColumn] reaches their label column.
+class LinagoraEventInfoTypeScale extends InheritedWidget {
+  final LinagoraEventInfoScale scale;
+
+  const LinagoraEventInfoTypeScale({
+    super.key,
+    required this.scale,
+    required super.child,
+  });
+
+  static LinagoraEventInfoScale of(BuildContext context) {
+    final inherited = context
+        .dependOnInheritedWidgetOfExactType<LinagoraEventInfoTypeScale>();
+    return inherited?.scale ?? LinagoraEventInfoScale.regular;
+  }
+
+  @override
+  bool updateShouldNotify(LinagoraEventInfoTypeScale oldWidget) =>
+      scale != oldWidget.scale;
+}
+
 /// Ink colours shared by the event info rows.
 abstract final class LinagoraEventInfoColors {
   /// Primary content.
@@ -62,10 +106,14 @@ class LinagoraEventInfoLabel extends StatelessWidget {
   });
 
   /// The label treatment, for callers building their own span or widget.
+  ///
+  /// [scale] only changes the size; the line height stays proportional to it.
   static TextStyle textStyle({
     Color color = LinagoraEventInfoColors.secondary,
+    LinagoraEventInfoScale scale = LinagoraEventInfoScale.regular,
   }) {
     return LinagoraTextTheme.material().labelMedium!.copyWith(
+      fontSize: scale.labelFontSize,
       fontWeight: FontWeight.w500,
       height: lineHeight / 12,
       letterSpacing: 0.5,
@@ -75,7 +123,10 @@ class LinagoraEventInfoLabel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final resolved = textStyle(color: color);
+    final resolved = textStyle(
+      color: color,
+      scale: LinagoraEventInfoTypeScale.of(context),
+    );
     return Text(
       text,
       maxLines: maxLines,
@@ -120,11 +171,15 @@ class LinagoraEventInfoText extends StatelessWidget {
   });
 
   /// The body treatment for [emphasis].
+  ///
+  /// [scale] only changes the size; the line height stays proportional to it.
   static TextStyle textStyle({
     LinagoraEventInfoEmphasis emphasis = LinagoraEventInfoEmphasis.normal,
     Color? color,
+    LinagoraEventInfoScale scale = LinagoraEventInfoScale.regular,
   }) {
     return LinagoraTextTheme.material().bodyMedium!.copyWith(
+      fontSize: scale.bodyFontSize,
       fontWeight: _weightFor(emphasis),
       height: lineHeight / 14,
       letterSpacing: 0.25,
@@ -152,7 +207,11 @@ class LinagoraEventInfoText extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final resolved = textStyle(emphasis: emphasis, color: color);
+    final resolved = textStyle(
+      emphasis: emphasis,
+      color: color,
+      scale: LinagoraEventInfoTypeScale.of(context),
+    );
     final label = Text(
       text,
       maxLines: maxLines,
@@ -219,7 +278,10 @@ class LinagoraEventInfoRichText extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final resolved = LinagoraEventInfoText.textStyle(emphasis: emphasis);
+    final resolved = LinagoraEventInfoText.textStyle(
+      emphasis: emphasis,
+      scale: LinagoraEventInfoTypeScale.of(context),
+    );
     return Text.rich(
       TextSpan(children: spans),
       maxLines: maxLines,
@@ -269,6 +331,7 @@ class LinagoraEventInfoLink extends StatelessWidget {
   Widget build(BuildContext context) {
     final resolved = LinagoraEventInfoText.textStyle(
       color: color,
+      scale: LinagoraEventInfoTypeScale.of(context),
     ).copyWith(fontWeight: FontWeight.w500);
 
     return LinagoraButton(

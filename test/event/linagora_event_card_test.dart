@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:linagora_design_flutter/linagora_design_flutter.dart';
 
@@ -20,6 +21,12 @@ void main() {
   testWidgets('hides the date marker when compact', _compactHidesDate);
   testWidgets('stacks the labels when compact', _compactStacksLabels);
   testWidgets('keeps labels beside values when regular', _regularKeepsInline);
+  testWidgets('sets the rows one size up when compact', _compactTypeScale);
+  testWidgets('keeps the regular type scale otherwise', _regularTypeScale);
+  testWidgets(
+    'leaves the title and the badge out of the compact scale',
+    _compactLeavesTitleAndBadge,
+  );
   testWidgets(
     'keeps the conference clear of a full-width badge',
     _headerKeepsItsGap,
@@ -833,4 +840,50 @@ Future<void> _pillHeightSurvivesDesktopDensity(WidgetTester tester) async {
     tester.getSize(find.widgetWithText(LinagoraButton, 'Yes')).height,
     40,
   );
+}
+
+/// The style the text actually paints with, which for a button label comes
+/// from the ambient [DefaultTextStyle] rather than the [Text] itself.
+TextStyle _styleOf(WidgetTester tester, String text) =>
+    tester.renderObject<RenderParagraph>(find.text(text).first).text.style!;
+
+Future<void> _compactTypeScale(WidgetTester tester) async {
+  await tester.pumpWidget(
+    _host(_card(layout: LinagoraEventCardLayout.compact), width: 375),
+  );
+
+  expect(_styleOf(tester, 'When').fontSize, 14);
+  expect(_styleOf(tester, 'Tuesday, Jun 16').fontSize, 16);
+  expect(
+    _styleOf(tester, 'See in Map').fontSize,
+    16,
+    reason: 'an inline link is set with the values it sits among',
+  );
+  expect(
+    _styleOf(tester, 'When').height,
+    LinagoraEventInfoLabel.lineHeight / 12,
+    reason: 'the line height stays proportional to the size',
+  );
+}
+
+Future<void> _regularTypeScale(WidgetTester tester) async {
+  await tester.pumpWidget(_host(_card()));
+
+  expect(_styleOf(tester, 'When').fontSize, 12);
+  expect(_styleOf(tester, 'Tuesday, Jun 16').fontSize, 14);
+}
+
+Future<void> _compactLeavesTitleAndBadge(WidgetTester tester) async {
+  await tester.pumpWidget(
+    _host(_card(layout: LinagoraEventCardLayout.compact), width: 375),
+  );
+
+  expect(_styleOf(tester, 'Automated DS Flutter').fontSize, 22);
+  final badge = tester.renderObject<RenderParagraph>(
+    find.descendant(
+      of: find.byType(EventActivityBadge),
+      matching: find.byType(Text),
+    ),
+  );
+  expect(badge.text.style!.fontSize, 14);
 }

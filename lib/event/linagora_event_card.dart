@@ -162,7 +162,16 @@ class LinagoraEventCard extends StatelessWidget {
         color: backgroundColor,
         borderRadius: BorderRadius.circular(borderRadius),
       ),
-      child: compact ? _buildCompactBody(metrics) : _buildRegularBody(metrics),
+      // The compact design sets its rows one size up, so the scale is
+      // published here rather than threaded through every row.
+      child: LinagoraEventInfoTypeScale(
+        scale: compact
+            ? LinagoraEventInfoScale.compact
+            : LinagoraEventInfoScale.regular,
+        child: compact
+            ? _buildCompactBody(metrics)
+            : _buildRegularBody(metrics),
+      ),
     );
   }
 
