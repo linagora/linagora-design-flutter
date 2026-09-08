@@ -109,6 +109,36 @@ class LinagoraEventInfoRow extends StatelessWidget {
   }
 
   Widget _buildInline(double? prefixWidth) {
+    if (trailing == null) return _inlineRow(prefixWidth);
+
+    return LayoutBuilder(
+      builder: (context, constraints) => _inlineRow(
+        prefixWidth,
+        trailingMaxWidth: _trailingMaxWidth(
+          available: constraints.maxWidth,
+          prefixWidth: prefixWidth,
+        ),
+      ),
+    );
+  }
+
+  /// Half of whatever the value and the trailing action have to share.
+  ///
+  /// A trailing action keeps its natural width while that fits, so the
+  /// design's layout is untouched; past that it is clamped and its label
+  /// ellipsizes rather than the row overflowing.
+  double _trailingMaxWidth({
+    required double available,
+    required double? prefixWidth,
+  }) {
+    if (!available.isFinite) return double.infinity;
+
+    final column = prefix == null ? 0.0 : (prefixWidth ?? 0) + prefixSpacing;
+    final free = available - column - trailingSpacing;
+    return free <= 0 ? 0 : free / 2;
+  }
+
+  Widget _inlineRow(double? prefixWidth, {double? trailingMaxWidth}) {
     final prefix = this.prefix;
     final trailing = this.trailing;
 
@@ -124,7 +154,15 @@ class LinagoraEventInfoRow extends StatelessWidget {
           Expanded(child: _hug(content))
         else
           Flexible(child: content),
-        if (trailing != null) ...[SizedBox(width: trailingSpacing), trailing],
+        if (trailing != null) ...[
+          SizedBox(width: trailingSpacing),
+          ConstrainedBox(
+            constraints: BoxConstraints(
+              maxWidth: trailingMaxWidth ?? double.infinity,
+            ),
+            child: trailing,
+          ),
+        ],
       ],
     );
   }

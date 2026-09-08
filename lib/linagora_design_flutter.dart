@@ -63,3 +63,5 @@ export 'package:linagora_design_flutter/sidebar/linagora_sidebar_tree_flattener.
 export 'package:linagora_design_flutter/sidebar/linagora_sidebar_version.dart';
 export 'package:linagora_design_flutter/event/linagora_event_info_row.dart';
 export 'package:linagora_design_flutter/event/linagora_event_info_text.dart';
+export 'package:linagora_design_flutter/event/linagora_event_card.dart';
+export 'package:linagora_design_flutter/event/linagora_event_card_data.dart';

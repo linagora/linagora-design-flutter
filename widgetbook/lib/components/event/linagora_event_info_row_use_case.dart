@@ -192,6 +192,7 @@ class _LayoutKnobs {
       layout: context.knobs.object.dropdown<LinagoraEventInfoRowLayout>(
         label: 'Layout',
         options: LinagoraEventInfoRowLayout.values,
+        initialOption: LinagoraEventInfoRowLayout.adaptive,
         labelBuilder: (value) => value.name,
       ),
       expand: context.knobs.boolean(label: 'Expand', initialValue: false),

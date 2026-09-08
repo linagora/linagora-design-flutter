@@ -9,6 +9,7 @@ import 'package:widgetbook_workspace/components/contact_component/matrix_contact
 import 'package:widgetbook_workspace/components/contact_component/phonebook_contact_use_case.dart';
 import 'package:widgetbook_workspace/components/event/event_activity_badge_use_case.dart';
 import 'package:widgetbook_workspace/components/event/event_conference_actions_use_case.dart';
+import 'package:widgetbook_workspace/components/event/linagora_event_card_use_case.dart';
 import 'package:widgetbook_workspace/components/event/linagora_event_date_icon_use_case.dart';
 import 'package:widgetbook_workspace/components/list_item/linagora_setting_item_use_case.dart';
 import 'package:widgetbook_workspace/components/list_item/session_device_list_item_use_case.dart';
@@ -128,16 +129,25 @@ class WidgetbookApp extends StatelessWidget {
           name: 'Event',
           children: [
             WidgetbookComponent(
-              name: 'Event conference actions',
+              name: 'Linagora event card',
+              useCases: [
+                WidgetbookUseCase(
+                  name: 'Complete card',
+                  builder: (context) => linagoraEventCardUseCase(context),
+                ),
+                WidgetbookUseCase(
+                  name: 'Playground',
+                  builder: (context) =>
+                      linagoraEventCardPlaygroundUseCase(context),
+                ),
+              ],
+            ),
+            WidgetbookComponent(
+              name: 'Linagora event date icon',
               useCases: [
                 WidgetbookUseCase(
                   name: 'Default',
-                  builder: (context) => eventConferenceActionsUseCase(context),
-                ),
-                WidgetbookUseCase(
-                  name: 'Custom',
-                  builder: (context) =>
-                      eventConferenceActionsCustomUseCase(context),
+                  builder: (context) => linagoraEventDateIconUseCase(context),
                 ),
               ],
             ),
@@ -151,6 +161,20 @@ class WidgetbookApp extends StatelessWidget {
                 WidgetbookUseCase(
                   name: 'Custom',
                   builder: (context) => eventActivityBadgeCustomUseCase(context),
+                ),
+              ],
+            ),
+            WidgetbookComponent(
+              name: 'Event conference actions',
+              useCases: [
+                WidgetbookUseCase(
+                  name: 'Default',
+                  builder: (context) => eventConferenceActionsUseCase(context),
+                ),
+                WidgetbookUseCase(
+                  name: 'Custom',
+                  builder: (context) =>
+                      eventConferenceActionsCustomUseCase(context),
                 ),
               ],
             ),
@@ -348,20 +372,6 @@ class WidgetbookApp extends StatelessWidget {
                 WidgetbookUseCase(
                   name: 'Matrix contact style',
                   builder: (context) => matrixContactUseCase(context),
-                ),
-              ],
-            ),
-          ],
-        ),
-        WidgetbookFolder(
-          name: 'Event',
-          children: [
-            WidgetbookComponent(
-              name: 'Linagora event date icon',
-              useCases: [
-                WidgetbookUseCase(
-                  name: 'Default',
-                  builder: (context) => linagoraEventDateIconUseCase(context),
                 ),
               ],
             ),
