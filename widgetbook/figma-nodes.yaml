@@ -1,5 +1,6 @@
 # Figma node URLs for widgets exposed in widgetbook.
 # Each URL must include a ?node-id= so the Figma MCP can resolve one component.
+EventActivityBadge: "https://www.figma.com/design/XqLqMINlZw09BdEHI8yLb9/Teammail---1.1?node-id=10953-7723&t=v6U2ekksIq4SKGe9-1"
 LinagoraSidebarButtonStyles: "https://www.figma.com/design/XqLqMINlZw09BdEHI8yLb9/Teammail---1.1?node-id=9152-12934"
 LinagoraSidebarControl: "https://www.figma.com/design/XqLqMINlZw09BdEHI8yLb9/Teammail---1.1?node-id=9152-12852"
 LinagoraSidebarItem: "https://www.figma.com/design/XqLqMINlZw09BdEHI8yLb9/Teammail---1.1?node-id=11101-2135"
