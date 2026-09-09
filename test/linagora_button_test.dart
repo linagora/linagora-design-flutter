@@ -21,7 +21,291 @@ void main() {
     'rejects width and constraints supplied together',
     _rejectsWidthAndConstraintsTogether,
   );
+  testWidgets(
+    'leaves every style field untouched when no colour is set',
+    _defersToTheThemeByDefault,
+  );
+  testWidgets('paints the given container and label colours', _explicitColours);
+  testWidgets('swaps the container on hover', _hoverBackground);
+  testWidgets('washes a borderless button on hover', _hoverOverlay);
+  testWidgets('dims to the disabled colours', _disabledColours);
+  testWidgets('rounds the container to a given radius', _borderRadius);
+  testWidgets('holds a minimum height and grows past it', _minimumHeight);
+  testWidgets('shrinks to its label at zero minimum height', _inlineLink);
+  testWidgets(
+    'keeps its height under the desktop density default',
+    _ignoresAmbientDensity,
+  );
+  testWidgets('takes an explicit density when asked', _explicitDensity);
+  testWidgets('tints an icon widget with the icon colour', _tintsIconWidget);
+  testWidgets('dims an icon widget when disabled', _dimsIconWidget);
+  testWidgets('shows a tooltip when provided', _tooltip);
+  test('rejects invalid measurements', _rejectsInvalidMeasurements);
 }
+
+/// A button that sets no colour must generate a [ButtonStyle] with those
+/// fields left null, so the ambient theme keeps deciding exactly as it did
+/// before these properties existed.
+Future<void> _defersToTheThemeByDefault(WidgetTester tester) async {
+  await _pump(
+    tester,
+    const LinagoraButton(label: 'Compose', onPressed: _noop, icon: Icons.add),
+  );
+
+  final style = _styleOf(tester);
+  expect(style.backgroundColor, isNull);
+  expect(style.foregroundColor, isNull);
+  expect(style.overlayColor, isNull);
+  expect(style.textStyle, isNull);
+  expect(style.fixedSize, isNull);
+  // A bare glyph still inherits size and colour from the button's IconTheme.
+  final icon = tester.widget<Icon>(find.byType(Icon));
+  expect(icon.size, isNull);
+  expect(icon.color, isNull);
+}
+
+Future<void> _explicitColours(WidgetTester tester) async {
+  await _pump(
+    tester,
+    const LinagoraButton(
+      label: 'Yes',
+      onPressed: _noop,
+      backgroundColor: Color(0xFF0A84FF),
+      foregroundColor: Color(0xFFFFFFFF),
+    ),
+  );
+
+  final style = _styleOf(tester);
+  expect(style.backgroundColor!.resolve({}), const Color(0xFF0A84FF));
+  expect(style.foregroundColor!.resolve({}), const Color(0xFFFFFFFF));
+}
+
+Future<void> _hoverBackground(WidgetTester tester) async {
+  await _pump(
+    tester,
+    const LinagoraButton(
+      label: 'Yes',
+      onPressed: _noop,
+      backgroundColor: Color(0xFF0A84FF),
+      hoverBackgroundColor: LinagoraButton.primaryHoverBackgroundColor,
+    ),
+  );
+
+  final style = _styleOf(tester);
+  expect(style.backgroundColor!.resolve({}), const Color(0xFF0A84FF));
+  for (final state in _hoverLikeStates) {
+    expect(
+      style.backgroundColor!.resolve({state}),
+      LinagoraButton.primaryHoverBackgroundColor,
+    );
+    // The container carries the change, so no layer is painted on top.
+    expect(style.overlayColor!.resolve({state}), Colors.transparent);
+  }
+}
+
+Future<void> _hoverOverlay(WidgetTester tester) async {
+  await _pump(
+    tester,
+    const LinagoraButton(
+      label: 'Propose a new time',
+      onPressed: _noop,
+      variant: LinagoraButtonVariant.text,
+      hoverOverlayColor: LinagoraButton.primaryHoverOverlayColor,
+    ),
+  );
+
+  final style = _styleOf(tester);
+  expect(style.overlayColor!.resolve({}), isNull);
+  for (final state in _hoverLikeStates) {
+    expect(
+      style.overlayColor!.resolve({state}),
+      LinagoraButton.primaryHoverOverlayColor,
+    );
+  }
+}
+
+Future<void> _disabledColours(WidgetTester tester) async {
+  await _pump(
+    tester,
+    const LinagoraButton(
+      label: 'Yes',
+      onPressed: null,
+      backgroundColor: Color(0xFF0A84FF),
+      foregroundColor: Color(0xFFFFFFFF),
+      disabledBackgroundColor: LinagoraButton.disabledContainerColor,
+      disabledForegroundColor: LinagoraButton.disabledContentColor,
+      hoverBackgroundColor: LinagoraButton.primaryHoverBackgroundColor,
+    ),
+  );
+
+  final style = _styleOf(tester);
+  const disabled = {WidgetState.disabled};
+  expect(
+    style.backgroundColor!.resolve(disabled),
+    LinagoraButton.disabledContainerColor,
+  );
+  expect(
+    style.foregroundColor!.resolve(disabled),
+    LinagoraButton.disabledContentColor,
+  );
+  // Disabled wins over hover rather than the two fighting.
+  expect(
+    style.backgroundColor!.resolve({
+      WidgetState.disabled,
+      WidgetState.hovered,
+    }),
+    LinagoraButton.disabledContainerColor,
+  );
+}
+
+Future<void> _borderRadius(WidgetTester tester) async {
+  await _pump(
+    tester,
+    const LinagoraButton(label: 'Save', onPressed: _noop, borderRadius: 4),
+  );
+
+  final shape = _styleOf(tester).shape!.resolve({})! as RoundedRectangleBorder;
+  expect((shape.borderRadius as BorderRadius).topLeft.x, 4);
+}
+
+Future<void> _minimumHeight(WidgetTester tester) async {
+  await _pump(
+    tester,
+    const LinagoraButton(
+      label: 'Yes',
+      onPressed: _noop,
+      minimumHeight: LinagoraButton.mediumHeight,
+      padding: LinagoraButton.mediumPadding,
+    ),
+  );
+  expect(tester.getSize(_button).height, LinagoraButton.mediumHeight);
+
+  await _pump(
+    tester,
+    const LinagoraButton(
+      label: 'Yes',
+      onPressed: _noop,
+      minimumHeight: LinagoraButton.mediumHeight,
+      padding: LinagoraButton.mediumPadding,
+      icon: Icons.check,
+      iconSize: 32,
+      iconColor: Color(0xFF424244),
+    ),
+  );
+  // Taller content grows the button instead of being squashed.
+  expect(
+    tester.getSize(_button).height,
+    greaterThan(LinagoraButton.mediumHeight),
+  );
+}
+
+Future<void> _inlineLink(WidgetTester tester) async {
+  await _pump(
+    tester,
+    const LinagoraButton(
+      label: 'More information',
+      onPressed: _noop,
+      variant: LinagoraButtonVariant.text,
+      padding: EdgeInsets.zero,
+      minimumHeight: 0,
+    ),
+  );
+
+  expect(_styleOf(tester).padding!.resolve({}), EdgeInsets.zero);
+  expect(tester.getSize(_button).height, lessThan(32));
+}
+
+Future<void> _tintsIconWidget(WidgetTester tester) async {
+  await _pump(
+    tester,
+    const LinagoraButton(
+      label: 'See in your Calendar',
+      onPressed: _noop,
+      iconWidget: Placeholder(),
+      iconColor: Color(0xFF123456),
+    ),
+  );
+
+  expect(
+    _iconFilterOf(tester),
+    const ColorFilter.mode(Color(0xFF123456), BlendMode.srcIn),
+  );
+}
+
+Future<void> _dimsIconWidget(WidgetTester tester) async {
+  await _pump(
+    tester,
+    const LinagoraButton(
+      label: 'See in your Calendar',
+      onPressed: null,
+      iconWidget: Placeholder(),
+      iconColor: Color(0xFF123456),
+      disabledForegroundColor: LinagoraButton.disabledContentColor,
+    ),
+  );
+
+  // The filter follows the resolved content colour, so a disabled icon dims
+  // with its label.
+  expect(
+    _iconFilterOf(tester),
+    const ColorFilter.mode(
+      LinagoraButton.disabledContentColor,
+      BlendMode.srcIn,
+    ),
+  );
+}
+
+Future<void> _tooltip(WidgetTester tester) async {
+  await _pump(
+    tester,
+    const LinagoraButton(
+      label: 'See all participants',
+      onPressed: _noop,
+      tooltip: 'See all participants',
+    ),
+  );
+
+  expect(
+    tester.widget<Tooltip>(find.byType(Tooltip)).message,
+    'See all participants',
+  );
+}
+
+void _rejectsInvalidMeasurements() {
+  expect(
+    () => LinagoraButton(label: 'L', onPressed: _noop, borderRadius: -1),
+    throwsAssertionError,
+  );
+  expect(
+    () => LinagoraButton(label: 'L', onPressed: _noop, iconSize: 0),
+    throwsAssertionError,
+  );
+  expect(
+    () => LinagoraButton(label: 'L', onPressed: _noop, height: 0),
+    throwsAssertionError,
+  );
+  expect(
+    () => LinagoraButton(label: 'L', onPressed: _noop, minimumHeight: -1),
+    throwsAssertionError,
+  );
+}
+
+const _hoverLikeStates = [
+  WidgetState.hovered,
+  WidgetState.focused,
+  WidgetState.pressed,
+];
+
+Finder get _button => find.byWidgetPredicate((w) => w is ButtonStyleButton);
+
+ButtonStyle _styleOf(WidgetTester tester) =>
+    tester.widget<ButtonStyleButton>(_button).style!;
+
+ColorFilter? _iconFilterOf(WidgetTester tester) => tester
+    .widget<ColorFiltered>(
+      find.descendant(of: _button, matching: find.byType(ColorFiltered)),
+    )
+    .colorFilter;
 
 Future<void> _xsTextButton(WidgetTester tester) async {
   await _pump(
@@ -203,9 +487,50 @@ void _rejectsWidthAndConstraintsTogether() {
   );
 }
 
-Future<void> _pump(WidgetTester tester, Widget button) {
+/// A button pinned to an exact height, the shape the design specifies.
+const _pill = LinagoraButton(
+  label: 'Yes',
+  onPressed: _noop,
+  minimumHeight: LinagoraButton.mediumHeight,
+  padding: LinagoraButton.mediumPadding,
+);
+
+/// Desktop and web resolve [VisualDensity.adaptivePlatformDensity] to
+/// [VisualDensity.compact], which takes 8px off a button that does not pin its
+/// own density.
+Future<void> _ignoresAmbientDensity(WidgetTester tester) async {
+  await _pump(tester, _pill, density: VisualDensity.compact);
+
+  expect(tester.getSize(_button).height, LinagoraButton.mediumHeight);
+}
+
+Future<void> _explicitDensity(WidgetTester tester) async {
+  await _pump(
+    tester,
+    const LinagoraButton(
+      label: 'Yes',
+      onPressed: _noop,
+      minimumHeight: LinagoraButton.mediumHeight,
+      padding: LinagoraButton.mediumPadding,
+      visualDensity: VisualDensity.compact,
+    ),
+    density: VisualDensity.standard,
+  );
+
+  expect(
+    tester.getSize(_button).height,
+    LinagoraButton.mediumHeight + VisualDensity.compact.baseSizeAdjustment.dy,
+  );
+}
+
+Future<void> _pump(
+  WidgetTester tester,
+  Widget button, {
+  VisualDensity? density,
+}) {
   return tester.pumpWidget(
     MaterialApp(
+      theme: density == null ? null : ThemeData(visualDensity: density),
       home: Scaffold(body: Center(child: button)),
     ),
   );
