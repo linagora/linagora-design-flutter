@@ -3,7 +3,11 @@
 class LinagoraDesignImages {
   const LinagoraDesignImages._();
 
-  static const String _assetPrefix = 'packages/linagora_design_flutter/assets';
+  static const String packageName = 'linagora_design_flutter';
+  static const String _assetPrefix = 'packages/$packageName/assets';
 
   static const String svgBytesClose = '$_assetPrefix/images/close.svg.vec';
+  static const String videoConferenceIcon =
+      'assets/images/video_conference_icon.svg';
+  static const String copyLinkIcon = 'assets/images/copy_link_icon.svg';
 }

@@ -6,6 +6,7 @@ import 'package:widgetbook_workspace/components/buttons/linagora_button_use_case
 import 'package:widgetbook_workspace/components/chat/message_bubble_use_case.dart';
 import 'package:widgetbook_workspace/components/contact_component/matrix_contact_use_case.dart';
 import 'package:widgetbook_workspace/components/contact_component/phonebook_contact_use_case.dart';
+import 'package:widgetbook_workspace/components/event/event_conference_actions_use_case.dart';
 import 'package:widgetbook_workspace/components/list_item/linagora_setting_item_use_case.dart';
 import 'package:widgetbook_workspace/components/list_item/session_device_list_item_use_case.dart';
 import 'package:widgetbook_workspace/components/sidebar/linagora_sidebar_item_use_case.dart';
@@ -41,6 +42,7 @@ class WidgetbookApp extends StatelessWidget {
         GitHubAddon('widgetbook'),
         ViewportAddon(
           [
+            MacosViewports.desktop,
             IosViewports.iPhone13,
             IosViewports.iPad,
           ],
@@ -113,6 +115,25 @@ class WidgetbookApp extends StatelessWidget {
                 WidgetbookUseCase(
                   name: 'Default',
                   builder: (context) => linagoraButtonUseCase(context),
+                ),
+              ],
+            ),
+          ],
+        ),
+        WidgetbookFolder(
+          name: 'Event',
+          children: [
+            WidgetbookComponent(
+              name: 'Event conference actions',
+              useCases: [
+                WidgetbookUseCase(
+                  name: 'Default',
+                  builder: (context) => eventConferenceActionsUseCase(context),
+                ),
+                WidgetbookUseCase(
+                  name: 'Custom',
+                  builder: (context) =>
+                      eventConferenceActionsCustomUseCase(context),
                 ),
               ],
             ),

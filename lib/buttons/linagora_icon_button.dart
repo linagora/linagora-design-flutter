@@ -20,6 +20,12 @@ class LinagoraIconButton extends StatelessWidget {
   final double iconSize;
   final Color? overlayColor;
 
+  /// Inner padding between the icon and the Material interaction boundary.
+  final EdgeInsetsGeometry padding;
+
+  /// Shape used to clip Material state layers such as the ink ripple.
+  final OutlinedBorder? shape;
+
   /// Overrides the rendered icon with any widget (e.g. `SvgPicture.asset`,
   /// `Image.asset`) instead of the Material glyph from [icon]. When set,
   /// [icon] and [color] are ignored for rendering; size it via [iconSize]
@@ -46,6 +52,8 @@ class LinagoraIconButton extends StatelessWidget {
     this.iconSize = 24,
     this.iconWidget,
     this.overlayColor,
+    this.padding = const EdgeInsets.all(LinagoraSpacing.base / 2),
+    this.shape,
     this.tapTargetSize = MaterialTapTargetSize.padded,
     this.visualDensity = VisualDensity.compact,
   }) : assert(
@@ -63,11 +71,13 @@ class LinagoraIconButton extends StatelessWidget {
       color: iconWidget == null ? color : null,
       tooltip: tooltip,
       onPressed: onPressed,
-      padding: const EdgeInsets.all(LinagoraSpacing.base / 2),
+      padding: padding,
       constraints: _constraints(context),
       visualDensity: visualDensity,
       style: IconButton.styleFrom(
         overlayColor: overlayColor ?? Colors.transparent,
+        padding: padding,
+        shape: shape,
         tapTargetSize: tapTargetSize,
       ),
     );

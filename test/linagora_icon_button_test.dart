@@ -9,6 +9,10 @@ void main() {
       (tester) => _tapTargetSize(tester, testCase),
     );
   }
+  testWidgets(
+    'supports a custom circular Material interaction boundary',
+    _customMaterialInteractionBoundary,
+  );
 }
 
 Future<void> _tapTargetSize(
@@ -34,6 +38,31 @@ Future<void> _tapTargetSize(
     tester.getSize(find.byType(IconButton)),
     testCase.expectedSize,
   );
+}
+
+Future<void> _customMaterialInteractionBoundary(WidgetTester tester) async {
+  const padding = EdgeInsets.all(8);
+  await tester.pumpWidget(
+    const MaterialApp(
+      home: Scaffold(
+        body: Center(
+          child: LinagoraIconButton(
+            icon: Icons.content_copy,
+            onPressed: _noop,
+            padding: padding,
+            shape: CircleBorder(),
+            tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+            visualDensity: VisualDensity.standard,
+          ),
+        ),
+      ),
+    ),
+  );
+
+  final button = tester.widget<IconButton>(find.byType(IconButton));
+  expect(tester.getSize(find.byType(IconButton)), const Size.square(40));
+  expect(button.padding, padding);
+  expect(button.style!.shape!.resolve({}), isA<CircleBorder>());
 }
 
 const _tapTargetCases = [
