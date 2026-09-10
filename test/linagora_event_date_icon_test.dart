@@ -17,6 +17,14 @@ void main() {
   testWidgets('scales shadows from the 50px Figma coordinate space', _shadow);
   testWidgets('exposes one accessible date label', _semantics);
   testWidgets('keeps a two-digit day whole inside the icon', _twoDigitDay);
+  testWidgets(
+    'falls back to the month and day as its accessible label',
+    _defaultSemanticLabel,
+  );
+  testWidgets(
+    'renders without clipping at the smallest supported size',
+    _minimumSize,
+  );
   test('rejects invalid date content and sizes', _invalidInputs);
 }
 
@@ -126,6 +134,36 @@ Future<void> _twoDigitDay(WidgetTester tester) async {
   );
 }
 
+Future<void> _defaultSemanticLabel(WidgetTester tester) async {
+  await _pump(tester, LinagoraEventDateIcon(month: 'Jun', day: '16'));
+
+  expect(find.bySemanticsLabel('Jun 16'), findsOneWidget);
+}
+
+Future<void> _minimumSize(WidgetTester tester) async {
+  await _pump(
+    tester,
+    LinagoraEventDateIcon(month: 'Jun', day: '16', size: 32),
+  );
+
+  expect(
+    tester.getSize(find.byType(LinagoraEventDateIcon)),
+    const Size.square(32),
+  );
+  expect(tester.takeException(), isNull);
+
+  _expectLabelStyle(tester, 'JUN', (
+    fontSize: 8.824 * (32 / 50),
+    fontWeight: FontWeight.w600,
+    color: LinagoraEventDateIcon.defaultMonthTextColor,
+  ));
+  _expectLabelStyle(tester, '16', (
+    fontSize: 27.451 * (32 / 50),
+    fontWeight: FontWeight.w300,
+    color: LinagoraEventDateIcon.defaultDayTextColor,
+  ));
+}
+
 Future<void> _shadow(WidgetTester tester) async {
   const shadow = BoxShadow(
     color: Color(0x26000000),
@@ -164,6 +202,15 @@ void _invalidInputs() {
 
   expect(
     () => LinagoraEventDateIcon(month: 'Jun', day: '16', size: 0),
+    throwsArgumentError,
+  );
+  expect(
+    () => LinagoraEventDateIcon(month: 'Jun', day: '16', size: double.nan),
+    throwsArgumentError,
+  );
+  expect(
+    () =>
+        LinagoraEventDateIcon(month: 'Jun', day: '16', size: double.infinity),
     throwsArgumentError,
   );
 }
