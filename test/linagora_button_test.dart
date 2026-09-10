@@ -36,6 +36,14 @@ void main() {
   testWidgets('dims an icon widget when disabled', _dimsIconWidget);
   testWidgets('shows a tooltip when provided', _tooltip);
   test('rejects invalid measurements', _rejectsInvalidMeasurements);
+  testWidgets(
+    'applies iconSize to an icon widget with no iconColor set',
+    _iconWidgetSizeWithoutColour,
+  );
+  testWidgets(
+    'suppresses the hover overlay when hoverBackgroundColor is also set',
+    _hoverOverlaySuppressedByHoverBackground,
+  );
 }
 
 /// A button that sets no colour must generate a [ButtonStyle] with those
@@ -116,6 +124,31 @@ Future<void> _hoverOverlay(WidgetTester tester) async {
       style.overlayColor!.resolve({state}),
       LinagoraButton.primaryHoverOverlayColor,
     );
+  }
+}
+
+/// [hoverBackgroundColor]'s own doc: "Setting this suppresses the state
+/// layer, since the container itself already carries the change" — that
+/// suppression must hold even when the caller also passes a
+/// [LinagoraButton.hoverOverlayColor], not just when it's the only hover
+/// colour set.
+Future<void> _hoverOverlaySuppressedByHoverBackground(
+  WidgetTester tester,
+) async {
+  await _pump(
+    tester,
+    const LinagoraButton(
+      label: 'Yes',
+      onPressed: _noop,
+      backgroundColor: Color(0xFF0A84FF),
+      hoverBackgroundColor: LinagoraButton.primaryHoverBackgroundColor,
+      hoverOverlayColor: LinagoraButton.primaryHoverOverlayColor,
+    ),
+  );
+
+  final style = _styleOf(tester);
+  for (final state in _hoverLikeStates) {
+    expect(style.overlayColor!.resolve({state}), Colors.transparent);
   }
 }
 
@@ -436,6 +469,25 @@ Future<void> _iconWidgetSize(WidgetTester tester) async {
   );
 
   expect(tester.getSize(find.byKey(iconKey)), const Size(12, 12));
+}
+
+/// [iconSize] governs the outer icon slot regardless of whether the caller
+/// also asked for a colour override — the two are documented as independent
+/// ([iconSize]: "Outer size of the leading icon slot"), so the SizedBox that
+/// sizes the slot must not be gated on [iconColor] being set.
+Future<void> _iconWidgetSizeWithoutColour(WidgetTester tester) async {
+  const iconKey = Key('custom-icon');
+  await _pump(
+    tester,
+    const LinagoraButton(
+      label: 'Compose',
+      iconWidget: SizedBox(key: iconKey, width: 12, height: 12),
+      iconSize: 32,
+      onPressed: _noop,
+    ),
+  );
+
+  expect(tester.getSize(find.byKey(iconKey)), const Size(32, 32));
 }
 
 Future<void> _iconWidgetTakesPrecedence(WidgetTester tester) async {
