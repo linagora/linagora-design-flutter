@@ -5,6 +5,9 @@ import 'package:linagora_design_flutter/linagora_design_flutter.dart';
 
 const _fontFamily = 'packages/linagora_design_flutter/TwakeInter';
 
+/// The per-label facts that vary between the month and day labels.
+typedef _LabelStyle = ({double fontSize, FontWeight fontWeight, Color color});
+
 void main() {
   testWidgets('matches the Figma date-icon geometry and typography', _figmaInk);
   testWidgets(
@@ -38,20 +41,16 @@ Future<void> _figmaInk(WidgetTester tester) async {
   expect(header.color, LinagoraEventDateIcon.defaultHeaderColor);
   expect(tester.getSize(_headerFinder()).height, closeTo(15.685, 0.001));
 
-  _expectLabelStyle(
-    tester,
-    'JUN',
+  _expectLabelStyle(tester, 'JUN', (
     fontSize: 8.824,
     fontWeight: FontWeight.w600,
     color: LinagoraEventDateIcon.defaultMonthTextColor,
-  );
-  _expectLabelStyle(
-    tester,
-    '16',
+  ));
+  _expectLabelStyle(tester, '16', (
     fontSize: 27.451,
     fontWeight: FontWeight.w300,
     color: LinagoraEventDateIcon.defaultDayTextColor,
-  );
+  ));
 }
 
 Future<void> _overrides(WidgetTester tester) async {
@@ -89,20 +88,16 @@ Future<void> _overrides(WidgetTester tester) async {
     ),
   );
 
-  _expectLabelStyle(
-    tester,
-    'SEP',
+  _expectLabelStyle(tester, 'SEP', (
     fontSize: 17.648,
     fontWeight: FontWeight.w600,
     color: monthColor,
-  );
-  _expectLabelStyle(
-    tester,
-    '24',
+  ));
+  _expectLabelStyle(tester, '24', (
     fontSize: 54.902,
     fontWeight: FontWeight.w300,
     color: dayColor,
-  );
+  ));
 }
 
 Future<void> _semantics(WidgetTester tester) async {
@@ -175,22 +170,16 @@ void _invalidInputs() {
 
 /// Asserts the whole typography contract of one label at once, so a failure
 /// reports every mismatching field instead of only the first.
-void _expectLabelStyle(
-  WidgetTester tester,
-  String text, {
-  required double fontSize,
-  required FontWeight fontWeight,
-  required Color color,
-}) {
+void _expectLabelStyle(WidgetTester tester, String text, _LabelStyle expected) {
   expect(
     tester.widget<Text>(find.text(text)).style,
     isA<TextStyle>()
-        .having((style) => style.fontSize, 'fontSize', fontSize)
-        .having((style) => style.fontWeight, 'fontWeight', fontWeight)
+        .having((style) => style.fontSize, 'fontSize', expected.fontSize)
+        .having((style) => style.fontWeight, 'fontWeight', expected.fontWeight)
         .having((style) => style.fontFamily, 'fontFamily', _fontFamily)
         .having((style) => style.height, 'height', 1)
         .having((style) => style.letterSpacing, 'letterSpacing', 0)
-        .having((style) => style.color, 'color', color),
+        .having((style) => style.color, 'color', expected.color),
   );
 }
 
