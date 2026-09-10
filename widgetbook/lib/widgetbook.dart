@@ -6,6 +6,7 @@ import 'package:widgetbook_workspace/components/buttons/linagora_button_use_case
 import 'package:widgetbook_workspace/components/chat/message_bubble_use_case.dart';
 import 'package:widgetbook_workspace/components/contact_component/matrix_contact_use_case.dart';
 import 'package:widgetbook_workspace/components/contact_component/phonebook_contact_use_case.dart';
+import 'package:widgetbook_workspace/components/event/linagora_event_date_icon_use_case.dart';
 import 'package:widgetbook_workspace/components/list_item/linagora_setting_item_use_case.dart';
 import 'package:widgetbook_workspace/components/list_item/session_device_list_item_use_case.dart';
 import 'package:widgetbook_workspace/components/sidebar/linagora_sidebar_item_use_case.dart';
@@ -43,6 +44,7 @@ class WidgetbookApp extends StatelessWidget {
           [
             IosViewports.iPhone13,
             IosViewports.iPad,
+            MacosViewports.desktop,
           ],
         ),
         InspectorAddon(),
@@ -291,6 +293,20 @@ class WidgetbookApp extends StatelessWidget {
                 WidgetbookUseCase(
                   name: 'Matrix contact style',
                   builder: (context) => matrixContactUseCase(context),
+                ),
+              ],
+            ),
+          ],
+        ),
+        WidgetbookFolder(
+          name: 'Event',
+          children: [
+            WidgetbookComponent(
+              name: 'Linagora event date icon',
+              useCases: [
+                WidgetbookUseCase(
+                  name: 'Default',
+                  builder: (context) => linagoraEventDateIconUseCase(context),
                 ),
               ],
             ),
