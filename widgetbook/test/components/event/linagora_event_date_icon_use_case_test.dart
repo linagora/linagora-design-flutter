@@ -35,6 +35,11 @@ Future<void> _dateIconInputValidation(WidgetTester tester) async {
 
   expect(find.text('Day must be a number from 1 to 31.'), findsOneWidget);
 
+  state.updateQueryField(group: 'knobs', field: 'Day', value: '+5');
+  await tester.pump();
+
+  expect(find.text('Day must be a number from 1 to 31.'), findsOneWidget);
+
   state.updateQueryField(group: 'knobs', field: 'Day', value: '24');
   await tester.pump();
 

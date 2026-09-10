@@ -73,8 +73,12 @@ class LinagoraEventDateIcon extends StatelessWidget {
     }
   }
 
+  /// Matches a bare one- or two-digit day, so signed or padded input such as
+  /// `+5` never reaches the layout.
+  static final RegExp _dayPattern = RegExp(r'^\d{1,2}$');
+
   /// Returns a user-facing validation message when [month] or [day] cannot
-  /// fit the Figma date-icon layout; otherwise returns null.
+  /// fit the date-icon layout; otherwise returns null.
   static String? validateDateParts({
     required String month,
     required String day,
@@ -83,8 +87,12 @@ class LinagoraEventDateIcon extends StatelessWidget {
       return 'Month must contain exactly three characters.';
     }
 
-    final dayValue = int.tryParse(day);
-    if (dayValue == null || dayValue < 1 || dayValue > 31 || day.length > 2) {
+    if (!_dayPattern.hasMatch(day)) {
+      return 'Day must be a number from 1 to 31.';
+    }
+
+    final dayValue = int.parse(day);
+    if (dayValue < 1 || dayValue > 31) {
       return 'Day must be a number from 1 to 31.';
     }
 
@@ -96,6 +104,7 @@ class LinagoraEventDateIcon extends StatelessWidget {
     final scale = size / defaultSize;
     final radius = 11.765 * scale;
     final scaledShadow = shadow?.scale(scale);
+    final horizontalInset = size * 0.0588;
 
     return Semantics(
       label: semanticLabel ?? '$month $day',
@@ -122,43 +131,33 @@ class LinagoraEventDateIcon extends StatelessWidget {
                   ),
                   Positioned(
                     top: size * 0.0588,
-                    left: size * 0.3137,
-                    right: size * 0.2941,
+                    left: horizontalInset,
+                    right: horizontalInset,
                     bottom: size * 0.7059,
-                    child: Center(
-                      child: Text(
-                        month.toUpperCase(),
-                        maxLines: 1,
-                        textAlign: TextAlign.center,
-                        style: LinagoraTextTheme.material().labelSmall!
-                            .copyWith(
-                              fontSize: 8.824 * scale,
-                              fontWeight: FontWeight.w600,
-                              height: 1,
-                              letterSpacing: 0,
-                              color: monthTextColor,
-                            ),
+                    child: _label(
+                      month.toUpperCase(),
+                      LinagoraTextTheme.material().labelSmall!.copyWith(
+                        fontSize: 8.824 * scale,
+                        fontWeight: FontWeight.w600,
+                        height: 1,
+                        letterSpacing: 0,
+                        color: monthTextColor,
                       ),
                     ),
                   ),
                   Positioned(
                     top: size * 0.2941,
-                    left: size * 0.2157,
-                    right: size * 0.2043,
+                    left: horizontalInset,
+                    right: horizontalInset,
                     bottom: size * 0.0459,
-                    child: Center(
-                      child: Text(
-                        day,
-                        maxLines: 1,
-                        textAlign: TextAlign.center,
-                        style: LinagoraTextTheme.material().headlineMedium!
-                            .copyWith(
-                              fontSize: 27.451 * scale,
-                              fontWeight: FontWeight.w300,
-                              height: 1,
-                              letterSpacing: 0,
-                              color: dayTextColor,
-                            ),
+                    child: _label(
+                      day,
+                      LinagoraTextTheme.material().headlineMedium!.copyWith(
+                        fontSize: 27.451 * scale,
+                        fontWeight: FontWeight.w300,
+                        height: 1,
+                        letterSpacing: 0,
+                        color: dayTextColor,
                       ),
                     ),
                   ),
@@ -167,6 +166,22 @@ class LinagoraEventDateIcon extends StatelessWidget {
             ),
           ),
         ),
+      ),
+    );
+  }
+
+  /// Centres [value] in its band and shrinks it only when the glyphs would
+  /// otherwise be clipped, so a two-digit day and a wide month label both
+  /// stay whole at every [size] and text scale.
+  static Widget _label(String value, TextStyle style) {
+    return FittedBox(
+      fit: BoxFit.scaleDown,
+      child: Text(
+        value,
+        maxLines: 1,
+        softWrap: false,
+        textAlign: TextAlign.center,
+        style: style,
       ),
     );
   }

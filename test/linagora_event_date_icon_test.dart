@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:linagora_design_flutter/linagora_design_flutter.dart';
 
@@ -10,6 +11,7 @@ void main() {
   );
   testWidgets('scales shadows from the 50px Figma coordinate space', _shadow);
   testWidgets('exposes one accessible date label', _semantics);
+  testWidgets('keeps a two-digit day whole inside the icon', _twoDigitDay);
   test('rejects invalid date content and sizes', _invalidInputs);
 }
 
@@ -104,6 +106,25 @@ Future<void> _semantics(WidgetTester tester) async {
   expect(find.bySemanticsLabel('Event date, June 16'), findsOneWidget);
 }
 
+Future<void> _twoDigitDay(WidgetTester tester) async {
+  await _pump(tester, LinagoraEventDateIcon(month: 'Jun', day: '28'));
+
+  final icon = tester.getRect(find.byType(LinagoraEventDateIcon));
+  final day = tester.getRect(find.text('28'));
+  final month = tester.getRect(find.text('JUN'));
+
+  // Both glyphs must survive: the pre-fix band was narrower than the day
+  // text, so the second digit was pushed onto a dropped second line.
+  expect(_paragraph(tester, '28').didExceedMaxLines, isFalse);
+  expect(_paragraph(tester, 'JUN').didExceedMaxLines, isFalse);
+
+  expect(day.left, greaterThanOrEqualTo(icon.left));
+  expect(day.right, lessThanOrEqualTo(icon.right));
+  expect(day.center.dx, closeTo(icon.center.dx, 0.001));
+  expect(month.left, greaterThanOrEqualTo(icon.left));
+  expect(month.right, lessThanOrEqualTo(icon.right));
+}
+
 Future<void> _shadow(WidgetTester tester) async {
   const shadow = BoxShadow(
     color: Color(0x26000000),
@@ -147,6 +168,18 @@ void _invalidInputs() {
     throwsArgumentError,
   );
   expect(
+    () => LinagoraEventDateIcon(month: 'Jun', day: '+5'),
+    throwsArgumentError,
+  );
+  expect(
+    () => LinagoraEventDateIcon(month: 'Jun', day: '-5'),
+    throwsArgumentError,
+  );
+  expect(
+    () => LinagoraEventDateIcon(month: 'Jun', day: ' 5'),
+    throwsArgumentError,
+  );
+  expect(
     () => LinagoraEventDateIcon(month: 'Jun', day: '16', size: 0),
     throwsArgumentError,
   );
@@ -159,6 +192,9 @@ Future<void> _pump(WidgetTester tester, Widget child) {
     ),
   );
 }
+
+RenderParagraph _paragraph(WidgetTester tester, String text) =>
+    tester.renderObject<RenderParagraph>(find.text(text));
 
 Finder _surfaceFinder() => find.descendant(
   of: find.byType(LinagoraEventDateIcon),
