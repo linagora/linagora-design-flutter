@@ -3,6 +3,8 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:linagora_design_flutter/linagora_design_flutter.dart';
 
+const _fontFamily = 'packages/linagora_design_flutter/TwakeInter';
+
 void main() {
   testWidgets('matches the Figma date-icon geometry and typography', _figmaInk);
   testWidgets(
@@ -23,37 +25,33 @@ Future<void> _figmaInk(WidgetTester tester) async {
     const Size.square(50),
   );
 
-  final surface = tester.widget<DecoratedBox>(_surfaceFinder());
-  final decoration = surface.decoration as BoxDecoration;
-  expect(decoration.color, LinagoraEventDateIcon.defaultBackgroundColor);
-  expect(decoration.borderRadius, BorderRadius.circular(11.765));
-  expect(decoration.boxShadow, [LinagoraEventDateIcon.defaultShadow]);
+  expect(
+    _decorationOf(tester),
+    _isSurface(
+      color: LinagoraEventDateIcon.defaultBackgroundColor,
+      borderRadius: BorderRadius.circular(11.765),
+      boxShadow: [LinagoraEventDateIcon.defaultShadow],
+    ),
+  );
 
   final header = tester.widget<ColoredBox>(_headerFinder());
   expect(header.color, LinagoraEventDateIcon.defaultHeaderColor);
   expect(tester.getSize(_headerFinder()).height, closeTo(15.685, 0.001));
 
-  final month = tester.widget<Text>(find.text('JUN'));
-  expect(month.style?.fontSize, 8.824);
-  expect(month.style?.fontWeight, FontWeight.w600);
-  expect(
-    month.style?.fontFamily,
-    'packages/linagora_design_flutter/TwakeInter',
+  _expectLabelStyle(
+    tester,
+    'JUN',
+    fontSize: 8.824,
+    fontWeight: FontWeight.w600,
+    color: LinagoraEventDateIcon.defaultMonthTextColor,
   );
-  expect(month.style?.height, 1);
-  expect(month.style?.letterSpacing, 0);
-  expect(month.style?.color, LinagoraEventDateIcon.defaultMonthTextColor);
-
-  final day = tester.widget<Text>(find.text('16'));
-  expect(day.style?.fontSize, 27.451);
-  expect(day.style?.fontWeight, FontWeight.w300);
-  expect(
-    day.style?.fontFamily,
-    'packages/linagora_design_flutter/TwakeInter',
+  _expectLabelStyle(
+    tester,
+    '16',
+    fontSize: 27.451,
+    fontWeight: FontWeight.w300,
+    color: LinagoraEventDateIcon.defaultDayTextColor,
   );
-  expect(day.style?.height, 1);
-  expect(day.style?.letterSpacing, 0);
-  expect(day.style?.color, LinagoraEventDateIcon.defaultDayTextColor);
 }
 
 Future<void> _overrides(WidgetTester tester) async {
@@ -82,15 +80,29 @@ Future<void> _overrides(WidgetTester tester) async {
   );
   expect(tester.widget<ColoredBox>(_headerFinder()).color, headerColor);
 
-  final surface = tester.widget<DecoratedBox>(_surfaceFinder());
-  final decoration = surface.decoration as BoxDecoration;
-  expect(decoration.color, backgroundColor);
-  expect(decoration.boxShadow, isNull);
+  expect(
+    _decorationOf(tester),
+    _isSurface(
+      color: backgroundColor,
+      borderRadius: BorderRadius.circular(23.53),
+      boxShadow: null,
+    ),
+  );
 
-  expect(tester.widget<Text>(find.text('SEP')).style?.fontSize, 17.648);
-  expect(tester.widget<Text>(find.text('SEP')).style?.color, monthColor);
-  expect(tester.widget<Text>(find.text('24')).style?.fontSize, 54.902);
-  expect(tester.widget<Text>(find.text('24')).style?.color, dayColor);
+  _expectLabelStyle(
+    tester,
+    'SEP',
+    fontSize: 17.648,
+    fontWeight: FontWeight.w600,
+    color: monthColor,
+  );
+  _expectLabelStyle(
+    tester,
+    '24',
+    fontSize: 54.902,
+    fontWeight: FontWeight.w300,
+    color: dayColor,
+  );
 }
 
 Future<void> _semantics(WidgetTester tester) async {
@@ -110,19 +122,13 @@ Future<void> _twoDigitDay(WidgetTester tester) async {
   await _pump(tester, LinagoraEventDateIcon(month: 'Jun', day: '28'));
 
   final icon = tester.getRect(find.byType(LinagoraEventDateIcon));
-  final day = tester.getRect(find.text('28'));
-  final month = tester.getRect(find.text('JUN'));
+  _expectLabelFits(tester, '28', within: icon);
+  _expectLabelFits(tester, 'JUN', within: icon);
 
-  // Both glyphs must survive: the pre-fix band was narrower than the day
-  // text, so the second digit was pushed onto a dropped second line.
-  expect(_paragraph(tester, '28').didExceedMaxLines, isFalse);
-  expect(_paragraph(tester, 'JUN').didExceedMaxLines, isFalse);
-
-  expect(day.left, greaterThanOrEqualTo(icon.left));
-  expect(day.right, lessThanOrEqualTo(icon.right));
-  expect(day.center.dx, closeTo(icon.center.dx, 0.001));
-  expect(month.left, greaterThanOrEqualTo(icon.left));
-  expect(month.right, lessThanOrEqualTo(icon.right));
+  expect(
+    tester.getRect(find.text('28')).center.dx,
+    closeTo(icon.center.dx, 0.001),
+  );
 }
 
 Future<void> _shadow(WidgetTester tester) async {
@@ -137,53 +143,92 @@ Future<void> _shadow(WidgetTester tester) async {
     LinagoraEventDateIcon(month: 'Jun', day: '16', size: 100, shadow: shadow),
   );
 
-  final surface = tester.widget<DecoratedBox>(_surfaceFinder());
-  final decoration = surface.decoration as BoxDecoration;
-  expect(decoration.boxShadow, [shadow.scale(2)]);
+  expect(_decorationOf(tester).boxShadow, [shadow.scale(2)]);
 }
 
 void _invalidInputs() {
-  expect(
-    () => LinagoraEventDateIcon(month: '', day: '16'),
-    throwsArgumentError,
-  );
-  expect(
-    () => LinagoraEventDateIcon(month: 'June', day: '16'),
-    throwsArgumentError,
-  );
-  expect(
-    () => LinagoraEventDateIcon(month: 'Jun', day: ''),
-    throwsArgumentError,
-  );
-  expect(
-    () => LinagoraEventDateIcon(month: 'Jun', day: '160'),
-    throwsArgumentError,
-  );
-  expect(
-    () => LinagoraEventDateIcon(month: 'Jun', day: '32'),
-    throwsArgumentError,
-  );
-  expect(
-    () => LinagoraEventDateIcon(month: 'Jun', day: 'AA'),
-    throwsArgumentError,
-  );
-  expect(
-    () => LinagoraEventDateIcon(month: 'Jun', day: '+5'),
-    throwsArgumentError,
-  );
-  expect(
-    () => LinagoraEventDateIcon(month: 'Jun', day: '-5'),
-    throwsArgumentError,
-  );
-  expect(
-    () => LinagoraEventDateIcon(month: 'Jun', day: ' 5'),
-    throwsArgumentError,
-  );
+  const invalidDateParts = <(String month, String day)>[
+    ('', '16'),
+    ('June', '16'),
+    ('Jun', ''),
+    ('Jun', '160'),
+    ('Jun', '32'),
+    ('Jun', 'AA'),
+    ('Jun', '+5'),
+    ('Jun', '-5'),
+    ('Jun', ' 5'),
+  ];
+
+  for (final (month, day) in invalidDateParts) {
+    expect(
+      () => LinagoraEventDateIcon(month: month, day: day),
+      throwsArgumentError,
+      reason: 'month "$month" with day "$day" must be rejected',
+    );
+  }
+
   expect(
     () => LinagoraEventDateIcon(month: 'Jun', day: '16', size: 0),
     throwsArgumentError,
   );
 }
+
+/// Asserts the whole typography contract of one label at once, so a failure
+/// reports every mismatching field instead of only the first.
+void _expectLabelStyle(
+  WidgetTester tester,
+  String text, {
+  required double fontSize,
+  required FontWeight fontWeight,
+  required Color color,
+}) {
+  expect(
+    tester.widget<Text>(find.text(text)).style,
+    isA<TextStyle>()
+        .having((style) => style.fontSize, 'fontSize', fontSize)
+        .having((style) => style.fontWeight, 'fontWeight', fontWeight)
+        .having((style) => style.fontFamily, 'fontFamily', _fontFamily)
+        .having((style) => style.height, 'height', 1)
+        .having((style) => style.letterSpacing, 'letterSpacing', 0)
+        .having((style) => style.color, 'color', color),
+  );
+}
+
+/// Asserts [text] renders whole: never truncated onto a dropped line, never
+/// past the icon edge.
+void _expectLabelFits(
+  WidgetTester tester,
+  String text, {
+  required Rect within,
+}) {
+  final label = tester.getRect(find.text(text));
+
+  expect(
+    tester.renderObject<RenderParagraph>(find.text(text)).didExceedMaxLines,
+    isFalse,
+    reason: '"$text" must fit on a single line',
+  );
+  expect(label.left, greaterThanOrEqualTo(within.left));
+  expect(label.right, lessThanOrEqualTo(within.right));
+}
+
+Matcher _isSurface({
+  required Color color,
+  required BorderRadius borderRadius,
+  required List<BoxShadow>? boxShadow,
+}) {
+  return isA<BoxDecoration>()
+      .having((decoration) => decoration.color, 'color', color)
+      .having(
+        (decoration) => decoration.borderRadius,
+        'borderRadius',
+        borderRadius,
+      )
+      .having((decoration) => decoration.boxShadow, 'boxShadow', boxShadow);
+}
+
+BoxDecoration _decorationOf(WidgetTester tester) =>
+    tester.widget<DecoratedBox>(_surfaceFinder()).decoration as BoxDecoration;
 
 Future<void> _pump(WidgetTester tester, Widget child) {
   return tester.pumpWidget(
@@ -192,9 +237,6 @@ Future<void> _pump(WidgetTester tester, Widget child) {
     ),
   );
 }
-
-RenderParagraph _paragraph(WidgetTester tester, String text) =>
-    tester.renderObject<RenderParagraph>(find.text(text));
 
 Finder _surfaceFinder() => find.descendant(
   of: find.byType(LinagoraEventDateIcon),
