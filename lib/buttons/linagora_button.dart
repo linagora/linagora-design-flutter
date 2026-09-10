@@ -27,7 +27,7 @@ class LinagoraButton extends StatelessWidget {
   static const Color primaryHoverOverlayColor = Color(0x0A0080FF);
 
   /// Container of a disabled button that draws one.
-  static const Color disabledContainerColor = Color(0x1F191929);
+  static const Color disabledContainerColor = Color(0x1F1D192B);
 
   /// Label and icon of a disabled button.
   static const Color disabledContentColor = Color(0x61424244);
@@ -107,7 +107,8 @@ class LinagoraButton extends StatelessWidget {
   final Color? hoverBackgroundColor;
 
   /// State layer painted while hovered, focused, or pressed. Suits variants
-  /// that draw no container of their own.
+  /// that draw no container of their own, so [hoverBackgroundColor] wins when
+  /// both are set.
   final Color? hoverOverlayColor;
 
   /// Corner radius of the container. Null keeps the fully rounded stadium.
@@ -123,7 +124,8 @@ class LinagoraButton extends StatelessWidget {
   final Color? iconColor;
 
   /// Outer size of the leading icon slot. Null keeps [defaultIconSize] for an
-  /// [icon] glyph and leaves an [iconWidget] to size itself.
+  /// [icon] glyph, and leaves an [iconWidget] to size itself unless [iconColor]
+  /// bounds it so the colour filter has a box to paint in.
   final double? iconSize;
 
   /// Pins the tap target to an exact height.
@@ -283,32 +285,37 @@ class LinagoraButton extends StatelessWidget {
   /// [IconData] glyph, or an arbitrary [iconWidget].
   Widget? _buildLeadingIcon() {
     final iconWidget = this.iconWidget;
-    if (iconWidget != null) {
-      final iconColor = _resolvedIconColor;
-      // Without a colour the widget is left exactly as the caller built it.
-      if (iconColor == null) return iconWidget;
-      // IconTheme reaches nested [Icon]s; the colour filter reaches painted
-      // assets — an SVG or a bitmap — which read no theme. srcIn keeps the
-      // glyph's alpha and replaces only its colour.
-      return SizedBox.square(
-        dimension: iconSize ?? defaultIconSize,
-        child: ColorFiltered(
-          colorFilter: ColorFilter.mode(iconColor, BlendMode.srcIn),
-          child: IconTheme.merge(
-            data: IconThemeData(
-              color: iconColor,
-              size: iconSize ?? defaultIconSize,
-            ),
-            child: iconWidget,
-          ),
-        ),
-      );
-    }
+    if (iconWidget != null) return _decoratedIconWidget(iconWidget);
     final icon = this.icon;
     if (icon == null) return null;
     // Both arguments stay null unless the caller set them, so the glyph keeps
     // inheriting size and colour from the button's own IconTheme.
     return Icon(icon, size: iconSize, color: _resolvedIconColor);
+  }
+
+  /// Applies [iconSize] and [iconColor] to an [iconWidget], each on its own:
+  /// sizing the slot does not require a colour, and vice versa.
+  Widget _decoratedIconWidget(Widget iconWidget) {
+    final iconColor = _resolvedIconColor;
+    // With neither the widget is left exactly as the caller built it.
+    if (iconColor == null && iconSize == null) return iconWidget;
+    // IconTheme reaches nested [Icon]s; the colour filter reaches painted
+    // assets — an SVG or a bitmap — which read no theme. srcIn keeps the
+    // glyph's alpha and replaces only its colour.
+    Widget result = IconTheme.merge(
+      data: IconThemeData(color: iconColor, size: iconSize ?? defaultIconSize),
+      child: iconWidget,
+    );
+    if (iconColor != null) {
+      result = ColorFiltered(
+        colorFilter: ColorFilter.mode(iconColor, BlendMode.srcIn),
+        child: result,
+      );
+    }
+    return SizedBox.square(
+      dimension: iconSize ?? defaultIconSize,
+      child: result,
+    );
   }
 
   ButtonStyle _buildStyle(BuildContext context) {
@@ -384,13 +391,13 @@ class LinagoraButton extends StatelessWidget {
   }
 
   WidgetStateProperty<Color?>? _overlayProperty() {
-    final wash = hoverOverlayColor;
-    if (wash == null) {
-      // A button that swaps its container on hover needs no layer on top.
-      return hoverBackgroundColor == null
-          ? null
-          : const WidgetStatePropertyAll(Colors.transparent);
+    // A button that swaps its container on hover needs no layer on top, even
+    // when a wash was supplied alongside it.
+    if (hoverBackgroundColor != null) {
+      return const WidgetStatePropertyAll(Colors.transparent);
     }
+    final wash = hoverOverlayColor;
+    if (wash == null) return null;
     return WidgetStateProperty.resolveWith(
       (states) => states.any(_hoverStates.contains) ? wash : null,
     );
