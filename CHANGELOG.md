@@ -1,5 +1,10 @@
 ## Unreleased
 
+### Changed
+
+* Sidebar accordion/expand chevron token (`LinagoraSidebarStyle.chevronSize`)
+  is 16, matching Teammail folder-row Figma.
+
 ### Fixed
 
 * Cozy external bridge script now falls back to its pre-1.x bundle path
