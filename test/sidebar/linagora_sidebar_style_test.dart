@@ -49,6 +49,7 @@ const _popoverOverride = LinagoraSidebarPopoverStyleOverride(
 );
 
 void main() {
+  test('ships a 16px accordion chevron by default', _defaultChevronSize);
   test('applies item style overrides', _itemOverrides);
   test('applies section style overrides', _sectionOverrides);
   test('applies storage style overrides', _storageOverrides);
@@ -72,6 +73,11 @@ void main() {
     _rejectsInvalidDisabledOpacity,
   );
   testWidgets('provides a sidebar style to descendant widgets', _themeScope);
+}
+
+void _defaultChevronSize() {
+  expect(LinagoraSidebarStyle.light().chevronSize, 16);
+  expect(LinagoraSidebarStyle.dark().chevronSize, 16);
 }
 
 void _itemOverrides() {

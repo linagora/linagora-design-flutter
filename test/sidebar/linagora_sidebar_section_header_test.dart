@@ -13,6 +13,7 @@ void main() {
   testWidgets('derives header tokens for a legacy custom style', _legacyStyle);
   testWidgets('honours header and action color overrides', _colorOverrides);
   testWidgets('renders the disclosure direction from expansion state', _disclosureDirection);
+  testWidgets('sizes the disclosure arrow at 16px by default', _disclosureSize);
   testWidgets('keeps the disclosure beside the caption either way', _disclosureSpacing);
   testWidgets('forwards disclosure taps with accessible semantics', _disclosureTap);
   testWidgets('publishes a decorative disclosure to semantics', _decorativeDisclosureSemantics);
@@ -185,6 +186,45 @@ Future<void> _disclosureDirection(WidgetTester tester) async {
     const LinagoraSidebarSectionHeader(label: 'Folders', expanded: false),
   );
   expect(find.byIcon(Icons.keyboard_arrow_right), findsOneWidget);
+}
+
+Future<void> _disclosureSize(WidgetTester tester) async {
+  const expectedSize = 16.0;
+
+  await pumpSidebar(
+    tester,
+    const LinagoraSidebarSectionHeader(label: 'Folders', expanded: true),
+  );
+  final decorative = tester.widget<Icon>(
+    find.byIcon(Icons.keyboard_arrow_down),
+  );
+  expect(decorative.size, expectedSize);
+  expect(
+    tester.getSize(find.byIcon(Icons.keyboard_arrow_down)),
+    const Size.square(expectedSize),
+  );
+
+  await pumpSidebar(
+    tester,
+    LinagoraSidebarSectionHeader(
+      label: 'Folders',
+      expanded: false,
+      expandToggleLabel: 'Expand folders',
+      onExpandToggle: _noop,
+    ),
+  );
+  final tappable = tester.widget<Icon>(
+    find.byIcon(Icons.keyboard_arrow_right),
+  );
+  final control = tester.widget<LinagoraSidebarControl>(
+    find.byType(LinagoraSidebarControl),
+  );
+  expect(tappable.size, expectedSize);
+  expect(control.iconSize, expectedSize);
+  expect(
+    tester.getSize(find.byIcon(Icons.keyboard_arrow_right)),
+    const Size.square(expectedSize),
+  );
 }
 
 /// A tappable disclosure never reduces the visual title gap.

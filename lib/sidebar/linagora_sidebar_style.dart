@@ -21,7 +21,7 @@ class LinagoraSidebarStyle {
   final double itemIconSize;
   final double itemHorizontalPadding;
 
-  /// The expand/collapse chevron is smaller than the leading glyph.
+  /// Expand/collapse accordion glyph on a row or section header.
   final double chevronSize;
 
   /// Gap between the leading glyph, the label and the trailing slot.
@@ -395,7 +395,7 @@ class LinagoraSidebarStyle {
       itemBorderRadius: LinagoraSpacing.base,
       itemIconSize: LinagoraSpacing.base * 2,
       itemHorizontalPadding: LinagoraSpacing.base,
-      chevronSize: 10,
+      chevronSize: 16,
       itemSpacing: LinagoraSpacing.base,
       hoverBackground: overlay.base.withValues(alpha: overlay.hover),
       selectedBackground: selected,
