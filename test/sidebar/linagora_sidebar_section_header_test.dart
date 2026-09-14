@@ -206,7 +206,7 @@ Future<void> _disclosureSize(WidgetTester tester) async {
 
   await pumpSidebar(
     tester,
-    LinagoraSidebarSectionHeader(
+    const LinagoraSidebarSectionHeader(
       label: 'Folders',
       expanded: false,
       expandToggleLabel: 'Expand folders',
@@ -224,6 +224,11 @@ Future<void> _disclosureSize(WidgetTester tester) async {
   expect(
     tester.getSize(find.byIcon(Icons.keyboard_arrow_right)),
     const Size.square(expectedSize),
+  );
+  expect(
+    tester.getRect(find.byIcon(Icons.keyboard_arrow_right)).left -
+        tester.getRect(find.text('Folders')).right,
+    closeTo(LinagoraSidebarSectionHeader.titleSpacing, 0.5),
   );
 }
 
