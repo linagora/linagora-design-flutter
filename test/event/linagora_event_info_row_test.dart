@@ -21,8 +21,12 @@ void _registerInlineLayoutTests() {
   testWidgets('hugs its content when it does not expand', _hugsWithoutExpand);
   testWidgets('pins the trailing action when expanded', _expandPinsTrailing);
   testWidgets(
-    'does not crash when expanded under an unbounded width',
-    _expandUnderUnboundedWidth,
+    'shrink-wraps an adaptive expanded row under an unbounded width',
+    _adaptiveExpandUnderUnboundedWidth,
+  );
+  testWidgets(
+    'shrink-wraps an inline expanded row under an unbounded width',
+    _inlineExpandUnderUnboundedWidth,
   );
   testWidgets(
     'keeps the trailing action beside the content when not expanded',
@@ -182,17 +186,27 @@ Future<void> _expandPinsTrailing(WidgetTester tester) async {
   expect(tester.getTopLeft(find.text('Yes')).dx, lessThan(trailingRight));
 }
 
-/// Blocker: `adaptive` picks inline (not stacked) once width is unbounded,
-/// and inline wraps content in `Expanded` when `expand` is true — a bare
-/// `Row` gives no width for `Expanded` to resolve against.
-Future<void> _expandUnderUnboundedWidth(WidgetTester tester) async {
+Future<void> _adaptiveExpandUnderUnboundedWidth(WidgetTester tester) =>
+    _expandUnderUnboundedWidth(tester, LinagoraEventInfoRowLayout.adaptive);
+
+Future<void> _inlineExpandUnderUnboundedWidth(WidgetTester tester) =>
+    _expandUnderUnboundedWidth(tester, LinagoraEventInfoRowLayout.inline);
+
+Future<void> _expandUnderUnboundedWidth(
+  WidgetTester tester,
+  LinagoraEventInfoRowLayout layout,
+) async {
+  const hostKey = Key('unbounded-width-host');
+
   await tester.pumpWidget(
     MaterialApp(
       home: Scaffold(
         body: Row(
+          key: hostKey,
           children: [
             LinagoraEventInfoRow(
               expand: true,
+              layout: layout,
               prefix: const LinagoraEventInfoLabel('Attending?'),
               content: const LinagoraEventInfoText('Yes'),
               trailing: LinagoraEventInfoLink(
@@ -206,7 +220,12 @@ Future<void> _expandUnderUnboundedWidth(WidgetTester tester) async {
     ),
   );
 
-  expect(tester.takeException(), isNull);
+  expect(tester.takeException(), isNull, reason: '$layout must not use flex');
+  expect(
+    tester.getSize(find.byType(LinagoraEventInfoRow)).width,
+    lessThan(tester.getSize(find.byKey(hostKey)).width),
+    reason: '$layout must shrink-wrap when there is no finite width to fill',
+  );
 }
 
 Future<void> _unexpandedTrailingFollowsContent(WidgetTester tester) async {
@@ -317,7 +336,13 @@ Future<void> _runOverflowsUnbreakableToken(WidgetTester tester) async {
   final container = tester.getRect(find.byType(LinagoraEventInfoRun));
   final text = tester.getRect(find.text(longToken));
 
+  expect(tester.takeException(), isNull);
   expect(text.right, lessThanOrEqualTo(container.right));
+  expect(
+    text.height,
+    greaterThan(LinagoraEventInfoText.lineHeight),
+    reason: 'the token must occupy multiple visual lines instead of clipping',
+  );
 }
 
 Future<void> _groupSharesPrefixColumn(WidgetTester tester) async {
