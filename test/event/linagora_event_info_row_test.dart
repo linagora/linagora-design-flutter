@@ -31,6 +31,10 @@ void _registerInlineLayoutTests() {
   testWidgets('spaces a run by 8px', _runSpacing);
   testWidgets('forwards custom run presentation', _runPresentation);
   testWidgets('reflows a run instead of overflowing', _runWraps);
+  testWidgets(
+    'reflows a single unbreakable token instead of overflowing',
+    _runOverflowsUnbreakableToken,
+  );
 }
 
 void _registerResponsiveLayoutTests() {
@@ -294,6 +298,26 @@ Future<void> _runWraps(WidgetTester tester) async {
     tester.getTopLeft(find.text('Someone Else Entirely')).dy,
     greaterThan(tester.getTopLeft(find.text('Alex Martin')).dy),
   );
+}
+
+/// Gap: nothing previously exercised a single unbreakable token wider than
+/// the row, the shape the class doc calls out as "reflows instead of
+/// overflowing".
+Future<void> _runOverflowsUnbreakableToken(WidgetTester tester) async {
+  const longToken =
+      'https://example.invalid/an-unbreakable-token-longer-than-the-row';
+
+  await tester.pumpWidget(
+    _host(
+      const LinagoraEventInfoRun(children: [LinagoraEventInfoText(longToken)]),
+      width: 200,
+    ),
+  );
+
+  final container = tester.getRect(find.byType(LinagoraEventInfoRun));
+  final text = tester.getRect(find.text(longToken));
+
+  expect(text.right, lessThanOrEqualTo(container.right));
 }
 
 Future<void> _groupSharesPrefixColumn(WidgetTester tester) async {
