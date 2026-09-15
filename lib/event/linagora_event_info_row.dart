@@ -57,7 +57,9 @@ class LinagoraEventInfoRow extends StatelessWidget {
   final CrossAxisAlignment crossAxisAlignment;
 
   /// Whether an inline row fills the width it is given, pushing [trailing] to
-  /// the far end. False hugs the content.
+  /// the far end. False hugs the content. When the available width is
+  /// unbounded, the row also hugs its content because there is no finite
+  /// space to fill.
   final bool expand;
 
   final LinagoraEventInfoRowLayout layout;
@@ -116,32 +118,36 @@ class LinagoraEventInfoRow extends StatelessWidget {
     final column = prefixWidth ?? LinagoraEventInfoPrefixColumn.of(context);
 
     return switch (layout) {
-      LinagoraEventInfoRowLayout.inline => _buildInline(column),
+      LinagoraEventInfoRowLayout.inline => LayoutBuilder(
+        builder: (context, constraints) =>
+            _buildInline(column, canExpand: constraints.hasBoundedWidth),
+      ),
       LinagoraEventInfoRowLayout.stacked => _buildStacked(),
       LinagoraEventInfoRowLayout.adaptive => LayoutBuilder(
         builder: (context, constraints) {
           final width = constraints.maxWidth;
           return width.isFinite && width < stackedBreakpoint
               ? _buildStacked()
-              : _buildInline(column);
+              : _buildInline(column, canExpand: constraints.hasBoundedWidth);
         },
       ),
     };
   }
 
-  Widget _buildInline(double? prefixWidth) {
+  Widget _buildInline(double? prefixWidth, {required bool canExpand}) {
     final prefix = this.prefix;
     final trailing = this.trailing;
+    final shouldExpand = expand && canExpand;
 
     return Row(
-      mainAxisSize: expand ? MainAxisSize.max : MainAxisSize.min,
+      mainAxisSize: shouldExpand ? MainAxisSize.max : MainAxisSize.min,
       crossAxisAlignment: crossAxisAlignment,
       children: [
         if (prefix != null) ...[
           _hug(prefix, width: prefixWidth),
           SizedBox(width: prefixSpacing),
         ],
-        if (expand)
+        if (shouldExpand)
           Expanded(child: _hug(content))
         else
           Flexible(child: content),
