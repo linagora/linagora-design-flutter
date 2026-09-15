@@ -21,6 +21,10 @@ void _registerInlineLayoutTests() {
   testWidgets('hugs its content when it does not expand', _hugsWithoutExpand);
   testWidgets('pins the trailing action when expanded', _expandPinsTrailing);
   testWidgets(
+    'does not crash when expanded under an unbounded width',
+    _expandUnderUnboundedWidth,
+  );
+  testWidgets(
     'keeps the trailing action beside the content when not expanded',
     _unexpandedTrailingFollowsContent,
   );
@@ -172,6 +176,33 @@ Future<void> _expandPinsTrailing(WidgetTester tester) async {
 
   expect(rowRight - trailingRight, lessThan(1));
   expect(tester.getTopLeft(find.text('Yes')).dx, lessThan(trailingRight));
+}
+
+/// Blocker: `adaptive` picks inline (not stacked) once width is unbounded,
+/// and inline wraps content in `Expanded` when `expand` is true — a bare
+/// `Row` gives no width for `Expanded` to resolve against.
+Future<void> _expandUnderUnboundedWidth(WidgetTester tester) async {
+  await tester.pumpWidget(
+    MaterialApp(
+      home: Scaffold(
+        body: Row(
+          children: [
+            LinagoraEventInfoRow(
+              expand: true,
+              prefix: const LinagoraEventInfoLabel('Attending?'),
+              content: const LinagoraEventInfoText('Yes'),
+              trailing: LinagoraEventInfoLink(
+                label: 'See in your Calendar',
+                onPressed: () {},
+              ),
+            ),
+          ],
+        ),
+      ),
+    ),
+  );
+
+  expect(tester.takeException(), isNull);
 }
 
 Future<void> _unexpandedTrailingFollowsContent(WidgetTester tester) async {
