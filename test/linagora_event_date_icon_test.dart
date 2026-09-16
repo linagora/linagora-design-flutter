@@ -26,6 +26,10 @@ void main() {
     _minimumSize,
   );
   test('rejects invalid date content and sizes', _invalidInputs);
+  test(
+    'accepts locale month abbreviations that are not 3 characters',
+    _localeMonthAbbreviations,
+  );
 }
 
 Future<void> _figmaInk(WidgetTester tester) async {
@@ -265,6 +269,25 @@ Matcher _isSurface({
 
 BoxDecoration _decorationOf(WidgetTester tester) =>
     tester.widget<DecoratedBox>(_surfaceFinder()).decoration as BoxDecoration;
+
+void _localeMonthAbbreviations() {
+  // A locale-aware formatter does not always produce a 3-character
+  // abbreviation. The widget should render these instead of crashing.
+  const localeMonths = [
+    '1月', // a CJK-style short month
+    'janv.', // an abbreviation with a trailing period
+    'Sept', // a four-letter English abbreviation
+    'Th01', // a two-digit month abbreviation
+  ];
+
+  for (final month in localeMonths) {
+    expect(
+      () => LinagoraEventDateIcon(month: month, day: '16'),
+      returnsNormally,
+      reason: 'month "$month" should not crash the date icon',
+    );
+  }
+}
 
 Future<void> _pump(WidgetTester tester, Widget child) {
   return tester.pumpWidget(
