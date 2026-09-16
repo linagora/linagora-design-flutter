@@ -26,7 +26,7 @@ void main() {
     _minimumSize,
   );
   test('rejects invalid date content and sizes', _invalidInputs);
-  test(
+  testWidgets(
     'accepts locale month abbreviations that are not 3 characters',
     _localeMonthAbbreviations,
   );
@@ -186,7 +186,7 @@ Future<void> _shadow(WidgetTester tester) async {
 void _invalidInputs() {
   const invalidDateParts = <(String month, String day)>[
     ('', '16'),
-    ('June', '16'),
+    ('   ', '16'),
     ('Jun', ''),
     ('Jun', '160'),
     ('Jun', '32'),
@@ -270,7 +270,7 @@ Matcher _isSurface({
 BoxDecoration _decorationOf(WidgetTester tester) =>
     tester.widget<DecoratedBox>(_surfaceFinder()).decoration as BoxDecoration;
 
-void _localeMonthAbbreviations() {
+Future<void> _localeMonthAbbreviations(WidgetTester tester) async {
   // A locale-aware formatter does not always produce a 3-character
   // abbreviation. The widget should render these instead of crashing.
   const localeMonths = [
@@ -281,10 +281,13 @@ void _localeMonthAbbreviations() {
   ];
 
   for (final month in localeMonths) {
-    expect(
-      () => LinagoraEventDateIcon(month: month, day: '16'),
-      returnsNormally,
-      reason: 'month "$month" should not crash the date icon',
+    await _pump(tester, LinagoraEventDateIcon(month: month, day: '16'));
+
+    expect(tester.takeException(), isNull);
+    _expectLabelFits(
+      tester,
+      month.toUpperCase(),
+      within: tester.getRect(find.byType(LinagoraEventDateIcon)),
     );
   }
 }

@@ -3,9 +3,10 @@ import 'package:linagora_design_flutter/style/linagora_text_theme.dart';
 
 /// A compact calendar date marker for event-related content.
 ///
-/// [month] is the already-localized three-character month label to display.
-/// The widget uppercases that label to preserve the Figma component's
-/// presentation. [day] is a one- or two-digit calendar day from 1 through 31.
+/// [month] is the already-localized, non-blank month label to display. The
+/// widget uppercases and scales that label down when needed to preserve the
+/// Figma component's presentation. [day] is a one- or two-digit calendar day
+/// from 1 through 31.
 class LinagoraEventDateIcon extends StatelessWidget {
   /// The Figma component's default square dimension.
   static const double defaultSize = 50;
@@ -83,8 +84,8 @@ class LinagoraEventDateIcon extends StatelessWidget {
     required String month,
     required String day,
   }) {
-    if (month.length != 3) {
-      return 'Month must contain exactly three characters.';
+    if (month.trim().isEmpty) {
+      return 'Month must not be blank.';
     }
 
     if (!_dayPattern.hasMatch(day)) {
