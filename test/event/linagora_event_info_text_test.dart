@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:linagora_design_flutter/linagora_design_flutter.dart';
 
@@ -16,6 +17,10 @@ void main() {
   testWidgets('reports a link tap', _linkTap);
   testWidgets('disables a link with no callback', _linkDisabled);
   testWidgets('forwards custom link presentation', _customLinkPresentation);
+  testWidgets('reports a tap on an actionable value', _valueTap);
+  testWidgets('activates an actionable value from the keyboard', _valueKeyboard);
+  testWidgets('exposes actionable value semantics', _valueSemantics);
+  testWidgets('keeps its treatment while actionable', _valueTapTreatment);
   testWidgets('carries emphasis into a rich span', _richSpanEmphasis);
   testWidgets('forwards rich text presentation', _richTextPresentation);
   test('keeps the link and button blues distinct', _linkAndButtonBluesDiffer);
@@ -119,6 +124,19 @@ const _treatments = <_Treatment>[
     height: LinagoraEventInfoText.lineHeight / 14,
     letterSpacing: 0.25,
     color: LinagoraEventInfoColors.secondary,
+  ),
+  _Treatment(
+    description: 'paints a link value in the link blue at w500',
+    widget: LinagoraEventInfoText(
+      'https://meet.example.invalid/room',
+      emphasis: LinagoraEventInfoEmphasis.link,
+    ),
+    text: 'https://meet.example.invalid/room',
+    fontSize: 14,
+    fontWeight: FontWeight.w500,
+    height: LinagoraEventInfoText.lineHeight / 14,
+    letterSpacing: 0.25,
+    color: LinagoraEventInfoColors.link,
   ),
 ];
 
@@ -404,6 +422,100 @@ void _linkAndButtonBluesDiffer() {
     LinagoraEventInfoColors.link,
     isNot(LinagoraEventInfoColors.buttonLabel),
     reason: 'inline links and button labels use different blues',
+  );
+}
+
+Future<void> _valueTap(WidgetTester tester) async {
+  var taps = 0;
+
+  await tester.pumpWidget(
+    _host(
+      LinagoraEventInfoText(
+        'alex.martin@example.invalid',
+        emphasis: LinagoraEventInfoEmphasis.muted,
+        onTap: () => taps++,
+      ),
+    ),
+  );
+
+  await tester.tap(find.text('alex.martin@example.invalid'));
+
+  expect(taps, 1);
+}
+
+Future<void> _valueKeyboard(WidgetTester tester) async {
+  var activations = 0;
+
+  await tester.pumpWidget(
+    _host(
+      LinagoraEventInfoText(
+        'alex.martin@example.invalid',
+        onTap: () => activations++,
+      ),
+    ),
+  );
+
+  await tester.sendKeyEvent(LogicalKeyboardKey.tab);
+  expect(
+    Focus.of(tester.element(find.text('alex.martin@example.invalid'))).hasFocus,
+    isTrue,
+  );
+
+  await tester.sendKeyEvent(LogicalKeyboardKey.enter);
+  await tester.sendKeyEvent(LogicalKeyboardKey.space);
+
+  expect(activations, 2);
+}
+
+Future<void> _valueSemantics(WidgetTester tester) async {
+  final semantics = tester.ensureSemantics();
+  try {
+    await tester.pumpWidget(
+      _host(
+        LinagoraEventInfoText(
+          'alex.martin@example.invalid',
+          onTap: () {},
+        ),
+      ),
+    );
+
+    expect(
+      tester.getSemantics(
+        find.bySemanticsLabel('alex.martin@example.invalid'),
+      ),
+      matchesSemantics(
+        label: 'alex.martin@example.invalid',
+        isButton: true,
+        hasEnabledState: true,
+        isEnabled: true,
+        hasTapAction: true,
+        hasFocusAction: true,
+        isFocusable: true,
+      ),
+    );
+  } finally {
+    semantics.dispose();
+  }
+}
+
+Future<void> _valueTapTreatment(WidgetTester tester) async {
+  await tester.pumpWidget(
+    _host(
+      LinagoraEventInfoText(
+        'Alex Martin',
+        emphasis: LinagoraEventInfoEmphasis.strong,
+        onTap: () {},
+      ),
+    ),
+  );
+
+  final style = _styleOf(tester, 'Alex Martin');
+
+  expect(style.fontWeight, FontWeight.w600);
+  expect(
+    style.color,
+    LinagoraEventInfoColors.content,
+    reason: 'an actionable value keeps the emphasis it was given',
   );
 }
 
