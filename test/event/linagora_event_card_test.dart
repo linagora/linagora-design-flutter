@@ -4,6 +4,16 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:linagora_design_flutter/linagora_design_flutter.dart';
 
 void main() {
+  _registerRenderingTests();
+  _registerDetailLayoutTests();
+  _registerConferenceTests();
+  _registerResponsiveTests();
+  _registerInteractionTests();
+  _registerExpansionTests();
+  _registerValidationTests();
+}
+
+void _registerRenderingTests() {
   testWidgets('renders every section it is given', _rendersEverySection);
   testWidgets('renders nothing for an empty event', _emptyEvent);
   for (final omission in _omissions) {
@@ -17,16 +27,33 @@ void main() {
   testWidgets('renders any subset of the action buttons', _actionSubset);
   testWidgets('lines an unlabelled row up with the labelled ones', _emptyLabelColumn);
   testWidgets('shows a status notice under the rows', _statusNotice);
+}
+
+void _registerDetailLayoutTests() {
   testWidgets('stacks extra value lines under the first', _detailExtraLines);
   testWidgets('hides the date marker when compact', _compactHidesDate);
   testWidgets('stacks the labels when compact', _compactStacksLabels);
-  testWidgets('keeps labels beside values when regular', _regularKeepsInline);
+  testWidgets(
+    'aligns labels with the first value line when regular',
+    _regularAlignsLabel,
+  );
+  testWidgets(
+    'keeps an expanded detail label on its first value line',
+    _expandedDetailKeepsLabelOnFirstLine,
+  );
+  testWidgets(
+    'keeps labels centred with accessible text scaling',
+    _regularAlignmentScalesWithText,
+  );
   testWidgets('sets the rows one size up when compact', _compactTypeScale);
   testWidgets('keeps the regular type scale otherwise', _regularTypeScale);
   testWidgets(
     'leaves the title and the badge out of the compact scale',
     _compactLeavesTitleAndBadge,
   );
+}
+
+void _registerConferenceTests() {
   testWidgets(
     'keeps the conference clear of a full-width badge',
     _headerKeepsItsGap,
@@ -39,6 +66,9 @@ void main() {
     'forwards localised copy tooltip and semantics',
     _localisesCopyAction,
   );
+}
+
+void _registerResponsiveTests() {
   testWidgets('goes compact under the breakpoint', _adaptiveGoesCompact);
   testWidgets(
     'shrink-wraps a regular card in unbounded width',
@@ -65,6 +95,9 @@ void main() {
     'fits a pinned regular layout into a narrow card',
     _regularSurvivesNarrowWidth,
   );
+}
+
+void _registerInteractionTests() {
   testWidgets(
     'settles only the chosen response',
     _selectionSettlesOnlyTheChosenResponse,
@@ -85,6 +118,9 @@ void main() {
   );
   testWidgets('leaves a plain value inert', _plainValueIsInert);
   testWidgets('renders content from a card data object', _rendersFromData);
+}
+
+void _registerExpansionTests() {
   testWidgets(
     'expands and collapses detail lines inside the card',
     _expandsAndCollapsesDetailLines,
@@ -97,6 +133,9 @@ void main() {
     'resets detail expansion when its identity changes',
     _resetsExpansionForNewIdentity,
   );
+}
+
+void _registerValidationTests() {
   test('rejects invalid card metrics', _rejectsInvalidCardMetrics);
   test('rejects invalid detail expansion configuration', _invalidExpansion);
 }
@@ -124,9 +163,20 @@ const _attending = LinagoraEventAttending(
   secondaryAction: LinagoraEventAction(label: 'Propose a new time'),
 );
 
-Widget _host(Widget child, {double width = 1000, VisualDensity? density}) {
+Widget _host(
+  Widget child, {
+  double width = 1000,
+  VisualDensity? density,
+  TextScaler? textScaler,
+}) {
   return MaterialApp(
     theme: density == null ? null : ThemeData(visualDensity: density),
+    builder: textScaler == null
+        ? null
+        : (context, child) => MediaQuery(
+            data: MediaQuery.of(context).copyWith(textScaler: textScaler),
+            child: child!,
+          ),
     home: Scaffold(
       body: SingleChildScrollView(
         child: SizedBox(width: width, child: child),
@@ -508,13 +558,58 @@ Future<void> _compactStacksLabels(WidgetTester tester) async {
   );
 }
 
-Future<void> _regularKeepsInline(WidgetTester tester) async {
+Future<void> _regularAlignsLabel(WidgetTester tester) async {
   await tester.pumpWidget(_host(_card()));
 
+  final label = find.text('When');
+  final firstValue = find.text('Tuesday, Jun 16');
+
   expect(
-    tester.getTopLeft(find.text('Tuesday, Jun 16')).dy,
-    tester.getTopLeft(find.text('When')).dy,
-    reason: 'an inline row keeps the label on the value it labels',
+    tester.getRect(label).center.dy,
+    closeTo(tester.getRect(firstValue).center.dy, 0.5),
+    reason: 'the label is vertically centred on the first value line',
+  );
+}
+
+Future<void> _expandedDetailKeepsLabelOnFirstLine(WidgetTester tester) async {
+  await tester.pumpWidget(
+    _host(
+      LinagoraEventCard(
+        layout: LinagoraEventCardLayout.regular,
+        details: [
+          LinagoraEventDetail(
+            label: 'Who',
+            values: const [LinagoraEventValue.strong('Organizer')],
+            lines: _participantLines('Attendee', 7),
+            expansion: const LinagoraEventDetailExpansion(
+              expandLabel: 'See all participants',
+              collapseLabel: 'Hide',
+            ),
+          ),
+        ],
+      ),
+    ),
+  );
+
+  await tester.tap(find.text('See all participants'));
+  await tester.pump();
+
+  final label = tester.getRect(find.text('Who'));
+  final firstValue = tester.getRect(find.text('Organizer'));
+  final lastValue = tester.getRect(find.text('Attendee 6'));
+
+  expect(label.center.dy, closeTo(firstValue.center.dy, 0.5));
+  expect(label.bottom, lessThan(lastValue.top));
+}
+
+Future<void> _regularAlignmentScalesWithText(WidgetTester tester) async {
+  await tester.pumpWidget(
+    _host(_card(), textScaler: const TextScaler.linear(2)),
+  );
+
+  expect(
+    tester.getRect(find.text('When')).center.dy,
+    closeTo(tester.getRect(find.text('Tuesday, Jun 16')).center.dy, 0.5),
   );
 }
 

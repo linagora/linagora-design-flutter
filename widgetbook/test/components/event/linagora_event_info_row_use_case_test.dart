@@ -10,6 +10,10 @@ void main() {
   testWidgets('collapses again from the hide action', _collapsesAgain);
   testWidgets('names some participants and not others', _mixedDisplayNames);
   testWidgets('toggles from inside the card rows too', _cardRowsToggle);
+  testWidgets(
+    'centres Who on the first participant line',
+    _centresParticipantLabelOnFirstLine,
+  );
   testWidgets('greys the calendar glyph', _calendarIconIsGrey);
   testWidgets('explains the warning glyph on hover', _warningTooltip);
   testWidgets('builds the playground from default knobs', _playgroundDefaults);
@@ -117,6 +121,32 @@ Future<void> _cardRowsToggle(WidgetTester tester) async {
 
   expect(find.text('Hide'), findsOneWidget);
   expect(find.text('jordan.blake@example.invalid'), findsOneWidget);
+}
+
+Future<void> _centresParticipantLabelOnFirstLine(
+  WidgetTester tester,
+) async {
+  await _pumpUseCase(tester, linagoraEventInfoRowUseCase);
+
+  final label = find.text('Who');
+  final firstValue = find.text('Alex Martin');
+
+  expect(
+    tester.getRect(label).center.dy,
+    closeTo(tester.getRect(firstValue).center.dy, 0.5),
+  );
+
+  await _expand(tester);
+
+  expect(
+    tester.getRect(label).center.dy,
+    closeTo(tester.getRect(firstValue).center.dy, 0.5),
+    reason: 'expanding keeps the label centred on the first line',
+  );
+  expect(
+    tester.getRect(label).bottom,
+    lessThan(tester.getRect(find.text('Jordan Blake')).top),
+  );
 }
 
 Future<void> _calendarIconIsGrey(WidgetTester tester) async {

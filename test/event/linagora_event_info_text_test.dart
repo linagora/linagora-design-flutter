@@ -8,6 +8,10 @@ void main() {
     testWidgets(treatment.description, treatment.verify);
   }
   testWidgets('honours label presentation overrides', _labelOverrides);
+  testWidgets(
+    'centres a label on a body line with accessible text scaling',
+    _labelCentresOnScaledBodyLine,
+  );
   testWidgets('prefers an explicit colour over the emphasis', _colourOverride);
   testWidgets(
     'merges a caller style over the resolved treatment',
@@ -27,8 +31,15 @@ void main() {
   test('rejects invalid link icon spacing', _rejectsInvalidLinkIconSpacing);
 }
 
-Widget _host(Widget child) =>
-    MaterialApp(home: Scaffold(body: Center(child: child)));
+Widget _host(Widget child, {TextScaler? textScaler}) => MaterialApp(
+  builder: textScaler == null
+      ? null
+      : (context, child) => MediaQuery(
+          data: MediaQuery.of(context).copyWith(textScaler: textScaler),
+          child: child!,
+        ),
+  home: Scaffold(body: Center(child: child)),
+);
 
 TextStyle _styleOf(WidgetTester tester, String text) =>
     tester.widget<Text>(find.text(text)).style!;
@@ -170,6 +181,27 @@ Future<void> _labelOverrides(WidgetTester tester) async {
       fontStyle: FontStyle.italic,
       fontWeight: FontWeight.w500,
     ),
+  );
+}
+
+Future<void> _labelCentresOnScaledBodyLine(WidgetTester tester) async {
+  await tester.pumpWidget(
+    _host(
+      const Row(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          LinagoraEventInfoLabel('When', centerOnBodyLine: true),
+          LinagoraEventInfoText('Tuesday, Jun 16'),
+        ],
+      ),
+      textScaler: const TextScaler.linear(2),
+    ),
+  );
+
+  expect(
+    tester.getRect(find.text('When')).center.dy,
+    closeTo(tester.getRect(find.text('Tuesday, Jun 16')).center.dy, 0.5),
   );
 }
 
