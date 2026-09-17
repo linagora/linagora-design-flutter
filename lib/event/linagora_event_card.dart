@@ -497,23 +497,34 @@ class LinagoraEventCard extends StatelessWidget {
   }
 
   Widget _buildDetailRow(LinagoraEventDetail detail, {required bool compact}) {
-    final label = detail.label;
+    final prefix = _prefix(
+      detail.label,
+      compact: compact,
+      centerOnBodyLine: !compact,
+    );
 
     return LinagoraEventInfoRow(
       layout: compact
           ? LinagoraEventInfoRowLayout.stacked
           : LinagoraEventInfoRowLayout.inline,
       crossAxisAlignment: CrossAxisAlignment.start,
-      prefix: _prefix(label, compact: compact),
+      prefix: prefix,
       content: _buildDetailContent(detail),
     );
   }
 
   /// The label, or a placeholder that holds the column open so an unlabelled
   /// row still lines its content up with the labelled ones.
-  Widget? _prefix(String? label, {required bool compact}) {
+  Widget? _prefix(
+    String? label, {
+    required bool compact,
+    bool centerOnBodyLine = false,
+  }) {
     if (label != null && label.isNotEmpty) {
-      return LinagoraEventInfoLabel(label);
+      return LinagoraEventInfoLabel(
+        label,
+        centerOnBodyLine: centerOnBodyLine,
+      );
     }
     return compact ? null : const SizedBox.shrink();
   }

@@ -100,6 +100,11 @@ class LinagoraEventInfoLabel extends StatelessWidget {
   final int? maxLines;
   final TextOverflow overflow;
 
+  /// Moves the label down so its visual centre matches a body-text line when
+  /// both start at the same top edge. Useful for an inline row whose content
+  /// can grow beyond its first line.
+  final bool centerOnBodyLine;
+
   const LinagoraEventInfoLabel(
     this.text, {
     super.key,
@@ -107,6 +112,7 @@ class LinagoraEventInfoLabel extends StatelessWidget {
     this.style,
     this.maxLines = 1,
     this.overflow = TextOverflow.ellipsis,
+    this.centerOnBodyLine = false,
   });
 
   /// The label treatment, for callers building their own span or widget.
@@ -127,15 +133,29 @@ class LinagoraEventInfoLabel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final resolved = textStyle(
-      color: color,
-      scale: LinagoraEventInfoTypeScale.of(context),
-    );
-    return Text(
+    final scale = LinagoraEventInfoTypeScale.of(context);
+    final resolved = textStyle(color: color, scale: scale);
+    final effectiveStyle = style == null ? resolved : resolved.merge(style);
+    final label = Text(
       text,
       maxLines: maxLines,
       overflow: overflow,
-      style: style == null ? resolved : resolved.merge(style),
+      style: effectiveStyle,
+    );
+    if (!centerOnBodyLine) return label;
+
+    final textScaler =
+        MediaQuery.maybeTextScalerOf(context) ?? TextScaler.noScaling;
+    final bodyStyle = LinagoraEventInfoText.textStyle(scale: scale);
+    final labelHeight =
+        textScaler.scale(effectiveStyle.fontSize!) * effectiveStyle.height!;
+    final bodyHeight =
+        textScaler.scale(bodyStyle.fontSize!) * bodyStyle.height!;
+    final topOffset = (bodyHeight - labelHeight) / 2;
+
+    return Padding(
+      padding: EdgeInsets.only(top: topOffset > 0 ? topOffset : 0),
+      child: label,
     );
   }
 }

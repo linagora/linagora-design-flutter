@@ -242,7 +242,10 @@ class _ParticipantsRowState extends State<_ParticipantsRow> {
   Widget build(BuildContext context) {
     return LinagoraEventInfoRow(
       crossAxisAlignment: CrossAxisAlignment.start,
-      prefix: const LinagoraEventInfoLabel('Who'),
+      prefix: const LinagoraEventInfoLabel(
+        'Who',
+        centerOnBodyLine: true,
+      ),
       content: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
