@@ -33,12 +33,5 @@ jobs:
       - name: Install dependencies
         run: flutter pub get
 
-      - name: Run tests
-        run: flutter test
-
-      # --no-fatal-infos tolerates the pre-existing info-level deprecation
-      # baseline in lib/ while still failing on errors and warnings.
-      # Scoped to lib/ and test/ so widgetbook/ and example/ issues stay out.
-      - name: Analyze
-        if: always()
-        run: flutter analyze --no-fatal-infos lib test
+      - name: Analyze and test all packages
+        run: bash scripts/run-checks.sh

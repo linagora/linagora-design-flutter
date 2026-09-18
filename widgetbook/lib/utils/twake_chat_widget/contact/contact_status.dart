@@ -8,8 +8,6 @@ enum ContactStatus {
         return 'Active';
       case ContactStatus.inactive:
         return 'Inactive';
-      default:
-        return '';
     }
   }
 }
