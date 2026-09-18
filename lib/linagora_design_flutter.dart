@@ -10,6 +10,7 @@ export 'package:linagora_design_flutter/images_picker/images_picker.dart';
 export 'package:linagora_design_flutter/images/linagora_design_images.dart';
 export 'package:linagora_design_flutter/style/linagora_text_style.dart';
 export 'package:linagora_design_flutter/style/linagora_text_theme.dart';
+export 'package:linagora_design_flutter/style/linagora_typography.dart';
 export 'package:linagora_design_flutter/twake_screen/twake_welcome_screen.dart';
 export 'package:linagora_design_flutter/multiple_account/multiple_account_picker.dart';
 export 'package:linagora_design_flutter/list_item/twake_list_item.dart';
