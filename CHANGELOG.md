@@ -1,3 +1,47 @@
+## 0.3.3
+
+### Added
+
+* Complete the Event Invitation Card UI and public API (`LinagoraEventCard`)
+  with adaptive, regular and compact layouts; optional date, activity and
+  title sections; labelled and expandable event details; conflict and status
+  indicators; attendee RSVP controls; and more-information, secondary and
+  calendar actions.
+* Add `EventActivityBadge` for created, reminder, updated, accepted,
+  cancelled and not-invited event states.
+* Add `EventConferenceActions` with independently configurable
+  video-conference join and copy-link controls.
+* Add configurable `padding` and `shape` to `LinagoraIconButton` for custom
+  icon-button action designs.
+* Add Event Card, event activity badge, conference action and event info-row
+  use cases to Widgetbook.
+* `LinagoraAlert`: a rounded, accent-tinted notice with a leading icon, an
+  optional title, a message, and any combination of a primary action, a
+  secondary action, a dismiss control, and a callout pointer. Five severities
+  (`primary`, `secondary`, `error`, `warning`, `success`), two container
+  treatments (`standard`, `filled`), two vertical rhythms (`normal`,
+  `compact`), three action alignments and two text alignments.
+* `LinagoraAlertPalette`: resolves a severity to its accent, container tint,
+  text and dismiss colours, so a product can tint a neighbouring surface to
+  match the alert beside it.
+* `LinagoraAlertPointer`: the callout tail, reusable on a product's own
+  surface.
+* `LinagoraTypography`: the shared product type scale, available as a theme
+  extension with configurable heading, body, button and caption variants.
+
+### Changed
+
+* Preserve explicitly configured `LinagoraButton` heights when desktop visual
+  density is active.
+* Make all predefined viewports available in Widgetbook.
+
+### Fixed
+
+* Allow localized month abbreviations of any non-blank length in event date
+  markers, scaling longer labels down to fit.
+* Make expanded event information rows shrink-wrap safely when their available
+  width is unbounded.
+
 ## 0.3.2
 
 ### Changed
