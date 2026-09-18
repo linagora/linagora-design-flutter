@@ -20,14 +20,11 @@ Future<void> _dateIconInputValidation(WidgetTester tester) async {
   state.updateQueryField(
     group: 'knobs',
     field: 'Month',
-    value: 'JUN22222',
+    value: '   ',
   );
   await tester.pump();
 
-  expect(
-    find.text('Month must contain exactly three characters.'),
-    findsOneWidget,
-  );
+  expect(find.text('Month must not be blank.'), findsOneWidget);
 
   state.updateQueryField(group: 'knobs', field: 'Month', value: 'SEP');
   state.updateQueryField(group: 'knobs', field: 'Day', value: '32');
