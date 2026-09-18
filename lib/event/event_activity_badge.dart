@@ -12,6 +12,7 @@ enum EventActivityBadgeState {
   reminder,
   updated,
   accepted,
+  maybe,
   canceled,
   notInvited,
 }
@@ -28,6 +29,9 @@ enum EventActivityBadgeState {
 class EventActivityBadge extends StatelessWidget {
   /// Default light success colour.
   static const Color successBackground = Color(0xFFB9F6CA);
+
+  /// Default light warning colour.
+  static const Color warningBackground = Color(0xFFFDF3E2);
 
   /// Default foreground colour at 90% opacity.
   static const Color defaultForeground = Color(0xE6424244);
@@ -98,6 +102,7 @@ class EventActivityBadge extends StatelessWidget {
       EventActivityBadgeState.updated =>
         LinagoraSysColors.material().primaryContainer,
       EventActivityBadgeState.accepted => successBackground,
+      EventActivityBadgeState.maybe => warningBackground,
       EventActivityBadgeState.canceled || EventActivityBadgeState.notInvited =>
         LinagoraRefColors.material().error[90]!,
     };

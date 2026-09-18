@@ -51,6 +51,7 @@ Future<void> _mapsStateBackgrounds(WidgetTester tester) async {
     EventActivityBadgeState.updated:
         LinagoraSysColors.material().primaryContainer,
     EventActivityBadgeState.accepted: EventActivityBadge.successBackground,
+    EventActivityBadgeState.maybe: const Color(0xFFFDF3E2),
     EventActivityBadgeState.canceled: errorLight,
     EventActivityBadgeState.notInvited: errorLight,
   };

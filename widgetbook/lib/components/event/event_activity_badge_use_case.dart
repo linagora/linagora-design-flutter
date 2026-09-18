@@ -31,6 +31,11 @@ Widget eventActivityBadgeStatesUseCase(BuildContext context) {
             activity: 'has accepted this invitation',
           ),
           EventActivityBadge(
+            state: EventActivityBadgeState.maybe,
+            actorName: 'userA',
+            activity: 'has tentatively accepted this invitation',
+          ),
+          EventActivityBadge(
             state: EventActivityBadgeState.canceled,
             actorName: 'userA',
             activity: 'has canceled a meeting',
