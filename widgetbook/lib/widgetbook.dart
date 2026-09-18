@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:linagora_design_flutter/linagora_design_flutter.dart';
 import 'package:widgetbook/widgetbook.dart' hide AlignmentAddon;
+import 'package:widgetbook_workspace/components/banners/linagora_alert_use_case.dart';
 import 'package:widgetbook_workspace/components/banners/linagora_banner_use_case.dart';
 import 'package:widgetbook_workspace/components/buttons/linagora_button_use_case.dart';
 import 'package:widgetbook_workspace/components/chat/message_bubble_use_case.dart';
@@ -89,6 +90,15 @@ class WidgetbookApp extends StatelessWidget {
         WidgetbookFolder(
           name: 'Banners',
           children: [
+            WidgetbookComponent(
+              name: 'Linagora alert',
+              useCases: [
+                WidgetbookUseCase(
+                  name: 'Default',
+                  builder: (context) => linagoraAlertUseCase(context),
+                ),
+              ],
+            ),
             WidgetbookComponent(
               name: 'Linagora banner',
               useCases: [
