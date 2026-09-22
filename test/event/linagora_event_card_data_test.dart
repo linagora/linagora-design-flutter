@@ -1,7 +1,57 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:linagora_design_flutter/linagora_design_flutter.dart';
 
 void main() {
+  group('LinagoraEventAction.calendar', () {
+    test('uses the packaged calendar SVG by default', () {
+      final action = LinagoraEventAction.calendar(
+        id: 'event-42',
+        label: 'See in your Calendar',
+        tooltip: 'Open event',
+      );
+
+      final iconLoader = (action.icon!.widget as SvgPicture).bytesLoader
+          as SvgAssetLoader;
+      expect(iconLoader.assetName, LinagoraDesignImages.calendarTodayIcon);
+      expect(iconLoader.packageName, LinagoraDesignImages.packageName);
+      expect(action.id, 'event-42');
+      expect(action.label, 'See in your Calendar');
+      expect(action.tooltip, 'Open event');
+      expect(action.icon?.data, isNull);
+    });
+
+    test('uses a custom IconData instead of the packaged SVG', () {
+      final action = LinagoraEventAction.calendar(
+        label: 'Open calendar',
+        icon: const LinagoraEventActionIcon.data(
+          Icons.event,
+          color: Colors.indigo,
+        ),
+      );
+
+      expect(action.icon?.data, Icons.event);
+      expect(action.icon?.widget, isNull);
+      expect(action.icon?.color, Colors.indigo);
+    });
+
+    test('uses a custom widget instead of the packaged SVG', () {
+      const customIcon = SizedBox(key: Key('custom-calendar-icon'));
+      final action = LinagoraEventAction.calendar(
+        label: 'Open calendar',
+        icon: const LinagoraEventActionIcon.widget(
+          customIcon,
+          color: Colors.teal,
+        ),
+      );
+
+      expect(action.icon?.data, isNull);
+      expect(action.icon?.widget, same(customIcon));
+      expect(action.icon?.color, Colors.teal);
+    });
+  });
+
   group('LinagoraEventDetail.when', () {
     test('builds the standard date and time value run', () {
       final detail = LinagoraEventDetail.when(

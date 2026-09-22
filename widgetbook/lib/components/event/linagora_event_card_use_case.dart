@@ -10,7 +10,7 @@ import 'package:widgetbook_annotation/widgetbook_annotation.dart' as widgetbook;
 /// Playground to switch a single state on or off.
 @widgetbook.UseCase(name: 'Complete card', type: LinagoraEventCard)
 Widget linagoraEventCardUseCase(BuildContext context) {
-  return const _Frame(
+  return _Frame(
     child: _InteractiveEventCard(
       content: LinagoraEventCardData(
         date: _date,
@@ -170,9 +170,8 @@ const _conference = LinagoraEventConference(
   onCopyLink: _noop,
 );
 
-const _calendarAction = LinagoraEventAction(
+final _calendarAction = LinagoraEventAction.calendar(
   label: 'See in your Calendar',
-  icon: Icons.calendar_today,
   onPressed: _noop,
 );
 

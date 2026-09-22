@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:linagora_design_flutter/event/event_activity_badge.dart';
 import 'package:linagora_design_flutter/event/linagora_event_info_text.dart';
+import 'package:linagora_design_flutter/images/linagora_design_images.dart';
 
 /// A calendar date shown on the card's date marker.
 class LinagoraEventDate {
@@ -60,6 +62,22 @@ class LinagoraEventCardData {
   });
 }
 
+/// The optional leading visual and its colour for an event action.
+class LinagoraEventActionIcon {
+  final Object _value;
+  final Color? color;
+
+  const LinagoraEventActionIcon.data(IconData data, {this.color})
+    : _value = data;
+
+  const LinagoraEventActionIcon.widget(Widget widget, {this.color})
+    : _value = widget;
+
+  IconData? get data => _value is IconData ? _value : null;
+
+  Widget? get widget => _value is Widget ? _value : null;
+}
+
 /// Something the reader can do, rendered as a link or a button depending on
 /// where the card places it.
 class LinagoraEventAction {
@@ -71,10 +89,7 @@ class LinagoraEventAction {
   /// A null callback disables the control and keeps it visible.
   final VoidCallback? onPressed;
 
-  final IconData? icon;
-
-  /// Colour for [icon] when it should differ from the label.
-  final Color? iconColor;
+  final LinagoraEventActionIcon? icon;
 
   final String? tooltip;
 
@@ -83,9 +98,35 @@ class LinagoraEventAction {
     required this.label,
     this.onPressed,
     this.icon,
-    this.iconColor,
     this.tooltip,
   });
+
+  /// Creates the action that opens this event in a calendar application.
+  ///
+  /// The packaged calendar SVG is used unless [icon] supplies a
+  /// product-specific alternative. [label] remains required so products can
+  /// localise the action rather than inheriting English copy from the library.
+  factory LinagoraEventAction.calendar({
+    Object? id,
+    required String label,
+    VoidCallback? onPressed,
+    LinagoraEventActionIcon? icon,
+    String? tooltip,
+  }) {
+    return LinagoraEventAction(
+      id: id,
+      label: label,
+      onPressed: onPressed,
+      icon: icon ??
+          LinagoraEventActionIcon.widget(
+            SvgPicture.asset(
+              LinagoraDesignImages.calendarTodayIcon,
+              package: LinagoraDesignImages.packageName,
+            ),
+          ),
+      tooltip: tooltip,
+    );
+  }
 }
 
 /// A person rendered in the participant section of an event card.

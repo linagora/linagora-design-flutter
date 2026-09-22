@@ -25,6 +25,7 @@ void _registerRenderingTests() {
   testWidgets('labels the action row from the data', _customAttendingLabel);
   testWidgets('holds the column for a blank label', _blankLabelHoldsColumn);
   testWidgets('renders any subset of the action buttons', _actionSubset);
+  testWidgets('renders custom action icons', _customActionIcons);
   testWidgets('lines an unlabelled row up with the labelled ones', _emptyLabelColumn);
   testWidgets('shows a status notice under the rows', _statusNotice);
 }
@@ -249,6 +250,45 @@ Future<void> _emptyEvent(WidgetTester tester) async {
 
   expect(tester.takeException(), isNull);
   expect(find.byType(Text), findsNothing);
+}
+
+Future<void> _customActionIcons(WidgetTester tester) async {
+  const pillIconKey = Key('pill-action-icon');
+  const calendarIconKey = Key('calendar-action-icon');
+  const pillIconColor = Color(0xFF123456);
+  const calendarIconColor = Color(0xFF654321);
+
+  await tester.pumpWidget(
+    _host(
+      const LinagoraEventCard(
+        attending: _attending,
+        actions: [
+          LinagoraEventAction(
+            label: 'Mail to attendees',
+            icon: LinagoraEventActionIcon.widget(
+              SizedBox(key: pillIconKey),
+              color: pillIconColor,
+            ),
+          ),
+        ],
+        calendarAction: LinagoraEventAction(
+          label: 'See in your Calendar',
+          icon: LinagoraEventActionIcon.widget(
+            SizedBox(key: calendarIconKey),
+            color: calendarIconColor,
+          ),
+        ),
+      ),
+    ),
+  );
+
+  expect(find.byKey(pillIconKey), findsOneWidget);
+  expect(find.byKey(calendarIconKey), findsOneWidget);
+  expect(_responseButton(tester, 'Mail to attendees').iconColor, pillIconColor);
+  expect(
+    _responseButton(tester, 'See in your Calendar').iconColor,
+    calendarIconColor,
+  );
 }
 
 /// One hidden section and the text that must disappear with it.
