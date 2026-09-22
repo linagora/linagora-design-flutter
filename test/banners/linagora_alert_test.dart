@@ -309,6 +309,27 @@ void main() {
 
       expect(find.byIcon(Icons.shield), findsOneWidget);
     });
+
+    testWidgets('a fully visible action has no tooltip repeating its label',
+        (tester) async {
+      await tester.pumpWidget(
+        host(
+          LinagoraAlert(
+            message: 'Body',
+            actionLabel: 'Not spam',
+            onActionPressed: () {},
+            secondaryActionLabel: 'Report',
+            onSecondaryActionPressed: () {},
+          ),
+        ),
+      );
+
+      for (final action in tester.widgetList<LinagoraButton>(
+        find.byType(LinagoraButton),
+      )) {
+        expect(action.tooltip, isNull);
+      }
+    });
   });
 
   group('layout', () {
@@ -999,6 +1020,31 @@ void main() {
   });
 
   group('validation', () {
+    test('rejects an action label or callback without its pair', () {
+      expect(
+        () => LinagoraAlert(message: 'Body', actionLabel: 'Not spam'),
+        throwsAssertionError,
+      );
+      expect(
+        () => LinagoraAlert(message: 'Body', onActionPressed: () {}),
+        throwsAssertionError,
+      );
+      expect(
+        () => LinagoraAlert(
+          message: 'Body',
+          secondaryActionLabel: 'Report phishing',
+        ),
+        throwsAssertionError,
+      );
+      expect(
+        () => LinagoraAlert(
+          message: 'Body',
+          onSecondaryActionPressed: () {},
+        ),
+        throwsAssertionError,
+      );
+    });
+
     test('rejects invalid line and action constraints', () {
       expect(
         () => LinagoraAlert(
