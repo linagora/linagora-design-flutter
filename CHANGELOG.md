@@ -21,6 +21,8 @@
   (`primary`, `secondary`, `error`, `warning`, `success`), two container
   treatments (`standard`, `filled`), two vertical rhythms (`normal`,
   `compact`), three action alignments and two text alignments.
+* `LinagoraAlertAction`: groups an alert action's label, required callback
+  slot and optional icon so incomplete action configurations cannot be built.
 * `LinagoraAlertPalette`: resolves a severity to its accent, container tint,
   text and dismiss colours, so a product can tint a neighbouring surface to
   match the alert beside it.

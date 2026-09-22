@@ -172,31 +172,53 @@ void main() {
   });
 
   group('trailing controls', () {
-    testWidgets('the action needs both a label and a callback',
-        (tester) async {
-      await tester.pumpWidget(
-        host(const LinagoraAlert(message: 'Body', actionLabel: 'Not spam')),
-      );
-      expect(find.byType(LinagoraButton), findsNothing);
-
-      await tester.pumpWidget(
-        host(LinagoraAlert(message: 'Body', onActionPressed: () {})),
-      );
-      expect(find.byType(LinagoraButton), findsNothing);
-    });
-
-    testWidgets('the secondary action needs both a label and a callback',
+    testWidgets('an explicit null callback keeps a disabled action visible',
         (tester) async {
       await tester.pumpWidget(
         host(
           const LinagoraAlert(
             message: 'Body',
-            secondaryActionLabel: 'Report phishing',
+            action: LinagoraAlertAction(
+              label: 'Not spam',
+              onPressed: null,
+            ),
           ),
         ),
       );
 
-      expect(find.byType(LinagoraButton), findsNothing);
+      expect(find.byType(LinagoraButton), findsOneWidget);
+      final action = tester.widget<LinagoraButton>(find.byType(LinagoraButton));
+      expect(
+        action.disabledForegroundColor,
+        LinagoraButton.disabledContentColor,
+      );
+      expect(
+        action.disabledBackgroundColor,
+        LinagoraButton.disabledContainerColor,
+      );
+      expect(action.onPressed, isNull);
+    });
+
+    testWidgets('a secondary action works without a primary action',
+        (tester) async {
+      var secondary = 0;
+      await tester.pumpWidget(
+        host(
+          LinagoraAlert(
+            message: 'Body',
+            secondaryAction: LinagoraAlertAction(
+              label: 'Report phishing',
+              onPressed: () => secondary++,
+            ),
+          ),
+        ),
+      );
+
+      expect(find.byType(LinagoraButton), findsOneWidget);
+      expect(find.text('Report phishing'), findsOneWidget);
+      await tester.tap(find.text('Report phishing'));
+      expect(secondary, 1);
+      expect(tester.takeException(), isNull);
     });
 
     testWidgets('both actions fire their own callbacks', (tester) async {
@@ -206,10 +228,14 @@ void main() {
         host(
           LinagoraAlert(
             message: 'Body',
-            actionLabel: 'Not spam',
-            onActionPressed: () => primary++,
-            secondaryActionLabel: 'Report phishing',
-            onSecondaryActionPressed: () => secondary++,
+            action: LinagoraAlertAction(
+              label: 'Not spam',
+              onPressed: () => primary++,
+            ),
+            secondaryAction: LinagoraAlertAction(
+              label: 'Report phishing',
+              onPressed: () => secondary++,
+            ),
           ),
         ),
       );
@@ -235,10 +261,14 @@ void main() {
         host(
           LinagoraAlert(
             message: 'Body',
-            actionLabel: 'Not spam',
-            onActionPressed: () {},
-            secondaryActionLabel: 'Report',
-            onSecondaryActionPressed: () {},
+            action: LinagoraAlertAction(
+              label: 'Not spam',
+              onPressed: () {},
+            ),
+            secondaryAction: LinagoraAlertAction(
+              label: 'Report',
+              onPressed: () {},
+            ),
             onClose: () {},
           ),
         ),
@@ -307,8 +337,7 @@ void main() {
         host(
           LinagoraAlert(
             message: 'Body',
-            actionLabel: 'Go',
-            onActionPressed: () {},
+            action: LinagoraAlertAction(label: 'Go', onPressed: () {}),
           ),
         ),
       );
@@ -324,14 +353,44 @@ void main() {
         host(
           LinagoraAlert(
             message: 'Body',
-            actionLabel: 'Not spam',
-            onActionPressed: () {},
-            actionIcon: Icons.shield,
+            action: LinagoraAlertAction(
+              label: 'Not spam',
+              onPressed: () {},
+              icon: Icons.shield,
+            ),
           ),
         ),
       );
 
       expect(find.byIcon(Icons.shield), findsOneWidget);
+    });
+
+    testWidgets('an action icon widget replaces and sizes the icon glyph',
+        (tester) async {
+      const iconKey = Key('action-icon-widget');
+      await tester.pumpWidget(
+        host(
+          LinagoraAlert(
+            message: 'Body',
+            action: LinagoraAlertAction(
+              label: 'Not spam',
+              onPressed: () {},
+              icon: Icons.shield,
+              iconWidget: const SizedBox.square(
+                key: iconKey,
+                dimension: 8,
+              ),
+            ),
+          ),
+        ),
+      );
+
+      expect(find.byKey(iconKey), findsOneWidget);
+      expect(find.byIcon(Icons.shield), findsNothing);
+      expect(
+        tester.getSize(find.byKey(iconKey)),
+        const Size.square(LinagoraAlert.iconSize),
+      );
     });
 
     testWidgets('a fully visible action has no tooltip repeating its label',
@@ -340,10 +399,14 @@ void main() {
         host(
           LinagoraAlert(
             message: 'Body',
-            actionLabel: 'Not spam',
-            onActionPressed: () {},
-            secondaryActionLabel: 'Report',
-            onSecondaryActionPressed: () {},
+            action: LinagoraAlertAction(
+              label: 'Not spam',
+              onPressed: () {},
+            ),
+            secondaryAction: LinagoraAlertAction(
+              label: 'Report',
+              onPressed: () {},
+            ),
             actionsMaxWidthFraction: 1,
           ),
         ),
@@ -363,8 +426,10 @@ void main() {
         host(
           LinagoraAlert(
             message: 'Body',
-            actionLabel: label,
-            onActionPressed: () {},
+            action: LinagoraAlertAction(
+              label: label,
+              onPressed: () {},
+            ),
             actionMaxWidth: 80,
           ),
         ),
@@ -429,8 +494,10 @@ void main() {
             LinagoraAlert(
               title: 'This message may be dangerous',
               message: 'This message contains a suspicious link.',
-              actionLabel: 'Not spam',
-              onActionPressed: () {},
+              action: LinagoraAlertAction(
+                label: 'Not spam',
+                onPressed: () {},
+              ),
               size: size,
             ),
             width: 1141,
@@ -458,8 +525,10 @@ void main() {
               title: 'Heads up',
               message: 'A message long enough to wrap onto a second line '
                   'inside this narrow alert container.',
-              actionLabel: 'Not spam',
-              onActionPressed: () {},
+              action: LinagoraAlertAction(
+                label: 'Not spam',
+                onPressed: () {},
+              ),
               actionsAlignment: value,
             ),
             width: 360,
@@ -514,8 +583,10 @@ void main() {
             title: 'This message may be dangerous',
             message: 'This message contains a suspicious link. Do not click '
                 'it, reply, or share personal information.',
-            actionLabel: 'Report this as not spam right now',
-            onActionPressed: () {},
+            action: LinagoraAlertAction(
+              label: 'Report this as not spam right now',
+              onPressed: () {},
+            ),
             onClose: () {},
           ),
           width: 300,
@@ -531,9 +602,11 @@ void main() {
         host(
           LinagoraAlert(
             message: 'Body',
-            actionLabel: 'Not spam',
-            onActionPressed: () {},
-            actionIcon: Icons.shield,
+            action: LinagoraAlertAction(
+              label: 'Not spam',
+              onPressed: () {},
+              icon: Icons.shield,
+            ),
           ),
           width: 160,
         ),
@@ -549,10 +622,14 @@ void main() {
         host(
           LinagoraAlert(
             message: 'This message contains a suspicious link.',
-            actionLabel: 'Not spam',
-            onActionPressed: () {},
-            secondaryActionLabel: 'Report phishing',
-            onSecondaryActionPressed: () {},
+            action: LinagoraAlertAction(
+              label: 'Not spam',
+              onPressed: () {},
+            ),
+            secondaryAction: LinagoraAlertAction(
+              label: 'Report phishing',
+              onPressed: () {},
+            ),
             onClose: () {},
           ),
           width: 320,
@@ -568,10 +645,14 @@ void main() {
         host(
           LinagoraAlert(
             message: 'Body',
-            actionLabel: 'Primary action',
-            onActionPressed: () {},
-            secondaryActionLabel: 'Secondary action',
-            onSecondaryActionPressed: () {},
+            action: LinagoraAlertAction(
+              label: 'Primary action',
+              onPressed: () {},
+            ),
+            secondaryAction: LinagoraAlertAction(
+              label: 'Secondary action',
+              onPressed: () {},
+            ),
             onClose: () {},
           ),
           width: 120,
@@ -595,10 +676,14 @@ void main() {
               child: LinagoraAlert(
                 title: 'Heads up',
                 message: 'Body',
-                actionLabel: 'Not spam',
-                onActionPressed: () {},
-                secondaryActionLabel: 'Report phishing',
-                onSecondaryActionPressed: () {},
+                action: LinagoraAlertAction(
+                  label: 'Not spam',
+                  onPressed: () {},
+                ),
+                secondaryAction: LinagoraAlertAction(
+                  label: 'Report phishing',
+                  onPressed: () {},
+                ),
                 onClose: () {},
               ),
             ),
@@ -616,10 +701,14 @@ void main() {
         host(
           LinagoraAlert(
             message: 'Body',
-            actionLabel: 'A very long primary action label',
-            onActionPressed: () {},
-            secondaryActionLabel: 'A very long secondary action label',
-            onSecondaryActionPressed: () {},
+            action: LinagoraAlertAction(
+              label: 'A very long primary action label',
+              onPressed: () {},
+            ),
+            secondaryAction: LinagoraAlertAction(
+              label: 'A very long secondary action label',
+              onPressed: () {},
+            ),
             onClose: () {},
             actionsMaxWidthFraction: 1,
           ),
@@ -659,10 +748,14 @@ void main() {
             child: LinagoraAlert(
               title: 'This message may be dangerous',
               message: 'This message contains a suspicious link.',
-              actionLabel: 'Not spam',
-              onActionPressed: () {},
-              secondaryActionLabel: 'Report phishing',
-              onSecondaryActionPressed: () {},
+              action: LinagoraAlertAction(
+                label: 'Not spam',
+                onPressed: () {},
+              ),
+              secondaryAction: LinagoraAlertAction(
+                label: 'Report phishing',
+                onPressed: () {},
+              ),
               onClose: () {},
             ),
           ),
@@ -681,10 +774,14 @@ void main() {
             textDirection: TextDirection.rtl,
             child: LinagoraAlert(
               message: 'Body',
-              actionLabel: 'Not spam',
-              onActionPressed: () {},
-              secondaryActionLabel: 'Report',
-              onSecondaryActionPressed: () {},
+              action: LinagoraAlertAction(
+                label: 'Not spam',
+                onPressed: () {},
+              ),
+              secondaryAction: LinagoraAlertAction(
+                label: 'Report',
+                onPressed: () {},
+              ),
               onClose: () {},
             ),
           ),
@@ -944,10 +1041,14 @@ void main() {
           home: Scaffold(
             body: LinagoraAlert(
               message: 'Body',
-              actionLabel: 'Primary',
-              onActionPressed: () {},
-              secondaryActionLabel: 'Secondary',
-              onSecondaryActionPressed: () {},
+              action: LinagoraAlertAction(
+                label: 'Primary',
+                onPressed: () {},
+              ),
+              secondaryAction: LinagoraAlertAction(
+                label: 'Secondary',
+                onPressed: () {},
+              ),
             ),
           ),
         ),
@@ -984,6 +1085,37 @@ void main() {
               .flagsCollection
               .isLiveRegion,
           isFalse,
+        );
+      } finally {
+        semantics.dispose();
+      }
+    });
+
+    testWidgets('a disabled action remains announced as disabled',
+        (tester) async {
+      final semantics = tester.ensureSemantics();
+      try {
+        await tester.pumpWidget(
+          host(
+            const LinagoraAlert(
+              message: 'Body',
+              action: LinagoraAlertAction(
+                label: 'Not spam',
+                onPressed: null,
+              ),
+            ),
+          ),
+        );
+
+        expect(find.bySemanticsLabel('Not spam'), findsOneWidget);
+        expect(
+          tester.getSemantics(find.bySemanticsLabel('Not spam')),
+          matchesSemantics(
+            label: 'Not spam',
+            isButton: true,
+            hasEnabledState: true,
+            isEnabled: false,
+          ),
         );
       } finally {
         semantics.dispose();
@@ -1066,6 +1198,13 @@ void main() {
   });
 
   group('validation', () {
+    test('rejects an empty action label', () {
+      expect(
+        () => LinagoraAlertAction(label: '', onPressed: null),
+        throwsAssertionError,
+      );
+    });
+
     test('rejects invalid line and action constraints', () {
       expect(
         () => LinagoraAlert(

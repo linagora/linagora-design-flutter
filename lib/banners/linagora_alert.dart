@@ -1,6 +1,7 @@
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
+import 'package:linagora_design_flutter/banners/linagora_alert_action.dart';
 import 'package:linagora_design_flutter/banners/linagora_alert_pointer.dart';
 import 'package:linagora_design_flutter/banners/linagora_alert_style.dart';
 import 'package:linagora_design_flutter/buttons/linagora_button.dart';
@@ -25,8 +26,10 @@ import 'package:linagora_design_flutter/style/linagora_typography.dart';
 ///   color: LinagoraAlertColor.error,
 ///   title: 'This message may be dangerous',
 ///   message: 'This message contains a suspicious link.',
-///   actionLabel: 'Not spam',
-///   onActionPressed: () => markAsNotSpam(),
+///   action: LinagoraAlertAction(
+///     label: 'Not spam',
+///     onPressed: () => markAsNotSpam(),
+///   ),
 /// )
 /// ```
 class LinagoraAlert extends StatelessWidget {
@@ -123,21 +126,12 @@ class LinagoraAlert extends StatelessWidget {
   /// sized to [iconSize].
   final Widget? iconWidget;
 
-  /// Label of the primary action. Must be provided together with
-  /// [onActionPressed] for the button to appear.
-  final String? actionLabel;
-  final VoidCallback? onActionPressed;
+  /// Primary action. Null omits the button; a null callback inside the action
+  /// keeps a disabled button visible.
+  final LinagoraAlertAction? action;
 
-  /// Leading glyph of the primary action.
-  final IconData? actionIcon;
-
-  /// Replaces [actionIcon] with any widget.
-  final Widget? actionIconWidget;
-
-  /// Label of the secondary action, shown after the primary one in a lighter
-  /// treatment. Must be provided together with [onSecondaryActionPressed].
-  final String? secondaryActionLabel;
-  final VoidCallback? onSecondaryActionPressed;
+  /// Secondary action, shown after [action] in a lighter treatment.
+  final LinagoraAlertAction? secondaryAction;
 
   /// Shows a trailing dismiss (X) control.
   final VoidCallback? onClose;
@@ -195,12 +189,8 @@ class LinagoraAlert extends StatelessWidget {
     this.showPointer = false,
     this.icon,
     this.iconWidget,
-    this.actionLabel,
-    this.onActionPressed,
-    this.actionIcon,
-    this.actionIconWidget,
-    this.secondaryActionLabel,
-    this.onSecondaryActionPressed,
+    this.action,
+    this.secondaryAction,
     this.onClose,
     this.closeIconWidget,
     this.closeTooltip = 'Dismiss',
@@ -228,10 +218,9 @@ class LinagoraAlert extends StatelessWidget {
 
   bool get _hasTitle => title?.isNotEmpty ?? false;
 
-  bool get _hasAction => actionLabel != null && onActionPressed != null;
+  bool get _hasAction => action != null;
 
-  bool get _hasSecondaryAction =>
-      secondaryActionLabel != null && onSecondaryActionPressed != null;
+  bool get _hasSecondaryAction => secondaryAction != null;
 
   bool get _hasTrailing => _hasAction || _hasSecondaryAction || onClose != null;
 
@@ -357,11 +346,14 @@ class LinagoraAlert extends StatelessWidget {
         (_hasAction
             ? _actionMinimumWidth(
                 padding: _actionPadding,
-                hasIcon: actionIcon != null || actionIconWidget != null,
+                hasIcon: action?.hasIcon ?? false,
               )
             : 0) +
         (_hasSecondaryAction
-            ? _actionMinimumWidth(padding: _secondaryActionPadding)
+            ? _actionMinimumWidth(
+                padding: _secondaryActionPadding,
+                hasIcon: secondaryAction?.hasIcon ?? false,
+              )
             : 0) +
         (onClose == null ? 0 : closeSlotSize);
     return constraints.maxWidth <
@@ -507,12 +499,9 @@ class LinagoraAlert extends StatelessWidget {
           if (_hasAction)
             Flexible(
               child: _buildAction(
-                label: actionLabel!,
-                onPressed: onActionPressed,
+                action: action!,
                 palette: palette,
                 padding: _actionPadding,
-                icon: actionIcon,
-                iconWidget: actionIconWidget,
                 filled: true,
                 textStyle: actionTextStyle,
               ),
@@ -520,8 +509,7 @@ class LinagoraAlert extends StatelessWidget {
           if (_hasSecondaryAction)
             Flexible(
               child: _buildAction(
-                label: secondaryActionLabel!,
-                onPressed: onSecondaryActionPressed,
+                action: secondaryAction!,
                 palette: palette,
                 padding: _secondaryActionPadding,
                 filled: false,
@@ -537,16 +525,13 @@ class LinagoraAlert extends StatelessWidget {
   /// The actions read as accent-coloured pills rather than filled buttons, so
   /// they never compete with the alert's own container.
   Widget _buildAction({
-    required String label,
-    required VoidCallback? onPressed,
+    required LinagoraAlertAction action,
     required LinagoraAlertPalette palette,
     required EdgeInsets padding,
     required bool filled,
     required TextStyle textStyle,
-    IconData? icon,
-    Widget? iconWidget,
   }) {
-    final hasIcon = icon != null || iconWidget != null;
+    final hasIcon = action.hasIcon;
     return LayoutBuilder(
       builder: (context, constraints) {
         final availableWidth = math.min(
@@ -554,10 +539,11 @@ class LinagoraAlert extends StatelessWidget {
           constraints.maxWidth,
         );
         final rigidContentWidth =
-            padding.horizontal + (hasIcon ? iconSize + LinagoraSpacing.base : 0);
+            padding.horizontal +
+            (hasIcon ? iconSize + LinagoraSpacing.base : 0);
         final labelWidth = math.max(0.0, availableWidth - rigidContentWidth);
         final labelPainter = TextPainter(
-          text: TextSpan(text: label, style: textStyle),
+          text: TextSpan(text: action.label, style: textStyle),
           textDirection: Directionality.of(context),
           textScaler: MediaQuery.textScalerOf(context),
           locale: Localizations.maybeLocaleOf(context),
@@ -568,23 +554,26 @@ class LinagoraAlert extends StatelessWidget {
         labelPainter.dispose();
 
         return LinagoraButton(
-          label: label,
-          onPressed: onPressed,
+          label: action.label,
+          onPressed: action.onPressed,
           size: LinagoraButtonSize.xs,
           variant: LinagoraButtonVariant.text,
           padding: padding,
           minimumHeight: actionMinHeight,
           textStyle: textStyle,
           constraints: BoxConstraints(maxWidth: actionMaxWidth),
-          icon: icon,
-          iconWidget: iconWidget,
+          icon: action.icon,
+          iconWidget: action.iconWidget,
           iconSize: hasIcon ? iconSize : null,
           iconColor: hasIcon ? palette.accent : null,
           foregroundColor: palette.accent,
           backgroundColor: filled ? palette.actionBackground : null,
+          disabledForegroundColor: LinagoraButton.disabledContentColor,
+          disabledBackgroundColor:
+              filled ? LinagoraButton.disabledContainerColor : null,
           hoverBackgroundColor: filled ? palette.actionHoverBackground : null,
           hoverOverlayColor: filled ? null : palette.actionHoverBackground,
-          tooltip: isLabelTruncated ? label : null,
+          tooltip: isLabelTruncated ? action.label : null,
         );
       },
     );

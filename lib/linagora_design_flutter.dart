@@ -33,6 +33,7 @@ export 'package:linagora_design_flutter/chat/bubble_shape.dart';
 export 'package:linagora_design_flutter/chat/message_bubble.dart';
 export 'package:linagora_design_flutter/behaviors/right_click_focus.dart';
 export 'package:linagora_design_flutter/banners/linagora_alert.dart';
+export 'package:linagora_design_flutter/banners/linagora_alert_action.dart';
 export 'package:linagora_design_flutter/banners/linagora_alert_pointer.dart';
 export 'package:linagora_design_flutter/banners/linagora_alert_style.dart';
 export 'package:linagora_design_flutter/banners/linagora_banner.dart';

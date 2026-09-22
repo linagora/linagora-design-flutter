@@ -28,11 +28,8 @@ Widget linagoraAlertUseCase(BuildContext context) {
       showIcon: content.showIcon,
       showPointer: style.showPointer,
       icon: content.icon,
-      actionLabel: actions.actionLabel,
-      onActionPressed: actions.onActionPressed,
-      actionIcon: actions.actionIcon,
-      secondaryActionLabel: actions.secondaryActionLabel,
-      onSecondaryActionPressed: actions.onSecondaryActionPressed,
+      action: actions.action,
+      secondaryAction: actions.secondaryAction,
       onClose: actions.onClose,
       accentColor: colours.accent,
       backgroundColor: colours.background,
@@ -170,11 +167,8 @@ _LayoutKnobs _layoutKnobs(BuildContext context) {
 }
 
 typedef _ActionKnobs = ({
-  String? actionLabel,
-  VoidCallback? onActionPressed,
-  IconData? actionIcon,
-  String? secondaryActionLabel,
-  VoidCallback? onSecondaryActionPressed,
+  LinagoraAlertAction? action,
+  LinagoraAlertAction? secondaryAction,
   VoidCallback? onClose,
   double actionMaxWidth,
   double actionsMaxWidthFraction,
@@ -189,23 +183,29 @@ _ActionKnobs _actionKnobs(BuildContext context) {
     initialValue: false,
   );
   final hasClose = context.knobs.boolean(label: 'Close', initialValue: false);
-
-  return (
-    actionLabel: hasAction
-        ? context.knobs.string(
+  final action = hasAction
+      ? LinagoraAlertAction(
+          label: context.knobs.string(
             label: 'Action label',
             initialValue: 'Not spam',
-          )
-        : null,
-    onActionPressed: hasAction ? _noop : null,
-    actionIcon: hasActionIcon ? Icons.shield_outlined : null,
-    secondaryActionLabel: hasSecondary
-        ? context.knobs.string(
+          ),
+          onPressed: _noop,
+          icon: hasActionIcon ? Icons.shield_outlined : null,
+        )
+      : null;
+  final secondaryAction = hasSecondary
+      ? LinagoraAlertAction(
+          label: context.knobs.string(
             label: 'Secondary action label',
             initialValue: 'Report phishing',
-          )
-        : null,
-    onSecondaryActionPressed: hasSecondary ? _noop : null,
+          ),
+          onPressed: _noop,
+        )
+      : null;
+
+  return (
+    action: action,
+    secondaryAction: secondaryAction,
     onClose: hasClose ? _noop : null,
     actionMaxWidth: context.knobs.double.slider(
       label: 'Action max width',

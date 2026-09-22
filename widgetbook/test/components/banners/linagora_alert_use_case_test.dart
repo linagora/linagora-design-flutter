@@ -7,6 +7,7 @@ import 'package:widgetbook_workspace/components/banners/linagora_alert_use_case.
 void main() {
   testWidgets('the use case builds from its default knobs', _defaultKnobs);
   testWidgets('knobs reach the alert', _forwardsKnobs);
+  testWidgets('action knobs reach both action models', _forwardsActionKnobs);
   testWidgets('booleans add each slot', _addsSlots);
 }
 
@@ -48,6 +49,11 @@ Future<void> _defaultKnobs(WidgetTester tester) async {
   await _pumpUseCase(tester, linagoraAlertUseCase);
 
   expect(find.byType(LinagoraAlert), findsOneWidget);
+  final alert = _alert(tester);
+  expect(alert.action?.label, 'Not spam');
+  expect(alert.action?.onPressed, isNotNull);
+  expect(alert.action?.icon, isNull);
+  expect(alert.secondaryAction, isNull);
   expect(tester.takeException(), isNull);
 }
 
@@ -75,6 +81,23 @@ Future<void> _forwardsKnobs(WidgetTester tester) async {
   expect(tester.takeException(), isNull);
 }
 
+Future<void> _forwardsActionKnobs(WidgetTester tester) async {
+  await _pumpUseCase(tester, linagoraAlertUseCase, knobs: {
+    'Action label': 'Move to inbox',
+    'Action icon': 'true',
+    'Secondary action': 'true',
+    'Secondary action label': 'Report sender',
+  });
+
+  final alert = _alert(tester);
+  expect(alert.action?.label, 'Move to inbox');
+  expect(alert.action?.onPressed, isNotNull);
+  expect(alert.action?.icon, Icons.shield_outlined);
+  expect(alert.secondaryAction?.label, 'Report sender');
+  expect(alert.secondaryAction?.onPressed, isNotNull);
+  expect(tester.takeException(), isNull);
+}
+
 Future<void> _addsSlots(WidgetTester tester) async {
   await _pumpUseCase(tester, linagoraAlertUseCase, knobs: {
     'Title': 'false',
@@ -88,8 +111,9 @@ Future<void> _addsSlots(WidgetTester tester) async {
   final alert = _alert(tester);
   expect(alert.title, isNull);
   expect(alert.showIcon, isFalse);
-  expect(alert.onActionPressed, isNull);
-  expect(alert.onSecondaryActionPressed, isNotNull);
+  expect(alert.action, isNull);
+  expect(alert.secondaryAction?.label, 'Report phishing');
+  expect(alert.secondaryAction?.onPressed, isNotNull);
   expect(alert.onClose, isNotNull);
   expect(alert.showPointer, isTrue);
   expect(tester.takeException(), isNull);
