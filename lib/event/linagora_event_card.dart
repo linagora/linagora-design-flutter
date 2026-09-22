@@ -464,7 +464,7 @@ class LinagoraEventCard extends StatelessWidget {
     return LinagoraEventInfoLink(
       label: action.label,
       onPressed: action.onPressed,
-      icon: action.icon,
+      icon: action.icon?.data,
       tooltip: action.tooltip,
     );
   }
@@ -705,7 +705,7 @@ class _EventDetailContent extends StatelessWidget {
         : LinagoraEventInfoLink(
             label: action.label,
             onPressed: action.onPressed,
-            icon: action.icon,
+            icon: action.icon?.data,
             tooltip: action.tooltip,
           );
     final firstLineChildren = <Widget>[
@@ -809,8 +809,9 @@ class _EventPillButton extends StatelessWidget {
     return LinagoraButton(
       label: action.label,
       onPressed: selected ? null : action.onPressed,
-      icon: action.icon,
-      iconColor: action.iconColor,
+      icon: action.icon?.data,
+      iconWidget: action.icon?.widget,
+      iconColor: action.icon?.color,
       tooltip: action.tooltip,
       backgroundColor: LinagoraEventInfoColors.link,
       foregroundColor: const Color(0xFFFFFFFF),
@@ -834,8 +835,9 @@ class _EventTextButton extends StatelessWidget {
     return LinagoraButton(
       label: action.label,
       onPressed: action.onPressed,
-      icon: action.icon,
-      iconColor: action.iconColor ?? LinagoraEventInfoColors.secondary,
+      icon: action.icon?.data,
+      iconWidget: action.icon?.widget,
+      iconColor: action.icon?.color ?? LinagoraEventInfoColors.secondary,
       iconSize: 18,
       iconSpacing: 8,
       tooltip: action.tooltip,
