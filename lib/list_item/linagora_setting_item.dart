@@ -52,6 +52,14 @@ class LinagoraSettingItem extends StatelessWidget {
   /// Background color override. Null means transparent.
   final Color? itemDecorationColor;
 
+  final Color? titleColor;
+
+  final Color? subtitleColor;
+
+  final Color? iconColor;
+
+  final CrossAxisAlignment? crossAxisAlignment;
+
   const LinagoraSettingItem({
     super.key,
     required this.title,
@@ -65,6 +73,10 @@ class LinagoraSettingItem extends StatelessWidget {
     this.enabled = true,
     this.pressedColor,
     this.itemDecorationColor,
+    this.titleColor,
+    this.subtitleColor,
+    this.iconColor,
+    this.crossAxisAlignment,
   });
 
   @override
@@ -72,9 +84,11 @@ class LinagoraSettingItem extends StatelessWidget {
     final colors = LinagoraSysColors.material();
     final textThemeExtension = LinagoraTextThemeExtension.material();
     final textTheme = LinagoraTextTheme.material();
-    final subtitleColor = LinagoraRefColors.material().tertiary[30] ??
+    final resolvedSubtitleColor =
+        subtitleColor ??
+        LinagoraRefColors.material().tertiary[30] ??
         const Color(0xFF99A0A9);
-    final iconColor = subtitleColor;
+    final resolvedIconColor = iconColor ?? resolvedSubtitleColor;
 
     final hoverStyle = LinagoraHoverStyle.material();
 
@@ -102,17 +116,25 @@ class LinagoraSettingItem extends StatelessWidget {
                   child: Padding(
                     padding: _padding,
                     child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.center,
+                      crossAxisAlignment:
+                          crossAxisAlignment ?? CrossAxisAlignment.center,
                       children: [
                         SizedBox(
                           width: _iconSize,
-                          height: _iconSize,
-                          child: leading ??
-                              Icon(
-                                leadingIcon,
-                                size: _iconSize,
-                                color: iconColor,
-                              ),
+                          child: Align(
+                            alignment: Alignment.topCenter,
+                            child: SizedBox(
+                              width: _iconSize,
+                              height: _iconSize,
+                              child:
+                                  leading ??
+                                  Icon(
+                                    leadingIcon,
+                                    size: _iconSize,
+                                    color: resolvedIconColor,
+                                  ),
+                            ),
+                          ),
                         ),
                         const SizedBox(width: _gap),
                         Expanded(
@@ -123,16 +145,18 @@ class LinagoraSettingItem extends StatelessWidget {
                             children: [
                               Text(
                                 title,
-                                style: textThemeExtension.bodyMedium2
-                                    .copyWith(color: colors.onSurface),
+                                style: textThemeExtension.bodyMedium2.copyWith(
+                                  color: titleColor ?? colors.onSurface,
+                                ),
                                 maxLines: 2,
                                 overflow: TextOverflow.ellipsis,
                               ),
                               const SizedBox(height: _textGap),
                               Text(
                                 subtitle,
-                                style: textTheme.bodyMedium
-                                    ?.copyWith(color: subtitleColor),
+                                style: textTheme.bodyMedium?.copyWith(
+                                  color: resolvedSubtitleColor,
+                                ),
                                 maxLines: 2,
                                 overflow: TextOverflow.ellipsis,
                               ),
@@ -140,22 +164,24 @@ class LinagoraSettingItem extends StatelessWidget {
                           ),
                         ),
                         const SizedBox(width: _gap),
-                        if (loading)
-                          SizedBox(
-                            width: _iconSize,
-                            height: _iconSize,
-                            child: CircularProgressIndicator(
-                              strokeWidth: 2,
-                              color: iconColor,
-                            ),
-                          )
-                        else
-                          trailing ??
-                              Icon(
-                                Icons.chevron_right,
-                                size: _iconSize,
-                                color: iconColor,
-                              ),
+                        Align(
+                          alignment: Alignment.center,
+                          child: loading
+                              ? SizedBox(
+                                  width: _iconSize,
+                                  height: _iconSize,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                    color: resolvedIconColor,
+                                  ),
+                                )
+                              : trailing ??
+                                    Icon(
+                                      Icons.chevron_right,
+                                      size: _iconSize,
+                                      color: resolvedIconColor,
+                                    ),
+                        ),
                       ],
                     ),
                   ),
