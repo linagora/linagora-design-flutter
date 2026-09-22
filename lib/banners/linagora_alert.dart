@@ -354,11 +354,27 @@ class LinagoraAlert extends StatelessWidget {
     final contentMinimum = _minimumTextWidth +
         (showIcon ? iconSize + iconSpacing : 0);
     final trailingMinimum =
-        (_hasAction ? actionMinHeight : 0) +
-        (_hasSecondaryAction ? actionMinHeight : 0) +
+        (_hasAction
+            ? _actionMinimumWidth(
+                padding: _actionPadding,
+                hasIcon: actionIcon != null || actionIconWidget != null,
+              )
+            : 0) +
+        (_hasSecondaryAction
+            ? _actionMinimumWidth(padding: _secondaryActionPadding)
+            : 0) +
         (onClose == null ? 0 : closeSlotSize);
     return constraints.maxWidth <
         contentMinimum + actionsSpacing + trailingMinimum;
+  }
+
+  double _actionMinimumWidth({
+    required EdgeInsets padding,
+    bool hasIcon = false,
+  }) {
+    final rigidContentWidth =
+        padding.horizontal + (hasIcon ? iconSize + LinagoraSpacing.base : 0);
+    return math.max(actionMinHeight, rigidContentWidth);
   }
 
   /// Resolves the palette, then applies the caller's colour overrides.
@@ -530,24 +546,47 @@ class LinagoraAlert extends StatelessWidget {
     IconData? icon,
     Widget? iconWidget,
   }) {
-    return LinagoraButton(
-      label: label,
-      onPressed: onPressed,
-      size: LinagoraButtonSize.xs,
-      variant: LinagoraButtonVariant.text,
-      padding: padding,
-      minimumHeight: actionMinHeight,
-      textStyle: textStyle,
-      constraints: BoxConstraints(maxWidth: actionMaxWidth),
-      icon: icon,
-      iconWidget: iconWidget,
-      iconSize: icon == null && iconWidget == null ? null : iconSize,
-      iconColor: icon == null && iconWidget == null ? null : palette.accent,
-      foregroundColor: palette.accent,
-      backgroundColor: filled ? palette.actionBackground : null,
-      hoverBackgroundColor: filled ? palette.actionHoverBackground : null,
-      hoverOverlayColor: filled ? null : palette.actionHoverBackground,
-      tooltip: label,
+    final hasIcon = icon != null || iconWidget != null;
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final availableWidth = math.min(
+          actionMaxWidth,
+          constraints.maxWidth,
+        );
+        final rigidContentWidth =
+            padding.horizontal + (hasIcon ? iconSize + LinagoraSpacing.base : 0);
+        final labelWidth = math.max(0.0, availableWidth - rigidContentWidth);
+        final labelPainter = TextPainter(
+          text: TextSpan(text: label, style: textStyle),
+          textDirection: Directionality.of(context),
+          textScaler: MediaQuery.textScalerOf(context),
+          locale: Localizations.maybeLocaleOf(context),
+          maxLines: 1,
+          ellipsis: '…',
+        )..layout(maxWidth: labelWidth);
+        final isLabelTruncated = labelPainter.didExceedMaxLines;
+        labelPainter.dispose();
+
+        return LinagoraButton(
+          label: label,
+          onPressed: onPressed,
+          size: LinagoraButtonSize.xs,
+          variant: LinagoraButtonVariant.text,
+          padding: padding,
+          minimumHeight: actionMinHeight,
+          textStyle: textStyle,
+          constraints: BoxConstraints(maxWidth: actionMaxWidth),
+          icon: icon,
+          iconWidget: iconWidget,
+          iconSize: hasIcon ? iconSize : null,
+          iconColor: hasIcon ? palette.accent : null,
+          foregroundColor: palette.accent,
+          backgroundColor: filled ? palette.actionBackground : null,
+          hoverBackgroundColor: filled ? palette.actionHoverBackground : null,
+          hoverOverlayColor: filled ? null : palette.actionHoverBackground,
+          tooltip: isLabelTruncated ? label : null,
+        );
+      },
     );
   }
 
