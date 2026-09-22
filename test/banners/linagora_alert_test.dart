@@ -277,6 +277,30 @@ void main() {
       );
     });
 
+    testWidgets('the dismiss control forwards closeTooltip', (tester) async {
+      await tester.pumpWidget(
+        host(LinagoraAlert(message: 'Body', onClose: () {})),
+      );
+      expect(
+        tester.widget<LinagoraIconButton>(find.byType(LinagoraIconButton)).tooltip,
+        'Dismiss',
+      );
+
+      await tester.pumpWidget(
+        host(
+          LinagoraAlert(
+            message: 'Body',
+            onClose: () {},
+            closeTooltip: 'Fermer',
+          ),
+        ),
+      );
+      expect(
+        tester.widget<LinagoraIconButton>(find.byType(LinagoraIconButton)).tooltip,
+        'Fermer',
+      );
+    });
+
     testWidgets('the action button honours the minimum height token',
         (tester) async {
       await tester.pumpWidget(
