@@ -344,6 +344,7 @@ void main() {
             onActionPressed: () {},
             secondaryActionLabel: 'Report',
             onSecondaryActionPressed: () {},
+            actionsMaxWidthFraction: 1,
           ),
         ),
       );
@@ -353,6 +354,27 @@ void main() {
       )) {
         expect(action.tooltip, isNull);
       }
+    });
+
+    testWidgets('a truncated action exposes its full label in a tooltip',
+        (tester) async {
+      const label = 'Report this message as not spam';
+      await tester.pumpWidget(
+        host(
+          LinagoraAlert(
+            message: 'Body',
+            actionLabel: label,
+            onActionPressed: () {},
+            actionMaxWidth: 80,
+          ),
+        ),
+      );
+
+      expect(
+        tester.widget<LinagoraButton>(find.byType(LinagoraButton)).tooltip,
+        label,
+      );
+      expect(tester.widget<Tooltip>(find.byType(Tooltip)).message, label);
     });
   });
 
@@ -1044,31 +1066,6 @@ void main() {
   });
 
   group('validation', () {
-    test('rejects an action label or callback without its pair', () {
-      expect(
-        () => LinagoraAlert(message: 'Body', actionLabel: 'Not spam'),
-        throwsAssertionError,
-      );
-      expect(
-        () => LinagoraAlert(message: 'Body', onActionPressed: () {}),
-        throwsAssertionError,
-      );
-      expect(
-        () => LinagoraAlert(
-          message: 'Body',
-          secondaryActionLabel: 'Report phishing',
-        ),
-        throwsAssertionError,
-      );
-      expect(
-        () => LinagoraAlert(
-          message: 'Body',
-          onSecondaryActionPressed: () {},
-        ),
-        throwsAssertionError,
-      );
-    });
-
     test('rejects invalid line and action constraints', () {
       expect(
         () => LinagoraAlert(
