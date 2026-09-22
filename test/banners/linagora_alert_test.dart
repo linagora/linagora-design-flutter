@@ -458,6 +458,24 @@ void main() {
       expect(tester.takeException(), isNull);
     });
 
+    testWidgets('an action icon does not overflow a narrow alert',
+        (tester) async {
+      await tester.pumpWidget(
+        host(
+          LinagoraAlert(
+            message: 'Body',
+            actionLabel: 'Not spam',
+            onActionPressed: () {},
+            actionIcon: Icons.shield,
+          ),
+          width: 160,
+        ),
+      );
+
+      expect(find.byIcon(Icons.shield), findsOneWidget);
+      expect(tester.takeException(), isNull);
+    });
+
     testWidgets('both actions and a dismiss control fit a narrow alert',
         (tester) async {
       await tester.pumpWidget(
