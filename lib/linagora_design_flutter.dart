@@ -24,6 +24,7 @@ export 'package:linagora_design_flutter/list_item/linagora_setting_item.dart';
 export 'package:linagora_design_flutter/list_item/linagora_radio_item.dart';
 export 'package:linagora_design_flutter/cozy_config_manager/cozy_config_manager.dart';
 export 'package:linagora_design_flutter/reaction/reaction_dialog.dart';
+export 'package:linagora_design_flutter/reaction/linagora_reaction_item.dart';
 export 'package:linagora_design_flutter/spacings/linagora_spacing.dart';
 export 'package:linagora_design_flutter/buttons/linagora_button.dart';
 export 'package:linagora_design_flutter/buttons/linagora_button_size.dart';

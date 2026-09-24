@@ -15,6 +15,7 @@ import 'package:widgetbook_workspace/components/event/linagora_event_info_row_us
 import 'package:widgetbook_workspace/components/list_item/linagora_radio_item_use_case.dart';
 import 'package:widgetbook_workspace/components/list_item/linagora_setting_item_use_case.dart';
 import 'package:widgetbook_workspace/components/list_item/session_device_list_item_use_case.dart';
+import 'package:widgetbook_workspace/components/reaction/linagora_reaction_item_use_case.dart';
 import 'package:widgetbook_workspace/components/sidebar/linagora_sidebar_item_use_case.dart';
 import 'package:widgetbook_workspace/components/sidebar/linagora_sidebar_actions_use_case.dart';
 import 'package:widgetbook_workspace/components/sidebar/linagora_sidebar_footer_use_case.dart';
@@ -209,6 +210,20 @@ class WidgetbookApp extends StatelessWidget {
                 WidgetbookUseCase(
                   name: 'Group',
                   builder: (context) => linagoraRadioItemUseCase(context),
+                ),
+              ],
+            ),
+          ],
+        ),
+        WidgetbookFolder(
+          name: 'Reaction',
+          children: [
+            WidgetbookComponent(
+              name: 'Linagora reaction item',
+              useCases: [
+                WidgetbookUseCase(
+                  name: 'Default',
+                  builder: (context) => linagoraReactionItemUseCase(context),
                 ),
               ],
             ),
