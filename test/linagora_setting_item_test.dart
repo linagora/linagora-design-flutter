@@ -3,30 +3,29 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:linagora_design_flutter/linagora_design_flutter.dart';
 
 void main() {
-  testWidgets(
-    'does not overflow with long title/subtitle on narrow width',
-    (tester) async {
-      await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: SizedBox(
-              width: 300,
-              child: LinagoraSettingItem(
-                title: 'A very long setting title that should wrap and clip',
-                subtitle:
-                    'A very long setting description that should wrap onto '
-                    'two lines and then get ellipsized instead of overflowing',
-                leadingIcon: Icons.chat_bubble_outline,
-                onTap: () {},
-              ),
+  testWidgets('does not overflow with long title/subtitle on narrow width', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          body: SizedBox(
+            width: 300,
+            child: LinagoraSettingItem(
+              title: 'A very long setting title that should wrap and clip',
+              subtitle:
+                  'A very long setting description that should wrap onto '
+                  'two lines and then get ellipsized instead of overflowing',
+              leadingIcon: Icons.chat_bubble_outline,
+              onTap: () {},
             ),
           ),
         ),
-      );
-      await tester.pump();
-      expect(tester.takeException(), isNull);
-    },
-  );
+      ),
+    );
+    await tester.pump();
+    expect(tester.takeException(), isNull);
+  });
 
   testWidgets('disabled item does not invoke onTap', (tester) async {
     var tapped = false;
@@ -97,5 +96,78 @@ void main() {
     await tester.pump();
 
     expect(find.byType(Divider), findsOneWidget);
+  });
+
+  testWidgets('titleColor/subtitleColor/iconColor override the default styling '
+      '(e.g. a destructive row)', (tester) async {
+    const errorColor = Color(0xFFFF3347);
+    final defaultTitleColor = LinagoraSysColors.material().onSurface;
+    final defaultSubtitleColor = LinagoraRefColors.material().tertiary[30];
+    final defaultIconColor = defaultSubtitleColor;
+
+    await tester.pumpWidget(
+      const MaterialApp(
+        home: Scaffold(
+          body: LinagoraSettingItem(
+            title: 'Remove device',
+            subtitle: 'Sign out and remove this session permanently',
+            leadingIcon: Icons.delete_outline,
+            titleColor: errorColor,
+            subtitleColor: errorColor,
+            iconColor: errorColor,
+          ),
+        ),
+      ),
+    );
+    await tester.pump();
+
+    final titleText = tester.widget<Text>(find.text('Remove device'));
+    final subtitleText = tester.widget<Text>(
+      find.text('Sign out and remove this session permanently'),
+    );
+    final icon = tester.widget<Icon>(find.byIcon(Icons.delete_outline));
+    final chevron = tester.widget<Icon>(find.byIcon(Icons.chevron_right));
+
+    expect(titleText.style?.color, errorColor);
+    expect(titleText.style?.color, isNot(defaultTitleColor));
+    expect(subtitleText.style?.color, errorColor);
+    expect(subtitleText.style?.color, isNot(defaultSubtitleColor));
+    expect(icon.color, errorColor);
+    expect(icon.color, isNot(defaultIconColor));
+    expect(chevron.color, errorColor);
+    expect(chevron.color, isNot(defaultIconColor));
+  });
+
+  testWidgets('without color overrides, defaults are unchanged', (
+    tester,
+  ) async {
+    final defaultTitleColor = LinagoraSysColors.material().onSurface;
+    final defaultSubtitleColor = LinagoraRefColors.material().tertiary[30];
+    final defaultIconColor = defaultSubtitleColor;
+
+    await tester.pumpWidget(
+      const MaterialApp(
+        home: Scaffold(
+          body: LinagoraSettingItem(
+            title: 'Name',
+            subtitle: 'Description',
+            leadingIcon: Icons.chat_bubble_outline,
+          ),
+        ),
+      ),
+    );
+    await tester.pump();
+
+    final titleText = tester.widget<Text>(find.text('Name'));
+    final subtitleText = tester.widget<Text>(find.text('Description'));
+    final icon = tester.widget<Icon>(
+      find.byIcon(Icons.chat_bubble_outline),
+    );
+    final chevron = tester.widget<Icon>(find.byIcon(Icons.chevron_right));
+
+    expect(titleText.style?.color, defaultTitleColor);
+    expect(subtitleText.style?.color, defaultSubtitleColor);
+    expect(icon.color, defaultIconColor);
+    expect(chevron.color, defaultIconColor);
   });
 }
