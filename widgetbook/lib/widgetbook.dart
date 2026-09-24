@@ -195,6 +195,11 @@ class WidgetbookApp extends StatelessWidget {
                   name: 'Default',
                   builder: (context) => linagoraSettingItemUseCase(context),
                 ),
+                WidgetbookUseCase(
+                  name: 'Selectable',
+                  builder: (context) =>
+                      linagoraSettingItemSelectableUseCase(context),
+                ),
               ],
             ),
           ],
