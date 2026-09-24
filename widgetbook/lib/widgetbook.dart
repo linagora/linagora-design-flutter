@@ -12,8 +12,10 @@ import 'package:widgetbook_workspace/components/event/linagora_event_card_use_ca
 import 'package:widgetbook_workspace/components/event/linagora_event_date_icon_use_case.dart';
 import 'package:widgetbook_workspace/components/event/event_activity_badge_use_case.dart';
 import 'package:widgetbook_workspace/components/event/linagora_event_info_row_use_case.dart';
+import 'package:widgetbook_workspace/components/list_item/linagora_radio_item_use_case.dart';
 import 'package:widgetbook_workspace/components/list_item/linagora_setting_item_use_case.dart';
 import 'package:widgetbook_workspace/components/list_item/session_device_list_item_use_case.dart';
+import 'package:widgetbook_workspace/components/reaction/linagora_reaction_item_use_case.dart';
 import 'package:widgetbook_workspace/components/sidebar/linagora_sidebar_item_use_case.dart';
 import 'package:widgetbook_workspace/components/sidebar/linagora_sidebar_actions_use_case.dart';
 import 'package:widgetbook_workspace/components/sidebar/linagora_sidebar_footer_use_case.dart';
@@ -194,6 +196,34 @@ class WidgetbookApp extends StatelessWidget {
                 WidgetbookUseCase(
                   name: 'Default',
                   builder: (context) => linagoraSettingItemUseCase(context),
+                ),
+                WidgetbookUseCase(
+                  name: 'Selectable',
+                  builder: (context) =>
+                      linagoraSettingItemSelectableUseCase(context),
+                ),
+              ],
+            ),
+            WidgetbookComponent(
+              name: 'Linagora radio item',
+              useCases: [
+                WidgetbookUseCase(
+                  name: 'Group',
+                  builder: (context) => linagoraRadioItemUseCase(context),
+                ),
+              ],
+            ),
+          ],
+        ),
+        WidgetbookFolder(
+          name: 'Reaction',
+          children: [
+            WidgetbookComponent(
+              name: 'Linagora reaction item',
+              useCases: [
+                WidgetbookUseCase(
+                  name: 'Default',
+                  builder: (context) => linagoraReactionItemUseCase(context),
                 ),
               ],
             ),
