@@ -1,3 +1,33 @@
+## 0.3.4
+
+### Added
+
+* `LinagoraReactionItem`: a reaction row with avatar, emoji and display name,
+  in small or large size, with optional tap handling.
+* `LinagoraRadioItem`: a single-choice list option with selected state,
+  optional divider, and disabled support.
+* `LinagoraSettingItem.selectable`: settings rows with a trailing toggle or
+  checkbox (`LinagoraSettingItemControl`), plus optional subtitle, count,
+  custom padding and title-only layout.
+* Customizable `titleColor`, `subtitleColor`, `iconColor` and
+  `crossAxisAlignment` on `LinagoraSettingItem`.
+* `LinagoraEventAction.calendar` factory and `LinagoraEventActionIcon` so
+  event actions can use IconData or a widget (including the packaged calendar
+  SVG) with an optional colour.
+* Deploy Widgetbook to GitHub Pages via CI.
+
+### Changed
+
+* `LinagoraSettingItem` subtitle is optional; leading icon alignment and
+  inset padding better match Figma setting-item variants.
+* `LinagoraEventAction.icon` is now `LinagoraEventActionIcon?` instead of
+  separate `IconData?` / `iconColor` fields.
+
+### Fixed
+
+* Harden `LinagoraAlert` action layout for narrow widths, incomplete action
+  pairs, repeating tooltips and localized dismiss tooltips.
+
 ## 0.3.3
 
 ### Added
