@@ -173,6 +173,11 @@ class WidgetbookApp extends StatelessWidget {
                   name: 'Default',
                   builder: (context) => messageBubbleUseCase(context),
                 ),
+                WidgetbookUseCase(
+                  name: 'With reactions',
+                  builder: (context) =>
+                      messageBubbleWithReactionsUseCase(context),
+                ),
               ],
             ),
           ],
