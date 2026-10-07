@@ -10,6 +10,9 @@
   Figma `🔷 dialog` with optional back and close buttons, a message with extra
   content, primary/secondary (or destructive) actions and an optional divided
   footer.
+* `LinagoraReactionChip`: a pill of the reactions row under a message bubble,
+  for a unicode or custom emoji with optional count, the tappable `+N`
+  remaining counter and the "more" button.
 
 ## 0.3.4
 
