@@ -2,11 +2,20 @@
 
 ### Added
 
+* `MessageBubble.reactions`: lays the reactions row over the bottom of the
+  bubble and lets it extend past a bubble narrower than the row (towards the
+  start with `isAlignedToEnd`).
+* `MessageBubble.plain`: a message without bubble decoration.
 * `LinagoraReactions`: the reactions row under a message bubble, showing up
   to 3 reactions then a `+N` chip or the "more" button.
 * `LinagoraReactionChip`: a pill of the reactions row under a message bubble,
   for a unicode or custom emoji with optional count, the tappable `+N`
   remaining counter and the "more" button.
+
+### Changed
+
+* **Breaking:** `MessageBubble.hasReactions` is replaced by
+  `MessageBubble.reactions`.
 
 ## 0.3.4
 
