@@ -1,3 +1,11 @@
+## Unreleased
+
+### Added
+
+* `LinagoraReactionChip`: a pill of the reactions row under a message bubble,
+  for a unicode or custom emoji with optional count, the tappable `+N`
+  remaining counter and the "more" button.
+
 ## 0.3.4
 
 ### Added
