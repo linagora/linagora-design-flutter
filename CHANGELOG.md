@@ -6,6 +6,8 @@
   bubble and lets it extend past a bubble narrower than the row (towards the
   start with `isAlignedToEnd`).
 * `MessageBubble.plain`: a message without bubble decoration.
+* `LinagoraReactionTabs`: the tabs filtering the list of who reacted to a
+  message.
 * `LinagoraReactions`: the reactions row under a message bubble, showing up
   to 3 reactions then a `+N` chip or the "more" button.
 * `LinagoraReactionChip`: a pill of the reactions row under a message bubble,

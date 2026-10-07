@@ -26,6 +26,7 @@ export 'package:linagora_design_flutter/cozy_config_manager/cozy_config_manager.
 export 'package:linagora_design_flutter/reaction/reaction_dialog.dart';
 export 'package:linagora_design_flutter/reaction/linagora_reaction_chip.dart';
 export 'package:linagora_design_flutter/reaction/linagora_reaction_item.dart';
+export 'package:linagora_design_flutter/reaction/linagora_reaction_tabs.dart';
 export 'package:linagora_design_flutter/reaction/linagora_reactions.dart';
 export 'package:linagora_design_flutter/spacings/linagora_spacing.dart';
 export 'package:linagora_design_flutter/buttons/linagora_button.dart';
