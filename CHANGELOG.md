@@ -6,6 +6,7 @@
   bubble and lets it extend past a bubble narrower than the row (towards the
   start with `isAlignedToEnd`).
 * `MessageBubble.plain`: a message without bubble decoration.
+* `LinagoraReactionItem.image`: a reaction row showing a custom emoji image.
 * `LinagoraReactionTabs`: the tabs filtering the list of who reacted to a
   message.
 * `LinagoraReactions`: the reactions row under a message bubble, showing up
@@ -16,6 +17,7 @@
 
 ### Changed
 
+* `LinagoraReactionItem` in large size shows its emoji in `headlineMedium`.
 * **Breaking:** `MessageBubble.hasReactions` is replaced by
   `MessageBubble.reactions`.
 

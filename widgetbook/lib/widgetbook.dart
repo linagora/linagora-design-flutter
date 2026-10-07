@@ -260,6 +260,11 @@ class WidgetbookApp extends StatelessWidget {
                   name: 'Default',
                   builder: (context) => linagoraReactionItemUseCase(context),
                 ),
+                WidgetbookUseCase(
+                  name: 'Custom emoji',
+                  builder: (context) =>
+                      linagoraReactionItemImageUseCase(context),
+                ),
               ],
             ),
           ],
