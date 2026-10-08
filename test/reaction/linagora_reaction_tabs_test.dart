@@ -86,4 +86,19 @@ void main() {
 
     expect(tester.takeException(), isNull);
   });
+
+  testWidgets('does not need a Material ancestor', (tester) async {
+    await tester.pumpWidget(
+      Directionality(
+        textDirection: TextDirection.ltr,
+        child: LinagoraReactionTabs(
+          tabs: tabs,
+          selectedIndex: 0,
+          onSelected: (_) {},
+        ),
+      ),
+    );
+
+    expect(tester.takeException(), isNull);
+  });
 }
