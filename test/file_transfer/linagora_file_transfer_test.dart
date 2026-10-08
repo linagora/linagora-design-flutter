@@ -309,6 +309,28 @@ void main() {
       expect(t.getSize(find.byType(LinagoraFileTransferDialog)).height, 188);
     });
 
+    testWidgets('footer Cancel hugs a short label at 40 tall on desktop',
+        (t) async {
+      await t.pumpWidget(MaterialApp(
+        theme: ThemeData(platform: TargetPlatform.macOS),
+        home: Scaffold(
+          body: LinagoraFileTransferDialog(
+            title: 'Attaching file',
+            description: const TextSpan(text: 'desc'),
+            itemCount: 0,
+            itemBuilder: (_, i) => const SizedBox(),
+            cancelLabel: 'OK',
+            onCancelAll: () {},
+          ),
+        ),
+      ));
+      final cancel =
+          t.getSize(find.byKey(LinagoraFileTransferDialog.cancelAllButtonKey));
+      final label = t.getSize(find.text('OK'));
+      expect(cancel, Size(label.width + 16, 40));
+      expect(cancel.width, lessThan(64));
+    });
+
     testWidgets('cancel aligns end on wide and start on compact', (t) async {
       await t.pumpWidget(_host(SizedBox(width: 600, child: dialog())));
       final wide = t.getCenter(
