@@ -55,6 +55,14 @@ void main() {
       expect(taps, 1);
     });
 
+    testWidgets('a settled row keeps the cancel slot and the bar width',
+        (t) async {
+      await t.pumpWidget(_host(_row(progress: 0.5, onCancel: () {})));
+      final running = t.getSize(find.byType(LinearProgressIndicator)).width;
+      await t.pumpWidget(_host(_row(progress: 0.5)));
+      expect(t.getSize(find.byType(LinearProgressIndicator)).width, running);
+    });
+
     testWidgets('wide keeps the bar beside the chip, compact below it',
         (t) async {
       await t.pumpWidget(_host(_row(progress: 0.5)));
