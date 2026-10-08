@@ -118,7 +118,7 @@ class LinagoraFileTransferDialog extends StatelessWidget {
             ? AlignmentDirectional.centerEnd
             : AlignmentDirectional.centerStart,
         child: Padding(
-          padding: tokens.headerPadding,
+          padding: tokens.footerPadding,
           child: Opacity(
             opacity: showCancelAll ? 1 : 0,
             child: ExcludeSemantics(
@@ -132,6 +132,9 @@ class LinagoraFileTransferDialog extends StatelessWidget {
                 onPressed: onCancelAll,
                 style: TextButton.styleFrom(
                   padding: tokens.cancelPadding,
+                  minimumSize: Size.zero,
+                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                  visualDensity: VisualDensity.standard,
                   shape: const StadiumBorder(),
                   textStyle: tokens.cancelTextStyle,
                   foregroundColor: tokens.cancelTextStyle.color,
