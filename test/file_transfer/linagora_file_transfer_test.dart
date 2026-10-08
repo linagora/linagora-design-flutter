@@ -19,6 +19,7 @@ Widget _row({
   String name = 'report.pdf',
   String statusLabel = '332M',
   String? cancelTooltip,
+  Widget? leading,
 }) =>
     LinagoraFileTransferRow(
       fileName: name,
@@ -26,6 +27,7 @@ Widget _row({
       progress: progress,
       onCancel: onCancel,
       cancelTooltip: cancelTooltip,
+      leading: leading ?? const LinagoraFileTransferLeading(),
       layout: layout,
     );
 
@@ -266,6 +268,30 @@ void main() {
       );
     });
 
+    testWidgets('default leading is the file glyph, a custom leading replaces it',
+        (t) async {
+      await t.pumpWidget(_host(_row(progress: 0.5)));
+      expect(find.byIcon(Icons.insert_drive_file_outlined), findsOneWidget);
+      await t.pumpWidget(_host(_row(
+        progress: 0.5,
+        leading: const FlutterLogo(),
+      )));
+      expect(find.byType(FlutterLogo), findsOneWidget);
+      expect(find.byIcon(Icons.insert_drive_file_outlined), findsNothing);
+    });
+
+    testWidgets('RTL places the chip at the start and cancel at the end',
+        (t) async {
+      await t.pumpWidget(_host(Directionality(
+        textDirection: TextDirection.rtl,
+        child: _row(progress: 0.5, onCancel: () {}),
+      )));
+      final chip = t.getCenter(find.byType(LinagoraFileTransferLeading)).dx;
+      final cancel =
+          t.getCenter(find.byKey(LinagoraFileTransferRow.cancelButtonKey)).dx;
+      expect(chip, greaterThan(cancel));
+    });
+
     testWidgets('cancelTooltip is the accessible name of the row cancel',
         (t) async {
       final semantics = t.ensureSemantics();
@@ -475,6 +501,26 @@ void main() {
       final compact = t.getCenter(
         find.byKey(LinagoraFileTransferDialog.cancelAllButtonKey)).dx;
       expect(wide, greaterThan(compact));
+    });
+
+    testWidgets('RTL puts wide footer Cancel at the end, compact at the start',
+        (t) async {
+      await t.pumpWidget(_host(Directionality(
+        textDirection: TextDirection.rtl,
+        child: SizedBox(width: 600, child: dialog()),
+      )));
+      final wide = t.getCenter(
+        find.byKey(LinagoraFileTransferDialog.cancelAllButtonKey)).dx;
+      await t.pumpWidget(_host(Directionality(
+        textDirection: TextDirection.rtl,
+        child: SizedBox(
+          width: 600,
+          child: dialog(layout: LinagoraFileTransferLayout.compact),
+        ),
+      )));
+      final compact = t.getCenter(
+        find.byKey(LinagoraFileTransferDialog.cancelAllButtonKey)).dx;
+      expect(wide, lessThan(compact));
     });
 
     testWidgets('closeTooltip is the accessible name of the header close',
