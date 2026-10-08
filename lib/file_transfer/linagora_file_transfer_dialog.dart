@@ -117,9 +117,13 @@ class LinagoraFileTransferDialog extends StatelessWidget {
           padding: tokens.headerPadding,
           child: Opacity(
             opacity: showCancelAll ? 1 : 0,
-            child: IgnorePointer(
-              ignoring: !showCancelAll,
-              child: TextButton(
+            child: ExcludeSemantics(
+              excluding: !showCancelAll,
+              child: ExcludeFocus(
+                excluding: !showCancelAll,
+                child: IgnorePointer(
+                  ignoring: !showCancelAll,
+                  child: TextButton(
                 key: cancelAllButtonKey,
                 onPressed: onCancelAll,
                 style: TextButton.styleFrom(
@@ -129,6 +133,8 @@ class LinagoraFileTransferDialog extends StatelessWidget {
                   foregroundColor: tokens.cancelTextStyle.color,
                 ),
                 child: Text(cancelLabel),
+                  ),
+                ),
               ),
             ),
           ),

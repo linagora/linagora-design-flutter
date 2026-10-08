@@ -14,6 +14,9 @@ class LinagoraFileTransferSurface extends StatelessWidget {
   /// Defaults to the Figma tokens of [layout].
   final LinagoraFileTransferStyle? style;
 
+  /// Announced by screen readers as the dialog's name.
+  final String? semanticLabel;
+
   /// Space kept around the wide card on small screens.
   final EdgeInsetsGeometry insetPadding;
 
@@ -22,6 +25,7 @@ class LinagoraFileTransferSurface extends StatelessWidget {
     required this.child,
     this.layout = LinagoraFileTransferLayout.wide,
     this.style,
+    this.semanticLabel,
     this.insetPadding =
         const EdgeInsetsDirectional.symmetric(horizontal: 24, vertical: 16),
   });
@@ -29,9 +33,15 @@ class LinagoraFileTransferSurface extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final tokens = style ?? LinagoraFileTransferStyle.forLayout(layout);
-    return layout == LinagoraFileTransferLayout.wide
-        ? _buildWide(tokens)
-        : _buildCompact(tokens);
+    return Semantics(
+      scopesRoute: true,
+      namesRoute: semanticLabel != null,
+      label: semanticLabel,
+      explicitChildNodes: true,
+      child: layout == LinagoraFileTransferLayout.wide
+          ? _buildWide(tokens)
+          : _buildCompact(tokens),
+    );
   }
 
   Widget _buildWide(LinagoraFileTransferStyle tokens) => Center(
