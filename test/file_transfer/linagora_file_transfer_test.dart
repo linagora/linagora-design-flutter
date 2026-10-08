@@ -327,6 +327,40 @@ void main() {
       expect(rect.width, screen.width);
       expect(rect.bottom, screen.bottom);
     });
+
+    testWidgets('compact keeps the content above the bottom inset',
+        (t) async {
+      await t.pumpWidget(const MaterialApp(
+        home: MediaQuery(
+          data: MediaQueryData(
+            size: Size(400, 800),
+            padding: EdgeInsets.only(bottom: 34),
+          ),
+          child: LinagoraFileTransferSurface(
+            layout: LinagoraFileTransferLayout.compact,
+            child: SizedBox(key: ValueKey('content'), height: 50),
+          ),
+        ),
+      ));
+      final card = t.getRect(find
+          .descendant(
+            of: find.byType(LinagoraFileTransferSurface),
+            matching: find.byType(DecoratedBox),
+          )
+          .first);
+      final content = t.getRect(find.byKey(const ValueKey('content')));
+      expect(card.bottom - content.bottom, 34);
+    });
+
+    testWidgets('wide keeps its inset padding on a narrow screen', (t) async {
+      t.view.physicalSize = const Size(400, 800);
+      t.view.devicePixelRatio = 1;
+      addTearDown(t.view.reset);
+      await t.pumpWidget(_host(const LinagoraFileTransferSurface(
+        child: SizedBox(height: 50, width: 2000),
+      )));
+      expect(t.getSize(find.byType(DecoratedBox).last).width, 400 - 48);
+    });
   });
 }
 
