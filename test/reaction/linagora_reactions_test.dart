@@ -10,18 +10,22 @@ void main() {
     WidgetTester tester, {
     required int count,
     GestureTapDownCallback? onShowAll,
+    double? width,
   }) {
     return tester.pumpWidget(
       MaterialApp(
         home: Scaffold(
           body: Align(
             alignment: Alignment.topLeft,
-            child: LinagoraReactions(
-              reactions: [
-                for (final emoji in emojis.take(count))
-                  LinagoraReactionChip(emoji: emoji),
-              ],
-              onShowAll: onShowAll,
+            child: SizedBox(
+              width: width,
+              child: LinagoraReactions(
+                reactions: [
+                  for (final emoji in emojis.take(count))
+                    LinagoraReactionChip(emoji: emoji),
+                ],
+                onShowAll: onShowAll,
+              ),
             ),
           ),
         ),
@@ -132,5 +136,91 @@ void main() {
 
     expect(tester.getSize(find.byType(LinagoraReactions)).height, 28);
     expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('a narrow width shows fewer reactions and a larger +N', (
+    tester,
+  ) async {
+    var shown = 0;
+    await pump(tester, count: 7, onShowAll: (_) => shown++, width: 100);
+
+    expect(tester.takeException(), isNull);
+    expect(find.text('❤️'), findsOneWidget);
+    expect(find.text('💜'), findsNothing);
+    expect(find.text('+4'), findsNothing);
+    expect(find.byType(LinagoraReactionChip), findsNWidgets(2));
+    expect(
+      tester.getSize(find.byType(LinagoraReactionChip).first),
+      const Size(28, 28),
+    );
+
+    await tester.tap(find.text('+6'));
+
+    expect(shown, 1);
+  });
+
+  testWidgets('a narrow width replaces the more button with +N', (
+    tester,
+  ) async {
+    await pump(tester, count: 2, onShowAll: (_) {}, width: 80);
+
+    expect(tester.takeException(), isNull);
+    expect(find.text('❤️'), findsOneWidget);
+    expect(find.text('+1'), findsOneWidget);
+    expect(find.byIcon(Icons.more_horiz_rounded), findsNothing);
+  });
+
+  testWidgets('reactions left out of the row cannot be tapped', (tester) async {
+    var taps = 0;
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          body: Align(
+            alignment: Alignment.topLeft,
+            child: SizedBox(
+              width: 100,
+              child: LinagoraReactions(
+                reactions: [
+                  for (final emoji in emojis)
+                    LinagoraReactionChip(emoji: emoji, onTap: () => taps++),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+
+    for (var x = 2.0; x < 100; x += 4) {
+      await tester.tapAt(Offset(x, 14));
+    }
+
+    expect(taps, 7);
+  });
+
+  testWidgets('takes the width of all its reactions when it is free to', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          body: Align(
+            alignment: Alignment.topLeft,
+            child: IntrinsicWidth(
+              child: LinagoraReactions(
+                reactions: [
+                  for (final emoji in emojis)
+                    LinagoraReactionChip(emoji: emoji),
+                ],
+                onShowAll: (_) {},
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+
+    expect(tester.takeException(), isNull);
+    expect(find.text('+4'), findsOneWidget);
   });
 }

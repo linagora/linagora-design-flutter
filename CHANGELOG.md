@@ -10,8 +10,8 @@
 * `LinagoraReactionTabs`: the tabs filtering the list of who reacted to a
   message.
 * `LinagoraReactions`: the reactions row under a message bubble, showing up
-  to 3 reactions then a `+N` chip or the "more" button, opening the full list
-  on tap.
+  to 3 reactions, or fewer when they do not fit its width, then a `+N` chip or
+  the "more" button, opening the full list on tap.
 * `LinagoraReactionChip`: a pill of the reactions row under a message bubble,
   for a unicode or custom emoji with optional count, the tappable `+N`
   remaining counter and the "more" button, each with an optional
