@@ -7,6 +7,10 @@ import 'package:linagora_design_flutter/spacings/linagora_spacing.dart';
 /// Lays out [reactions] over the bottom of [bubble], [reactionsInset] after
 /// its start edge. Reactions wider than the bubble extend past it, away from
 /// the side the bubble is aligned to.
+///
+/// A [Stack] with [Clip.none] would paint such reactions, but not hit test
+/// them outside of its bounds. This render object takes the width of the
+/// wider child instead, and keeps the bubble on its side.
 class BubbleWithReactions extends MultiChildRenderObjectWidget {
   BubbleWithReactions({
     super.key,
