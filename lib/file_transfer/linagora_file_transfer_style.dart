@@ -61,8 +61,12 @@ class LinagoraFileTransferStyle {
   /// Vertical gap between the row and its bar in the compact layout.
   final double compactBarGap;
 
-  /// Gap between the chip, the status label and the bar.
+  /// Gap between the chip and the status label (wide).
   final double itemGap;
+  /// Gap after the status label: before the bar (wide) or the close (compact).
+  final double labelTrailingGap;
+  /// Gap between the wide bar and the row close.
+  final double barEndGap;
   final double closeButtonSize;
   final double rowCloseIconSize;
   final double headerCloseIconSize;
@@ -100,6 +104,8 @@ class LinagoraFileTransferStyle {
     required this.compactBarPadding,
     required this.compactBarGap,
     required this.itemGap,
+    required this.labelTrailingGap,
+    required this.barEndGap,
     required this.closeButtonSize,
     required this.rowCloseIconSize,
     required this.headerCloseIconSize,
@@ -187,7 +193,9 @@ class LinagoraFileTransferStyle {
     progressAnimationDuration: const Duration(milliseconds: 250),
     compactBarPadding: const EdgeInsetsDirectional.only(start: 8),
     compactBarGap: 8,
-    itemGap: 16,
+    itemGap: 30,
+    labelTrailingGap: 0,
+    barEndGap: 9,
     closeButtonSize: 40,
     rowCloseIconSize: 16,
     headerCloseIconSize: 24,
@@ -204,6 +212,7 @@ class LinagoraFileTransferStyle {
     headerPadding: const EdgeInsetsDirectional.fromSTEB(16, 8, 16, 0),
     descriptionPadding: const EdgeInsetsDirectional.only(start: 16, end: 24),
     footerPadding: const EdgeInsetsDirectional.fromSTEB(16, 2, 16, 8),
+    labelTrailingGap: 6,
   );
 
   factory LinagoraFileTransferStyle.wide() => _wide;
@@ -246,6 +255,8 @@ class LinagoraFileTransferStyle {
     EdgeInsetsGeometry? compactBarPadding,
     double? compactBarGap,
     double? itemGap,
+    double? labelTrailingGap,
+    double? barEndGap,
     double? closeButtonSize,
     double? rowCloseIconSize,
     double? headerCloseIconSize,
@@ -283,6 +294,8 @@ class LinagoraFileTransferStyle {
         compactBarPadding: compactBarPadding ?? this.compactBarPadding,
         compactBarGap: compactBarGap ?? this.compactBarGap,
         itemGap: itemGap ?? this.itemGap,
+        labelTrailingGap: labelTrailingGap ?? this.labelTrailingGap,
+        barEndGap: barEndGap ?? this.barEndGap,
         closeButtonSize: closeButtonSize ?? this.closeButtonSize,
         rowCloseIconSize: rowCloseIconSize ?? this.rowCloseIconSize,
         headerCloseIconSize: headerCloseIconSize ?? this.headerCloseIconSize,
@@ -320,6 +333,8 @@ class LinagoraFileTransferStyle {
         compactBarPadding,
         compactBarGap,
         itemGap,
+        labelTrailingGap,
+        barEndGap,
         closeButtonSize,
         rowCloseIconSize,
         headerCloseIconSize,

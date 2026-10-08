@@ -63,9 +63,10 @@ class LinagoraFileTransferRow extends StatelessWidget {
             softWrap: false,
           ),
         ),
+        SizedBox(width: tokens.labelTrailingGap),
         if (wide) ...[
-          SizedBox(width: tokens.itemGap),
           Expanded(child: _buildBar(tokens)),
+          SizedBox(width: tokens.barEndGap),
         ],
         _buildCancel(tokens),
       ],
