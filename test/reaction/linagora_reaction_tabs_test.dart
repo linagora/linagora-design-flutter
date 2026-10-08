@@ -101,4 +101,21 @@ void main() {
 
     expect(tester.takeException(), isNull);
   });
+
+  testWidgets('only the selected tab is selected for screen readers', (
+    tester,
+  ) async {
+    final handle = tester.ensureSemantics();
+    await pump(tester, selectedIndex: 1);
+
+    expect(
+      tester.getSemantics(find.bySemanticsLabel('👍 3')),
+      containsSemantics(isButton: true, isSelected: true, hasTapAction: true),
+    );
+    expect(
+      tester.getSemantics(find.bySemanticsLabel('All 5')),
+      containsSemantics(isButton: true, isSelected: false),
+    );
+    handle.dispose();
+  });
 }
