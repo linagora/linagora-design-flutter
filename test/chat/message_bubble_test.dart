@@ -72,4 +72,31 @@ void main() {
     );
     expect(find.byType(DecoratedBox), findsNothing);
   });
+
+  testWidgets('a reactions row wider than the available width does not '
+      'overflow', (tester) async {
+    await pump(
+      tester,
+      SizedBox(
+        width: 200,
+        child: MessageBubble(
+          reactions: LinagoraReactions(
+            reactions: [
+              for (final emoji in ['❤️', '💜', '💚', '💛', '🧡'])
+                LinagoraReactionChip(emoji: emoji, count: 128),
+            ],
+            onShowAll: (_) {},
+          ),
+          child: content,
+        ),
+      ),
+    );
+
+    expect(tester.takeException(), isNull);
+    expect(
+      tester.getRect(find.byType(LinagoraReactions)).right,
+      lessThanOrEqualTo(200),
+    );
+    expect(find.text('+4'), findsOneWidget);
+  });
 }
