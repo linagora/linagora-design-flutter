@@ -119,7 +119,7 @@ void main() {
       );
     });
 
-    testWidgets('compact bar starts under the chip and the label hugs the close',
+    testWidgets('compact bar starts under the chip and the label sits 6 before the close',
         (t) async {
       await t.pumpWidget(_host(SizedBox(
         width: 361,
@@ -133,7 +133,7 @@ void main() {
       final bar = find.byType(LinearProgressIndicator);
       expect(t.getTopLeft(bar).dx - left, 24);
       expect(t.getTopRight(bar).dx - left, 345);
-      expect(t.getTopRight(find.text('332M')).dx - left, 305);
+      expect(t.getTopRight(find.text('332M')).dx - left, 299);
     });
 
     testWidgets('chip keeps the 191x36 frame size despite its border',
@@ -144,6 +144,19 @@ void main() {
         matching: find.byType(DecoratedBox),
       ).first;
       expect(t.getSize(chip), const Size(191, 36));
+    });
+
+    testWidgets('wide row spaces chip, label, bar and close like the web frame',
+        (t) async {
+      await t.pumpWidget(_host(SizedBox(
+        width: 527,
+        child: _row(progress: 0.5, onCancel: () {}),
+      )));
+      final left = t.getTopLeft(find.byType(SizedBox).first).dx;
+      final bar = find.byType(LinearProgressIndicator);
+      final close = find.byKey(LinagoraFileTransferRow.cancelButtonKey);
+      expect(t.getTopLeft(find.text('332M')).dx - left, 237);
+      expect(t.getTopLeft(close).dx - t.getTopRight(bar).dx, 9);
     });
 
     testWidgets('the bar rounds its fill as well as its track', (t) async {
@@ -519,6 +532,9 @@ List<_TokenOverride> _tokenOverrides(LinagoraFileTransferStyle b) {
         (s) => s.headerCloseIconSize, 3.0),
     ('footerPadding', b.copyWith(footerPadding: i),
         (s) => s.footerPadding, i),
+    ('labelTrailingGap', b.copyWith(labelTrailingGap: 3),
+        (s) => s.labelTrailingGap, 3.0),
+    ('barEndGap', b.copyWith(barEndGap: 3), (s) => s.barEndGap, 3.0),
     ('closeIconColor', b.copyWith(closeIconColor: c),
         (s) => s.closeIconColor, c),
   ];
