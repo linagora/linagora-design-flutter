@@ -174,6 +174,14 @@ void main() {
       expect(bar.borderRadius, BorderRadius.circular(26));
     });
 
+    testWidgets('the indeterminate bar is rounded too', (t) async {
+      await t.pumpWidget(_host(_row()));
+      final bar =
+          t.widget<LinearProgressIndicator>(find.byType(LinearProgressIndicator));
+      expect(bar.value, isNull);
+      expect(bar.borderRadius, BorderRadius.circular(26));
+    });
+
     testWidgets('a long name ellipsises without overflow', (t) async {
       await t.pumpWidget(_host(
         _row(progress: 0.5, name: 'a' * 200),
