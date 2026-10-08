@@ -97,6 +97,29 @@ void main() {
     expect(details?.globalPosition, tester.getCenter(more));
   });
 
+  testWidgets('the chip showing all is labelled for screen readers', (
+    tester,
+  ) async {
+    final handle = tester.ensureSemantics();
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          body: LinagoraReactions(
+            reactions: const [LinagoraReactionChip(emoji: '👍')],
+            onShowAll: (_) {},
+            showAllSemanticLabel: 'Show all reactions',
+          ),
+        ),
+      ),
+    );
+
+    expect(
+      tester.getSemantics(find.bySemanticsLabel('Show all reactions')),
+      containsSemantics(isButton: true, hasTapAction: true),
+    );
+    handle.dispose();
+  });
+
   testWidgets('the more button is hidden without onShowAll', (tester) async {
     await pump(tester, count: 2);
 

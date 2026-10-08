@@ -113,4 +113,27 @@ void main() {
 
     expect(details, isNotNull);
   });
+
+  testWidgets('semanticLabel replaces the content for screen readers', (
+    tester,
+  ) async {
+    final handle = tester.ensureSemantics();
+    await tester.pumpWidget(
+      build(
+        LinagoraReactionChip(
+          emoji: '👍',
+          count: 3,
+          semanticLabel: 'Thumbs up, 3 reactions',
+          onTap: () {},
+        ),
+      ),
+    );
+
+    expect(
+      tester.getSemantics(find.bySemanticsLabel('Thumbs up, 3 reactions')),
+      containsSemantics(isButton: true, hasTapAction: true),
+    );
+    expect(find.bySemanticsLabel(RegExp('3\$')), findsNothing);
+    handle.dispose();
+  });
 }

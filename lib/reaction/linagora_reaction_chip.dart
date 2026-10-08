@@ -38,6 +38,11 @@ class LinagoraReactionChip extends StatelessWidget {
   final String? _emoji;
   final Widget? _image;
   final int? _count;
+
+  /// Read by screen readers instead of the content of the chip, such as
+  /// `👍, 3 reactions`.
+  final String? semanticLabel;
+
   final VoidCallback? onTap;
   final VoidCallback? onLongPress;
   final GestureTapDownCallback? onTapDown;
@@ -47,6 +52,7 @@ class LinagoraReactionChip extends StatelessWidget {
     super.key,
     required String emoji,
     int? count,
+    this.semanticLabel,
     this.onTap,
     this.onLongPress,
   }) : _kind = _ChipKind.reaction,
@@ -60,6 +66,7 @@ class LinagoraReactionChip extends StatelessWidget {
     super.key,
     required Widget image,
     int? count,
+    this.semanticLabel,
     this.onTap,
     this.onLongPress,
   }) : _kind = _ChipKind.reaction,
@@ -73,6 +80,7 @@ class LinagoraReactionChip extends StatelessWidget {
   const LinagoraReactionChip.remaining({
     super.key,
     required int count,
+    this.semanticLabel,
     this.onTap,
     this.onTapDown,
   }) : _kind = _ChipKind.remaining,
@@ -82,12 +90,16 @@ class LinagoraReactionChip extends StatelessWidget {
        onLongPress = null;
 
   /// The button opening the full list of reactions.
-  const LinagoraReactionChip.more({super.key, this.onTap, this.onTapDown})
-    : _kind = _ChipKind.more,
-      _emoji = null,
-      _image = null,
-      _count = null,
-      onLongPress = null;
+  const LinagoraReactionChip.more({
+    super.key,
+    this.semanticLabel,
+    this.onTap,
+    this.onTapDown,
+  }) : _kind = _ChipKind.more,
+       _emoji = null,
+       _image = null,
+       _count = null,
+       onLongPress = null;
 
   Widget? get _content {
     final emoji = _emoji;
@@ -145,33 +157,39 @@ class LinagoraReactionChip extends StatelessWidget {
         onLongPress: onLongPress,
         onTapDown: onTapDown,
         borderRadius: borderRadius,
-        child: Container(
-          height: height,
-          constraints: const BoxConstraints(minWidth: height),
-          padding: _padding,
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              if (content != null)
-                IconTheme.merge(
-                  data: IconThemeData(color: labelColor),
-                  child: SizedBox.square(
-                    dimension: _contentSize,
-                    child: content,
+        child: Semantics(
+          button: onTap != null,
+          label: semanticLabel,
+          excludeSemantics: semanticLabel != null,
+          child: Container(
+            height: height,
+            constraints: const BoxConstraints(minWidth: height),
+            padding: _padding,
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                if (content != null)
+                  IconTheme.merge(
+                    data: IconThemeData(color: labelColor),
+                    child: SizedBox.square(
+                      dimension: _contentSize,
+                      child: content,
+                    ),
                   ),
-                ),
-              if (content != null && label != null) const SizedBox(width: _gap),
-              if (label != null)
-                Text(
-                  label,
-                  maxLines: 1,
-                  softWrap: false,
-                  style: LinagoraTextTheme.material().bodyMedium?.copyWith(
-                    color: labelColor,
+                if (content != null && label != null)
+                  const SizedBox(width: _gap),
+                if (label != null)
+                  Text(
+                    label,
+                    maxLines: 1,
+                    softWrap: false,
+                    style: LinagoraTextTheme.material().bodyMedium?.copyWith(
+                      color: labelColor,
+                    ),
                   ),
-                ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
