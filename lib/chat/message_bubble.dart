@@ -48,6 +48,8 @@ const double kMessageReactionsOverlayHeight = LinagoraSpacing.base * 3;
 class MessageBubble extends StatelessWidget {
   final Widget child;
 
+  /// Picks the default [color] only. It says nothing about the side the bubble
+  /// sits on: see [isAlignedToEnd].
   final bool isOwnMessage;
 
   final Color? color;
@@ -71,6 +73,10 @@ class MessageBubble extends StatelessWidget {
 
   /// Whether the bubble is aligned to the end of its row, so that wider
   /// [reactions] extend towards the start.
+  ///
+  /// Cannot be derived from [tailDirection], which is
+  /// [BubbleTailDirection.none] for a message without tail, nor from
+  /// [isOwnMessage], as own messages may be aligned to the start.
   final bool isAlignedToEnd;
 
   final bool _isDecorated;
