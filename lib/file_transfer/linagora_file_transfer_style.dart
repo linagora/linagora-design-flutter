@@ -34,6 +34,9 @@ class LinagoraFileTransferStyle {
   /// Merged over [bodyTextStyle] for the emphasised run of the description.
   final TextStyle emphasisTextStyle;
   final TextStyle statusTextStyle;
+
+  /// Wide enough for the longest terminal label ("Cancelled"), so labels
+  /// swapping in and out do not move the bar.
   final double statusLabelWidth;
   final TextStyle fileNameTextStyle;
   final TextStyle cancelTextStyle;
@@ -162,7 +165,7 @@ class LinagoraFileTransferStyle {
     bodyTextStyle: _body,
     emphasisTextStyle: const TextStyle(color: Color(0xFF0C0C0C)),
     statusTextStyle: _body,
-    statusLabelWidth: 68,
+    statusLabelWidth: 88,
     fileNameTextStyle: _label,
     cancelTextStyle: _label.copyWith(color: _primary),
     chipWidth: 191,
@@ -189,7 +192,7 @@ class LinagoraFileTransferStyle {
     titleTextStyle: _text(16, 21, FontWeight.w600, _titleColor)
         .copyWith(letterSpacing: 0.15),
     statusTextStyle: _text(13, 16, FontWeight.w400, _secondaryText),
-    statusLabelWidth: 45,
+    statusLabelWidth: 64,
   );
 
   factory LinagoraFileTransferStyle.wide() => _wide;
