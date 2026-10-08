@@ -136,6 +136,16 @@ void main() {
       expect(t.getTopRight(find.text('332M')).dx - left, 305);
     });
 
+    testWidgets('chip keeps the 191x36 frame size despite its border',
+        (t) async {
+      await t.pumpWidget(_host(_row(progress: 0.5)));
+      final chip = find.ancestor(
+        of: find.text('report.pdf'),
+        matching: find.byType(DecoratedBox),
+      ).first;
+      expect(t.getSize(chip), const Size(191, 36));
+    });
+
     testWidgets('a long name ellipsises without overflow', (t) async {
       await t.pumpWidget(_host(
         _row(progress: 0.5, name: 'a' * 200),
