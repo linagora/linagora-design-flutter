@@ -18,7 +18,15 @@ class LinagoraReactions extends StatelessWidget {
   /// (keyboard, screen reader), they point at the center of the chip.
   final GestureTapDownCallback? onShowAll;
 
-  const LinagoraReactions({super.key, required this.reactions, this.onShowAll});
+  /// Read by screen readers on the chip opening the full list of reactions.
+  final String? showAllSemanticLabel;
+
+  const LinagoraReactions({
+    super.key,
+    required this.reactions,
+    this.onShowAll,
+    this.showAllSemanticLabel,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -31,9 +39,16 @@ class LinagoraReactions extends StatelessWidget {
       children: [
         ...reactions.take(maxDisplayed),
         if (onShowAll != null && reactions.isNotEmpty)
-          _ShowAllChip(remaining: remaining, onShowAll: onShowAll)
+          _ShowAllChip(
+            remaining: remaining,
+            semanticLabel: showAllSemanticLabel,
+            onShowAll: onShowAll,
+          )
         else if (remaining > 0)
-          LinagoraReactionChip.remaining(count: remaining),
+          LinagoraReactionChip.remaining(
+            count: remaining,
+            semanticLabel: showAllSemanticLabel,
+          ),
       ],
     );
   }
@@ -41,9 +56,14 @@ class LinagoraReactions extends StatelessWidget {
 
 class _ShowAllChip extends StatefulWidget {
   final int remaining;
+  final String? semanticLabel;
   final GestureTapDownCallback onShowAll;
 
-  const _ShowAllChip({required this.remaining, required this.onShowAll});
+  const _ShowAllChip({
+    required this.remaining,
+    required this.semanticLabel,
+    required this.onShowAll,
+  });
 
   @override
   State<_ShowAllChip> createState() => _ShowAllChipState();
@@ -70,10 +90,12 @@ class _ShowAllChipState extends State<_ShowAllChip> {
     return widget.remaining > 0
         ? LinagoraReactionChip.remaining(
             count: widget.remaining,
+            semanticLabel: widget.semanticLabel,
             onTap: _showAll,
             onTapDown: _rememberTapDown,
           )
         : LinagoraReactionChip.more(
+            semanticLabel: widget.semanticLabel,
             onTap: _showAll,
             onTapDown: _rememberTapDown,
           );
