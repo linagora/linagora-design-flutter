@@ -78,47 +78,50 @@ class _ReactionTab extends StatelessWidget {
     final sysColors = LinagoraSysColors.material();
     final image = tab.image;
 
-    return InkWell(
-      onTap: onTap,
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: _padding),
-        child: IntrinsicWidth(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.end,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                spacing: LinagoraSpacing.base * 0.5,
-                children: [
-                  if (image != null)
-                    SizedBox.square(dimension: _imageSize, child: image),
-                  Text(
-                    tab.label,
-                    maxLines: 1,
-                    style: LinagoraTextTheme.material().titleMedium?.copyWith(
-                      color: sysColors.onSurfaceVariant,
+    return Material(
+      type: MaterialType.transparency,
+      child: InkWell(
+        onTap: onTap,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: _padding),
+          child: IntrinsicWidth(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.end,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  spacing: LinagoraSpacing.base * 0.5,
+                  children: [
+                    if (image != null)
+                      SizedBox.square(dimension: _imageSize, child: image),
+                    Text(
+                      tab.label,
+                      maxLines: 1,
+                      style: LinagoraTextTheme.material().titleMedium?.copyWith(
+                        color: sysColors.onSurfaceVariant,
+                      ),
                     ),
-                  ),
-                ],
-              ),
-              Container(
-                height: _indicatorHeight,
-                margin: const EdgeInsets.only(
-                  top: _indicatorAreaHeight - _indicatorHeight,
-                  left: _indicatorInset,
-                  right: _indicatorInset,
+                  ],
                 ),
-                decoration: isSelected
-                    ? BoxDecoration(
-                        color: sysColors.primary,
-                        borderRadius: const BorderRadius.vertical(
-                          top: Radius.circular(100),
-                        ),
-                      )
-                    : null,
-              ),
-            ],
+                Container(
+                  height: _indicatorHeight,
+                  margin: const EdgeInsets.only(
+                    top: _indicatorAreaHeight - _indicatorHeight,
+                    left: _indicatorInset,
+                    right: _indicatorInset,
+                  ),
+                  decoration: isSelected
+                      ? BoxDecoration(
+                          color: sysColors.primary,
+                          borderRadius: const BorderRadius.vertical(
+                            top: Radius.circular(100),
+                          ),
+                        )
+                      : null,
+                ),
+              ],
+            ),
           ),
         ),
       ),
