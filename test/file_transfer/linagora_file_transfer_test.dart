@@ -185,6 +185,36 @@ void main() {
       );
       expect(LinagoraFileTransferStyle.wide(),
           isNot(LinagoraFileTransferStyle.compact()));
+      expect(
+        identical(
+          LinagoraFileTransferStyle.forLayout(
+              LinagoraFileTransferLayout.compact),
+          LinagoraFileTransferStyle.compact(),
+        ),
+        isTrue,
+      );
+    });
+
+    test('compact keeps its own radius, title and status label', () {
+      final wide = LinagoraFileTransferStyle.wide();
+      final compact = LinagoraFileTransferStyle.compact();
+      expect([wide.surfaceRadius, compact.surfaceRadius], [6, 14]);
+      expect([wide.titleTextStyle.fontSize, compact.titleTextStyle.fontSize],
+          [24, 16]);
+      expect(
+          [wide.statusTextStyle.fontSize, compact.statusTextStyle.fontSize],
+          [16, 13]);
+      expect(compact.statusTextStyle.fontWeight, FontWeight.w400);
+      expect([wide.statusLabelWidth, compact.statusLabelWidth], [88, 64]);
+    });
+
+    test('copyWith sets every token and each one breaks equality', () {
+      final base = LinagoraFileTransferStyle.wide();
+      for (final (name, changed, read, value) in _tokenOverrides(base)) {
+        expect(read(changed), value, reason: name);
+        expect(changed, isNot(base), reason: name);
+        expect(changed.hashCode, isNot(base.hashCode), reason: name);
+      }
     });
 
     test('copyWith overrides one token and keeps equality', () {
@@ -235,4 +265,71 @@ void main() {
       expect(rect.bottom, screen.bottom);
     });
   });
+}
+
+typedef _TokenOverride = (
+  String,
+  LinagoraFileTransferStyle,
+  Object Function(LinagoraFileTransferStyle),
+  Object,
+);
+
+List<_TokenOverride> _tokenOverrides(LinagoraFileTransferStyle b) {
+  const c = Color(0xFF123456);
+  const i = EdgeInsets.all(3);
+  const t = TextStyle(fontSize: 3);
+  const sh = [BoxShadow(blurRadius: 3)];
+  const d = Duration(seconds: 3);
+  return [
+    ('surfaceColor', b.copyWith(surfaceColor: c), (s) => s.surfaceColor, c),
+    ('surfaceRadius', b.copyWith(surfaceRadius: 3),
+        (s) => s.surfaceRadius, 3.0),
+    ('surfaceShadow', b.copyWith(surfaceShadow: sh),
+        (s) => s.surfaceShadow, sh),
+    ('maxWidth', b.copyWith(maxWidth: 3), (s) => s.maxWidth, 3.0),
+    ('maxListHeight', b.copyWith(maxListHeight: 3),
+        (s) => s.maxListHeight, 3.0),
+    ('headerPadding', b.copyWith(headerPadding: i), (s) => s.headerPadding, i),
+    ('descriptionPadding', b.copyWith(descriptionPadding: i),
+        (s) => s.descriptionPadding, i),
+    ('rowPadding', b.copyWith(rowPadding: i), (s) => s.rowPadding, i),
+    ('cancelPadding', b.copyWith(cancelPadding: i), (s) => s.cancelPadding, i),
+    ('titleTextStyle', b.copyWith(titleTextStyle: t),
+        (s) => s.titleTextStyle, t),
+    ('bodyTextStyle', b.copyWith(bodyTextStyle: t), (s) => s.bodyTextStyle, t),
+    ('emphasisTextStyle', b.copyWith(emphasisTextStyle: t),
+        (s) => s.emphasisTextStyle, t),
+    ('statusTextStyle', b.copyWith(statusTextStyle: t),
+        (s) => s.statusTextStyle, t),
+    ('statusLabelWidth', b.copyWith(statusLabelWidth: 3),
+        (s) => s.statusLabelWidth, 3.0),
+    ('fileNameTextStyle', b.copyWith(fileNameTextStyle: t),
+        (s) => s.fileNameTextStyle, t),
+    ('cancelTextStyle', b.copyWith(cancelTextStyle: t),
+        (s) => s.cancelTextStyle, t),
+    ('chipWidth', b.copyWith(chipWidth: 3), (s) => s.chipWidth, 3.0),
+    ('chipRadius', b.copyWith(chipRadius: 3), (s) => s.chipRadius, 3.0),
+    ('chipPadding', b.copyWith(chipPadding: i), (s) => s.chipPadding, i),
+    ('chipBackgroundColor', b.copyWith(chipBackgroundColor: c),
+        (s) => s.chipBackgroundColor, c),
+    ('chipBorderColor', b.copyWith(chipBorderColor: c),
+        (s) => s.chipBorderColor, c),
+    ('barHeight', b.copyWith(barHeight: 3), (s) => s.barHeight, 3.0),
+    ('barRadius', b.copyWith(barRadius: 3), (s) => s.barRadius, 3.0),
+    ('barTrackColor', b.copyWith(barTrackColor: c), (s) => s.barTrackColor, c),
+    ('barColor', b.copyWith(barColor: c), (s) => s.barColor, c),
+    ('progressAnimationDuration', b.copyWith(progressAnimationDuration: d),
+        (s) => s.progressAnimationDuration, d),
+    ('compactBarInset', b.copyWith(compactBarInset: 3),
+        (s) => s.compactBarInset, 3.0),
+    ('compactBarGap', b.copyWith(compactBarGap: 3),
+        (s) => s.compactBarGap, 3.0),
+    ('itemGap', b.copyWith(itemGap: 3), (s) => s.itemGap, 3.0),
+    ('closeButtonSize', b.copyWith(closeButtonSize: 3),
+        (s) => s.closeButtonSize, 3.0),
+    ('rowCloseIconSize', b.copyWith(rowCloseIconSize: 3),
+        (s) => s.rowCloseIconSize, 3.0),
+    ('headerCloseIconSize', b.copyWith(headerCloseIconSize: 3),
+        (s) => s.headerCloseIconSize, 3.0),
+  ];
 }
