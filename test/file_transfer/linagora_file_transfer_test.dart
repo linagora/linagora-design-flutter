@@ -32,6 +32,36 @@ Widget _row({
 double? _barValue(WidgetTester t) =>
     t.widget<LinearProgressIndicator>(find.byType(LinearProgressIndicator)).value;
 
+Future<void> _setSurface(WidgetTester t, Size size) async {
+  addTearDown(() => t.binding.setSurfaceSize(null));
+  await t.binding.setSurfaceSize(size);
+}
+
+Widget _screen(Widget child) => MaterialApp(home: Scaffold(body: child));
+
+Widget _transfer({
+  LinagoraFileTransferLayout layout = LinagoraFileTransferLayout.wide,
+  int count = 1,
+}) =>
+    LinagoraFileTransferSurface(
+      layout: layout,
+      child: LinagoraFileTransferDialog(
+        layout: layout,
+        title: 'Attaching file',
+        description: const TextSpan(text: 'desc'),
+        itemCount: count,
+        itemBuilder: (_, i) => _row(
+          progress: 0.5,
+          name: 'f$i.pdf',
+          layout: layout,
+          onCancel: () {},
+        ),
+        cancelLabel: 'Cancel',
+        onClose: () {},
+        onCancelAll: () {},
+      ),
+    );
+
 Future<void> _loadTwakeInter() async {
   final loader = FontLoader('packages/linagora_design_flutter/TwakeInter')
     ..addFont(rootBundle.load('assets/fonts/TwakeInter-Regular.ttf'))
@@ -589,7 +619,6 @@ void main() {
       expect(rect.bottom, screen.bottom);
     });
 
-<<<<<<< HEAD
     testWidgets('compact keeps the content above the bottom inset',
         (t) async {
       await t.pumpWidget(const MaterialApp(
@@ -622,6 +651,31 @@ void main() {
         child: SizedBox(height: 50, width: 2000),
       )));
       expect(t.getSize(find.byType(DecoratedBox).last).width, 400 - 48);
+    });
+
+    testWidgets('wide row cancel stays on a 400px surface', (t) async {
+      await _setSurface(t, const Size(400, 800));
+      await t.pumpWidget(_screen(_transfer()));
+      expect(t.takeException(), isNull);
+      final cancel =
+          t.getRect(find.byKey(LinagoraFileTransferRow.cancelButtonKey));
+      expect(cancel.left, greaterThanOrEqualTo(0));
+      expect(cancel.right, lessThanOrEqualTo(400));
+    });
+
+    testWidgets('compact footer Cancel stays on a 320px-tall viewport',
+        (t) async {
+      await _setSurface(t, const Size(400, 320));
+      await t.pumpWidget(_screen(_transfer(
+        layout: LinagoraFileTransferLayout.compact,
+        count: 3,
+      )));
+      expect(t.takeException(), isNull);
+      final cancel = t.getRect(
+        find.byKey(LinagoraFileTransferDialog.cancelAllButtonKey),
+      );
+      expect(cancel.top, greaterThanOrEqualTo(0));
+      expect(cancel.bottom, lessThanOrEqualTo(320));
     });
   });
 }
