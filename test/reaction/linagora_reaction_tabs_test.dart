@@ -118,4 +118,33 @@ void main() {
     );
     handle.dispose();
   });
+
+  testWidgets('the selected tab is scrolled into view', (tester) async {
+    await pump(tester, width: 100);
+
+    expect(tester.getRect(find.text('2')).left, greaterThan(100));
+
+    await pump(tester, selectedIndex: 2, width: 100);
+    await tester.pumpAndSettle();
+
+    final tab = tester.getRect(find.text('2'));
+    expect(tab.left, greaterThanOrEqualTo(0));
+    expect(tab.right, lessThanOrEqualTo(100));
+  });
+
+  testWidgets('a tab selected from the start is in view', (tester) async {
+    await pump(tester, selectedIndex: 2, width: 100);
+    await tester.pump();
+
+    final tab = tester.getRect(find.text('2'));
+    expect(tab.left, greaterThanOrEqualTo(0));
+    expect(tab.right, lessThanOrEqualTo(100));
+  });
+
+  testWidgets('an out of range selectedIndex selects no tab', (tester) async {
+    await pump(tester, selectedIndex: 5);
+
+    expect(tester.takeException(), isNull);
+    expect(indicator(), findsNothing);
+  });
 }

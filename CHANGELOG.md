@@ -8,7 +8,7 @@
 * `MessageBubble.plain`: a message without bubble decoration.
 * `LinagoraReactionItem.image`: a reaction row showing a custom emoji image.
 * `LinagoraReactionTabs`: the tabs filtering the list of who reacted to a
-  message.
+  message, scrolling the selected one into view.
 * `LinagoraReactions`: the reactions row under a message bubble, showing up
   to 3 reactions, or fewer when they do not fit its width, then a `+N` chip or
   the "more" button, opening the full list on tap.
