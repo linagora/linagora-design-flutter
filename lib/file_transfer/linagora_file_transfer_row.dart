@@ -51,11 +51,12 @@ class LinagoraFileTransferRow extends StatelessWidget {
     final topLine = Row(
       children: [
         _buildChip(tokens),
-        SizedBox(width: tokens.itemGap),
+        if (wide) SizedBox(width: tokens.itemGap) else const Spacer(),
         SizedBox(
           width: tokens.statusLabelWidth,
           child: Text(
             statusLabel,
+            textAlign: wide ? TextAlign.start : TextAlign.end,
             style: tokens.statusTextStyle,
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
@@ -65,8 +66,7 @@ class LinagoraFileTransferRow extends StatelessWidget {
         if (wide) ...[
           SizedBox(width: tokens.itemGap),
           Expanded(child: _buildBar(tokens)),
-        ] else
-          const Spacer(),
+        ],
         _buildCancel(tokens),
       ],
     );
@@ -84,9 +84,7 @@ class LinagoraFileTransferRow extends StatelessWidget {
                   topLine,
                   SizedBox(height: tokens.compactBarGap),
                   Padding(
-                    padding: EdgeInsetsDirectional.symmetric(
-                      horizontal: tokens.compactBarInset,
-                    ),
+                    padding: tokens.compactBarPadding,
                     child: _buildBar(tokens),
                   ),
                 ],
