@@ -263,6 +263,21 @@ void main() {
       expect(find.byTooltip('Close'), findsOneWidget);
     });
 
+    testWidgets('tints the header close like the row close', (t) async {
+      await t.pumpWidget(_host(dialog(onClose: () {})));
+      final icon = t.widget<SvgPicture>(find.descendant(
+        of: find.byKey(LinagoraFileTransferDialog.closeButtonKey),
+        matching: find.byType(SvgPicture),
+      ));
+      expect(
+        icon.colorFilter,
+        ColorFilter.mode(
+          LinagoraFileTransferStyle.wide().closeIconColor,
+          BlendMode.srcIn,
+        ),
+      );
+    });
+
     testWidgets('null onClose hides the header close', (t) async {
       await t.pumpWidget(_host(dialog()));
       expect(find.byKey(LinagoraFileTransferDialog.closeButtonKey),
