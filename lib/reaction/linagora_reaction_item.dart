@@ -20,7 +20,7 @@ class LinagoraReactionItem extends StatelessWidget {
     vertical: LinagoraSpacing.base,
   );
   static const double _gap = LinagoraSpacing.base;
-  static const double _emojiWidth = LinagoraSpacing.base * 3;
+  static const double _emojiSize = LinagoraSpacing.base * 3;
 
   final String name;
   final String? emoji;
@@ -93,18 +93,19 @@ class LinagoraReactionItem extends StatelessWidget {
                 ),
               ),
               const SizedBox(width: _gap),
-              SizedBox(
-                width: _emojiWidth,
-                child:
-                    emojiImage ??
-                    Text(
-                      emoji ?? '',
-                      textAlign: TextAlign.center,
-                      softWrap: false,
-                      overflow: TextOverflow.visible,
-                      style: emojiStyle?.copyWith(color: onSurface),
-                    ),
-              ),
+              if (emojiImage != null)
+                SizedBox.square(dimension: _emojiSize, child: emojiImage)
+              else
+                SizedBox(
+                  width: _emojiSize,
+                  child: Text(
+                    emoji ?? '',
+                    textAlign: TextAlign.center,
+                    softWrap: false,
+                    overflow: TextOverflow.visible,
+                    style: emojiStyle?.copyWith(color: onSurface),
+                  ),
+                ),
             ],
           ),
         ),

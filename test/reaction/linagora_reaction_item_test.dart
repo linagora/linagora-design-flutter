@@ -57,6 +57,25 @@ void main() {
     expect(tester.getSize(find.byType(LinagoraReactionItem)).height, 40);
   });
 
+  testWidgets('custom emoji image taller than wide keeps the row height', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      const MaterialApp(
+        home: Scaffold(
+          body: LinagoraReactionItem.image(
+            name: 'Name',
+            image: SizedBox(key: Key('image'), width: 24, height: 96),
+            avatar: SizedBox(),
+          ),
+        ),
+      ),
+    );
+
+    expect(tester.getSize(find.byKey(const Key('image'))), const Size(24, 24));
+    expect(tester.getSize(find.byType(LinagoraReactionItem)).height, 40);
+  });
+
   testWidgets('tap calls onTap', (tester) async {
     var taps = 0;
     await tester.pumpWidget(build(onTap: () => taps++));
