@@ -44,7 +44,7 @@ Widget linagoraFileTransferDialogUseCase(BuildContext context) {
         layout: layout,
         fileName: 'Screenshot 2025-01-27 at 16.11.26 #$index.png',
         statusLabel: settled ? 'Done' : '332M',
-        progress: indeterminate ? null : progress,
+        progress: settled ? 1 : (indeterminate ? null : progress),
         onCancel: settled ? null : () {},
       ),
       cancelLabel: 'Cancel',
