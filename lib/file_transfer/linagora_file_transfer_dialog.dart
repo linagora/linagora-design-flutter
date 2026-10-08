@@ -102,6 +102,10 @@ class LinagoraFileTransferDialog extends StatelessWidget {
                         ),
                         width: tokens.headerCloseIconSize,
                         height: tokens.headerCloseIconSize,
+                        colorFilter: ColorFilter.mode(
+                          tokens.closeIconColor,
+                          BlendMode.srcIn,
+                        ),
                       ),
                     ),
             ),

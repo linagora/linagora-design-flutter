@@ -64,6 +64,8 @@ class LinagoraFileTransferStyle {
   final double closeButtonSize;
   final double rowCloseIconSize;
   final double headerCloseIconSize;
+  /// Tint of the row and header ✕, which the asset would otherwise draw blue-grey.
+  final Color closeIconColor;
 
   const LinagoraFileTransferStyle({
     required this.surfaceColor,
@@ -98,6 +100,7 @@ class LinagoraFileTransferStyle {
     required this.closeButtonSize,
     required this.rowCloseIconSize,
     required this.headerCloseIconSize,
+    required this.closeIconColor,
   });
 
   static const TextStyle _baseText = TextStyle(
@@ -184,6 +187,7 @@ class LinagoraFileTransferStyle {
     closeButtonSize: 40,
     rowCloseIconSize: 16,
     headerCloseIconSize: 24,
+    closeIconColor: const Color(0xA3424244),
   );
 
   /// Mobile sheet: rounder surface, smaller title and status label.
@@ -237,6 +241,7 @@ class LinagoraFileTransferStyle {
     double? closeButtonSize,
     double? rowCloseIconSize,
     double? headerCloseIconSize,
+    Color? closeIconColor,
   }) =>
       LinagoraFileTransferStyle(
         surfaceColor: surfaceColor ?? this.surfaceColor,
@@ -272,6 +277,7 @@ class LinagoraFileTransferStyle {
         closeButtonSize: closeButtonSize ?? this.closeButtonSize,
         rowCloseIconSize: rowCloseIconSize ?? this.rowCloseIconSize,
         headerCloseIconSize: headerCloseIconSize ?? this.headerCloseIconSize,
+        closeIconColor: closeIconColor ?? this.closeIconColor,
       );
 
   List<Object> get _props => [
@@ -307,6 +313,7 @@ class LinagoraFileTransferStyle {
         closeButtonSize,
         rowCloseIconSize,
         headerCloseIconSize,
+        closeIconColor,
       ];
 
   @override

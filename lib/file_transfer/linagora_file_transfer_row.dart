@@ -161,6 +161,10 @@ class LinagoraFileTransferRow extends StatelessWidget {
                   const AssetBytesLoader(LinagoraDesignImages.svgBytesClose),
                   width: tokens.rowCloseIconSize,
                   height: tokens.rowCloseIconSize,
+                  colorFilter: ColorFilter.mode(
+                    tokens.closeIconColor,
+                    BlendMode.srcIn,
+                  ),
                 ),
               ),
       );

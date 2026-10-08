@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:linagora_design_flutter/linagora_design_flutter.dart';
 
@@ -101,6 +102,21 @@ void main() {
       final compactBar = t.getTopLeft(find.byType(LinearProgressIndicator)).dy;
       final compactName = t.getTopLeft(find.text('report.pdf')).dy;
       expect(compactBar - compactName, greaterThan(20));
+    });
+
+    testWidgets('tints the close icon with closeIconColor', (t) async {
+      await t.pumpWidget(_host(_row(progress: 0.5, onCancel: () {})));
+      final icon = t.widget<SvgPicture>(find.descendant(
+        of: find.byKey(LinagoraFileTransferRow.cancelButtonKey),
+        matching: find.byType(SvgPicture),
+      ));
+      expect(
+        icon.colorFilter,
+        ColorFilter.mode(
+          LinagoraFileTransferStyle.wide().closeIconColor,
+          BlendMode.srcIn,
+        ),
+      );
     });
 
     testWidgets('a long name ellipsises without overflow', (t) async {
@@ -442,5 +458,7 @@ List<_TokenOverride> _tokenOverrides(LinagoraFileTransferStyle b) {
         (s) => s.rowCloseIconSize, 3.0),
     ('headerCloseIconSize', b.copyWith(headerCloseIconSize: 3),
         (s) => s.headerCloseIconSize, 3.0),
+    ('closeIconColor', b.copyWith(closeIconColor: c),
+        (s) => s.closeIconColor, c),
   ];
 }
