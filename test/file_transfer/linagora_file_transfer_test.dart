@@ -239,6 +239,31 @@ void main() {
           findsNothing);
     });
 
+    testWidgets('compact sheet matches the mobile frame height', (t) async {
+      await t.pumpWidget(_host(SizedBox(
+        width: 361,
+        child: LinagoraFileTransferDialog(
+          layout: LinagoraFileTransferLayout.compact,
+          title: 'Attaching file',
+          description: const TextSpan(text: 'One line'),
+          itemCount: 1,
+          itemBuilder: (_, __) => _row(
+            progress: 0.5,
+            onCancel: () {},
+            layout: LinagoraFileTransferLayout.compact,
+          ),
+          cancelLabel: 'Cancel',
+          onCancelAll: () {},
+        ),
+      )));
+      expect(
+        t.getSize(find.byKey(LinagoraFileTransferDialog.cancelAllButtonKey)).height,
+        40,
+      );
+      // header 48 + 1 line 20 + row 8+40+8+6+8 + footer 2+40+8
+      expect(t.getSize(find.byType(LinagoraFileTransferDialog)).height, 188);
+    });
+
     testWidgets('cancel aligns end on wide and start on compact', (t) async {
       await t.pumpWidget(_host(SizedBox(width: 600, child: dialog())));
       final wide = t.getCenter(
@@ -475,6 +500,8 @@ List<_TokenOverride> _tokenOverrides(LinagoraFileTransferStyle b) {
         (s) => s.rowCloseIconSize, 3.0),
     ('headerCloseIconSize', b.copyWith(headerCloseIconSize: 3),
         (s) => s.headerCloseIconSize, 3.0),
+    ('footerPadding', b.copyWith(footerPadding: i),
+        (s) => s.footerPadding, i),
     ('closeIconColor', b.copyWith(closeIconColor: c),
         (s) => s.closeIconColor, c),
   ];

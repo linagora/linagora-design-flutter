@@ -27,6 +27,8 @@ class LinagoraFileTransferStyle {
   final EdgeInsetsGeometry descriptionPadding;
   final EdgeInsetsGeometry rowPadding;
   final EdgeInsetsGeometry cancelPadding;
+  /// Padding around the footer Cancel, separate from the header's.
+  final EdgeInsetsGeometry footerPadding;
 
   final TextStyle titleTextStyle;
   final TextStyle bodyTextStyle;
@@ -77,6 +79,7 @@ class LinagoraFileTransferStyle {
     required this.descriptionPadding,
     required this.rowPadding,
     required this.cancelPadding,
+    required this.footerPadding,
     required this.titleTextStyle,
     required this.bodyTextStyle,
     required this.emphasisTextStyle,
@@ -164,6 +167,7 @@ class LinagoraFileTransferStyle {
       vertical: 8,
     ),
     cancelPadding: const EdgeInsets.symmetric(horizontal: 8, vertical: 10),
+    footerPadding: const EdgeInsetsDirectional.fromSTEB(16, 0, 16, 10),
     titleTextStyle: _text(24, 28, FontWeight.w600, _titleColor),
     bodyTextStyle: _body,
     emphasisTextStyle: const TextStyle(color: Color(0xFF0C0C0C)),
@@ -197,6 +201,9 @@ class LinagoraFileTransferStyle {
         .copyWith(letterSpacing: 0.15),
     statusTextStyle: _text(13, 16, FontWeight.w400, _secondaryText),
     statusLabelWidth: 64,
+    headerPadding: const EdgeInsetsDirectional.fromSTEB(16, 8, 16, 0),
+    descriptionPadding: const EdgeInsetsDirectional.only(start: 16, end: 24),
+    footerPadding: const EdgeInsetsDirectional.fromSTEB(16, 2, 16, 8),
   );
 
   factory LinagoraFileTransferStyle.wide() => _wide;
@@ -218,6 +225,7 @@ class LinagoraFileTransferStyle {
     EdgeInsetsGeometry? descriptionPadding,
     EdgeInsetsGeometry? rowPadding,
     EdgeInsetsGeometry? cancelPadding,
+    EdgeInsetsGeometry? footerPadding,
     TextStyle? titleTextStyle,
     TextStyle? bodyTextStyle,
     TextStyle? emphasisTextStyle,
@@ -253,6 +261,7 @@ class LinagoraFileTransferStyle {
         descriptionPadding: descriptionPadding ?? this.descriptionPadding,
         rowPadding: rowPadding ?? this.rowPadding,
         cancelPadding: cancelPadding ?? this.cancelPadding,
+        footerPadding: footerPadding ?? this.footerPadding,
         titleTextStyle: titleTextStyle ?? this.titleTextStyle,
         bodyTextStyle: bodyTextStyle ?? this.bodyTextStyle,
         emphasisTextStyle: emphasisTextStyle ?? this.emphasisTextStyle,
@@ -290,6 +299,7 @@ class LinagoraFileTransferStyle {
         descriptionPadding,
         rowPadding,
         cancelPadding,
+        footerPadding,
         titleTextStyle,
         bodyTextStyle,
         emphasisTextStyle,
