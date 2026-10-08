@@ -119,6 +119,23 @@ void main() {
       );
     });
 
+    testWidgets('compact bar starts under the chip and the label hugs the close',
+        (t) async {
+      await t.pumpWidget(_host(SizedBox(
+        width: 361,
+        child: _row(
+          progress: 0.5,
+          onCancel: () {},
+          layout: LinagoraFileTransferLayout.compact,
+        ),
+      )));
+      final left = t.getTopLeft(find.byType(SizedBox).first).dx;
+      final bar = find.byType(LinearProgressIndicator);
+      expect(t.getTopLeft(bar).dx - left, 24);
+      expect(t.getTopRight(bar).dx - left, 345);
+      expect(t.getTopRight(find.text('332M')).dx - left, 305);
+    });
+
     testWidgets('a long name ellipsises without overflow', (t) async {
       await t.pumpWidget(_host(
         _row(progress: 0.5, name: 'a' * 200),
@@ -447,8 +464,8 @@ List<_TokenOverride> _tokenOverrides(LinagoraFileTransferStyle b) {
     ('barColor', b.copyWith(barColor: c), (s) => s.barColor, c),
     ('progressAnimationDuration', b.copyWith(progressAnimationDuration: d),
         (s) => s.progressAnimationDuration, d),
-    ('compactBarInset', b.copyWith(compactBarInset: 3),
-        (s) => s.compactBarInset, 3.0),
+    ('compactBarPadding', b.copyWith(compactBarPadding: i),
+        (s) => s.compactBarPadding, i),
     ('compactBarGap', b.copyWith(compactBarGap: 3),
         (s) => s.compactBarGap, 3.0),
     ('itemGap', b.copyWith(itemGap: 3), (s) => s.itemGap, 3.0),

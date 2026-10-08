@@ -53,8 +53,8 @@ class LinagoraFileTransferStyle {
   final Color barColor;
   final Duration progressAnimationDuration;
 
-  /// Horizontal inset of the bar under the row in the compact layout.
-  final double compactBarInset;
+  /// Inset of the bar under the row in the compact layout.
+  final EdgeInsetsGeometry compactBarPadding;
 
   /// Vertical gap between the row and its bar in the compact layout.
   final double compactBarGap;
@@ -94,7 +94,7 @@ class LinagoraFileTransferStyle {
     required this.barTrackColor,
     required this.barColor,
     required this.progressAnimationDuration,
-    required this.compactBarInset,
+    required this.compactBarPadding,
     required this.compactBarGap,
     required this.itemGap,
     required this.closeButtonSize,
@@ -181,8 +181,8 @@ class LinagoraFileTransferStyle {
     barTrackColor: const Color(0xFFD9D9D9),
     barColor: _primary,
     progressAnimationDuration: const Duration(milliseconds: 250),
-    compactBarInset: 24,
-    compactBarGap: 12,
+    compactBarPadding: const EdgeInsetsDirectional.only(start: 8),
+    compactBarGap: 8,
     itemGap: 16,
     closeButtonSize: 40,
     rowCloseIconSize: 16,
@@ -235,7 +235,7 @@ class LinagoraFileTransferStyle {
     Color? barTrackColor,
     Color? barColor,
     Duration? progressAnimationDuration,
-    double? compactBarInset,
+    EdgeInsetsGeometry? compactBarPadding,
     double? compactBarGap,
     double? itemGap,
     double? closeButtonSize,
@@ -271,7 +271,7 @@ class LinagoraFileTransferStyle {
         barColor: barColor ?? this.barColor,
         progressAnimationDuration:
             progressAnimationDuration ?? this.progressAnimationDuration,
-        compactBarInset: compactBarInset ?? this.compactBarInset,
+        compactBarPadding: compactBarPadding ?? this.compactBarPadding,
         compactBarGap: compactBarGap ?? this.compactBarGap,
         itemGap: itemGap ?? this.itemGap,
         closeButtonSize: closeButtonSize ?? this.closeButtonSize,
@@ -307,7 +307,7 @@ class LinagoraFileTransferStyle {
         barTrackColor,
         barColor,
         progressAnimationDuration,
-        compactBarInset,
+        compactBarPadding,
         compactBarGap,
         itemGap,
         closeButtonSize,
