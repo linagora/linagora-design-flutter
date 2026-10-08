@@ -21,5 +21,6 @@ void main() {
 
     expect(find.text('Attaching file'), findsOneWidget);
     expect(find.byType(LinagoraFileTransferRow), findsOneWidget);
+    expect(find.byKey(LinagoraFileTransferDialog.closeButtonKey), findsNothing);
   });
 }
