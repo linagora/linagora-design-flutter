@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:linagora_design_flutter/linagora_design_flutter.dart';
@@ -16,19 +17,33 @@ Widget _row({
   VoidCallback? onCancel,
   LinagoraFileTransferLayout layout = LinagoraFileTransferLayout.wide,
   String name = 'report.pdf',
+  String statusLabel = '332M',
+  String? cancelTooltip,
 }) =>
     LinagoraFileTransferRow(
       fileName: name,
-      statusLabel: '332M',
+      statusLabel: statusLabel,
       progress: progress,
       onCancel: onCancel,
+      cancelTooltip: cancelTooltip,
       layout: layout,
     );
 
 double? _barValue(WidgetTester t) =>
     t.widget<LinearProgressIndicator>(find.byType(LinearProgressIndicator)).value;
 
+Future<void> _loadTwakeInter() async {
+  final loader = FontLoader('packages/linagora_design_flutter/TwakeInter')
+    ..addFont(rootBundle.load('assets/fonts/TwakeInter-Regular.ttf'))
+    ..addFont(rootBundle.load('assets/fonts/TwakeInter-Medium.ttf'))
+    ..addFont(rootBundle.load('assets/fonts/TwakeInter-SemiBold.ttf'))
+    ..addFont(rootBundle.load('assets/fonts/TwakeInter-Bold.ttf'));
+  await loader.load();
+}
+
 void main() {
+  setUpAll(_loadTwakeInter);
+
   group('LinagoraFileTransferRow', () {
     testWidgets('null progress is indeterminate', (t) async {
       await t.pumpWidget(_host(_row()));
@@ -208,6 +223,38 @@ void main() {
       ));
       expect(t.takeException(), isNull);
     });
+
+    testWidgets('compact Cancelled fits the status column', (t) async {
+      await t.pumpWidget(_host(_row(
+        progress: 0,
+        layout: LinagoraFileTransferLayout.compact,
+        statusLabel: 'Cancelled',
+      )));
+      expect(
+        t.renderObject<RenderParagraph>(find.text('Cancelled')).didExceedMaxLines,
+        isFalse,
+      );
+    });
+
+    testWidgets('cancelTooltip is the accessible name of the row cancel',
+        (t) async {
+      final semantics = t.ensureSemantics();
+      try {
+        await t.pumpWidget(_host(_row(
+          progress: 0.5,
+          onCancel: () {},
+          cancelTooltip: 'Cancel file',
+        )));
+        expect(find.byTooltip('Cancel file'), findsOneWidget);
+        expect(
+          t.getSemantics(find.byKey(LinagoraFileTransferRow.cancelButtonKey))
+              .tooltip,
+          'Cancel file',
+        );
+      } finally {
+        semantics.dispose();
+      }
+    });
   });
 
   group('LinagoraFileTransferDialog', () {
@@ -216,6 +263,7 @@ void main() {
       bool showCancelAll = true,
       VoidCallback? onClose,
       VoidCallback? onCancelAll,
+      String? closeTooltip,
       LinagoraFileTransferLayout layout = LinagoraFileTransferLayout.wide,
     }) =>
         LinagoraFileTransferDialog(
@@ -225,6 +273,7 @@ void main() {
           itemBuilder: (_, i) => _row(progress: 0.5, name: 'f$i'),
           cancelLabel: 'Cancel',
           onClose: onClose,
+          closeTooltip: closeTooltip,
           onCancelAll: onCancelAll,
           showCancelAll: showCancelAll,
           layout: layout,
@@ -397,6 +446,25 @@ void main() {
         find.byKey(LinagoraFileTransferDialog.cancelAllButtonKey)).dx;
       expect(wide, greaterThan(compact));
     });
+
+    testWidgets('closeTooltip is the accessible name of the header close',
+        (t) async {
+      final semantics = t.ensureSemantics();
+      try {
+        await t.pumpWidget(_host(dialog(
+          onClose: () {},
+          closeTooltip: 'Close',
+        )));
+        expect(find.byTooltip('Close'), findsOneWidget);
+        expect(
+          t.getSemantics(find.byKey(LinagoraFileTransferDialog.closeButtonKey))
+              .tooltip,
+          'Close',
+        );
+      } finally {
+        semantics.dispose();
+      }
+    });
   });
 
   group('LinagoraFileTransferStyle', () {
@@ -521,6 +589,7 @@ void main() {
       expect(rect.bottom, screen.bottom);
     });
 
+<<<<<<< HEAD
     testWidgets('compact keeps the content above the bottom inset',
         (t) async {
       await t.pumpWidget(const MaterialApp(
