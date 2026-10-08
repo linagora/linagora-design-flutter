@@ -72,6 +72,7 @@ class LinagoraFileTransferRow extends StatelessWidget {
     );
     return Semantics(
       container: true,
+      explicitChildNodes: true,
       label: '$fileName, $statusLabel',
       child: Padding(
         padding: tokens.rowPadding,

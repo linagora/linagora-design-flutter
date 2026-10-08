@@ -133,6 +133,27 @@ void main() {
       expect(cancels, 0);
     });
 
+    testWidgets('hidden cancel-all leaves the focus and semantics trees',
+        (t) async {
+      await t.pumpWidget(_host(dialog(showCancelAll: false)));
+      expect(
+        find.ancestor(
+          of: find.byKey(LinagoraFileTransferDialog.cancelAllButtonKey),
+          matching: find.byWidgetPredicate(
+              (w) => w is ExcludeFocus && w.excluding),
+        ),
+        findsOneWidget,
+      );
+      expect(
+        find.ancestor(
+          of: find.byKey(LinagoraFileTransferDialog.cancelAllButtonKey),
+          matching: find.byWidgetPredicate(
+              (w) => w is ExcludeSemantics && w.excluding),
+        ),
+        findsOneWidget,
+      );
+    });
+
     testWidgets('null onClose hides the header close', (t) async {
       await t.pumpWidget(_host(dialog()));
       expect(find.byKey(LinagoraFileTransferDialog.closeButtonKey),
