@@ -125,27 +125,23 @@ class LinagoraFileTransferRow extends StatelessWidget {
     final radius = BorderRadius.circular(tokens.barRadius);
     final value = progress;
     if (value == null) {
-      return ClipRRect(
+      return LinearProgressIndicator(
+        minHeight: tokens.barHeight,
         borderRadius: radius,
-        child: LinearProgressIndicator(
-          minHeight: tokens.barHeight,
-          backgroundColor: tokens.barTrackColor,
-          color: tokens.barColor,
-        ),
+        backgroundColor: tokens.barTrackColor,
+        color: tokens.barColor,
       );
     }
     final target = value.isFinite ? value.clamp(0.0, 1.0) : 0.0;
     return TweenAnimationBuilder<double>(
       tween: Tween<double>(end: target),
       duration: tokens.progressAnimationDuration,
-      builder: (_, animated, __) => ClipRRect(
+      builder: (_, animated, __) => LinearProgressIndicator(
+        value: animated,
+        minHeight: tokens.barHeight,
         borderRadius: radius,
-        child: LinearProgressIndicator(
-          value: animated,
-          minHeight: tokens.barHeight,
-          backgroundColor: tokens.barTrackColor,
-          color: tokens.barColor,
-        ),
+        backgroundColor: tokens.barTrackColor,
+        color: tokens.barColor,
       ),
     );
   }
