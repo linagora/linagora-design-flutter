@@ -63,6 +63,31 @@ void main() {
       expect(t.getSize(find.byType(LinearProgressIndicator)).width, running);
     });
 
+    testWidgets('announces name and status, cancel shows its tooltip',
+        (t) async {
+      final semantics = t.ensureSemantics();
+      await t.pumpWidget(_host(Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          for (final name in ['a.pdf', 'b.pdf'])
+            LinagoraFileTransferRow(
+              fileName: name,
+              statusLabel: '332M',
+              progress: 0.5,
+              onCancel: () {},
+              cancelTooltip: 'Cancel upload',
+            ),
+        ],
+      )));
+      final rows = find.byType(LinagoraFileTransferRow);
+      expect(t.getSemantics(rows.first),
+          containsSemantics(label: 'a.pdf, 332M'));
+      expect(t.getSemantics(rows.last),
+          containsSemantics(label: 'b.pdf, 332M'));
+      expect(find.byTooltip('Cancel upload'), findsNWidgets(2));
+      semantics.dispose();
+    });
+
     testWidgets('wide keeps the bar beside the chip, compact below it',
         (t) async {
       await t.pumpWidget(_host(_row(progress: 0.5)));
@@ -160,6 +185,19 @@ void main() {
         ),
         findsOneWidget,
       );
+    });
+
+    testWidgets('header close shows its tooltip', (t) async {
+      await t.pumpWidget(_host(LinagoraFileTransferDialog(
+        title: 'Attaching file',
+        description: const TextSpan(text: 'desc'),
+        itemCount: 0,
+        itemBuilder: (_, i) => const SizedBox(),
+        cancelLabel: 'Cancel',
+        onClose: () {},
+        closeTooltip: 'Close',
+      )));
+      expect(find.byTooltip('Close'), findsOneWidget);
     });
 
     testWidgets('null onClose hides the header close', (t) async {
@@ -260,6 +298,23 @@ void main() {
         t.getSize(find.byType(DecoratedBox).last).width,
         LinagoraFileTransferStyle.wide().maxWidth,
       );
+    });
+
+    testWidgets('names its route for screen readers', (t) async {
+      final semantics = t.ensureSemantics();
+      await t.pumpWidget(_host(const LinagoraFileTransferSurface(
+        semanticLabel: 'Upload dialog',
+        child: SizedBox(height: 50),
+      )));
+      expect(
+        t.getSemantics(find.byType(LinagoraFileTransferSurface)),
+        matchesSemantics(
+          label: 'Upload dialog',
+          scopesRoute: true,
+          namesRoute: true,
+        ),
+      );
+      semantics.dispose();
     });
 
     testWidgets('compact sits at the bottom, full width', (t) async {
