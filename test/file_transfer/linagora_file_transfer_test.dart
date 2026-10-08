@@ -146,6 +146,13 @@ void main() {
       expect(t.getSize(chip), const Size(191, 36));
     });
 
+    testWidgets('the bar rounds its fill as well as its track', (t) async {
+      await t.pumpWidget(_host(_row(progress: 0.5)));
+      final bar =
+          t.widget<LinearProgressIndicator>(find.byType(LinearProgressIndicator));
+      expect(bar.borderRadius, BorderRadius.circular(26));
+    });
+
     testWidgets('a long name ellipsises without overflow', (t) async {
       await t.pumpWidget(_host(
         _row(progress: 0.5, name: 'a' * 200),
