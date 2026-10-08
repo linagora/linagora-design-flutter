@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:linagora_design_flutter/linagora_design_flutter.dart';
@@ -24,6 +25,28 @@ void main() {
     );
     expect(find.text('👍'), findsOneWidget);
   });
+
+  for (final platform in [TargetPlatform.iOS, TargetPlatform.android]) {
+    testWidgets('emoji wider than its box stays centered on ${platform.name}', (
+      tester,
+    ) async {
+      debugDefaultTargetPlatformOverride = platform;
+      // The glyphs of the test font are as wide as the font size: a flag is
+      // made of two of them.
+      await tester.pumpWidget(build(const LinagoraReactionChip(emoji: '🇫🇷')));
+
+      final emoji = tester.getRect(find.text('🇫🇷'));
+      final chip = tester.getRect(find.byType(LinagoraReactionChip));
+      debugDefaultTargetPlatformOverride = null;
+
+      expect(emoji.center.dy, chip.center.dy);
+      // Apple Color Emoji is not centered in its advance: see the chip.
+      if (platform == TargetPlatform.android) {
+        expect(emoji.width, greaterThan(20));
+        expect(emoji.center.dx, chip.center.dx);
+      }
+    });
+  }
 
   testWidgets('reaction shows its count next to the emoji', (tester) async {
     await tester.pumpWidget(
