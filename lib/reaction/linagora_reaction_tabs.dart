@@ -15,11 +15,15 @@ class LinagoraReactionTab {
 }
 
 /// The tabs filtering the list of who reacted to a message.
-class LinagoraReactionTabs extends StatelessWidget {
+///
+/// The selected tab is scrolled into view. No tab is selected when
+/// [selectedIndex] is out of range.
+class LinagoraReactionTabs extends StatefulWidget {
   static const double height = LinagoraSpacing.base * 6;
 
   static const double _horizontalPadding = LinagoraSpacing.base * 2;
   static const double _tabSpacing = LinagoraSpacing.base * 0.5;
+  static const Duration _scrollDuration = Duration(milliseconds: 200);
 
   final List<LinagoraReactionTab> tabs;
   final int selectedIndex;
@@ -33,21 +37,61 @@ class LinagoraReactionTabs extends StatelessWidget {
   });
 
   @override
+  State<LinagoraReactionTabs> createState() => _LinagoraReactionTabsState();
+}
+
+class _LinagoraReactionTabsState extends State<LinagoraReactionTabs> {
+  List<GlobalKey> _tabKeys = const [];
+
+  @override
+  void initState() {
+    super.initState();
+    _showSelectedTab(Duration.zero);
+  }
+
+  @override
+  void didUpdateWidget(LinagoraReactionTabs oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.selectedIndex != oldWidget.selectedIndex ||
+        widget.tabs.length != oldWidget.tabs.length) {
+      _showSelectedTab(LinagoraReactionTabs._scrollDuration);
+    }
+  }
+
+  void _showSelectedTab(Duration duration) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      final index = widget.selectedIndex;
+      if (index < 0 || index >= _tabKeys.length) return;
+      final tabContext = _tabKeys[index].currentContext;
+      if (tabContext == null) return;
+      Scrollable.ensureVisible(tabContext, alignment: 0.5, duration: duration);
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
+    if (_tabKeys.length != widget.tabs.length) {
+      _tabKeys = [for (final _ in widget.tabs) GlobalKey()];
+    }
+
     return SizedBox(
-      height: height,
+      height: LinagoraReactionTabs.height,
       child: SingleChildScrollView(
         scrollDirection: Axis.horizontal,
         physics: const ClampingScrollPhysics(),
-        padding: const EdgeInsets.symmetric(horizontal: _horizontalPadding),
+        padding: const EdgeInsets.symmetric(
+          horizontal: LinagoraReactionTabs._horizontalPadding,
+        ),
         child: Row(
-          spacing: _tabSpacing,
+          spacing: LinagoraReactionTabs._tabSpacing,
           children: [
-            for (final (index, tab) in tabs.indexed)
+            for (final (index, tab) in widget.tabs.indexed)
               _ReactionTab(
+                key: _tabKeys[index],
                 tab: tab,
-                isSelected: index == selectedIndex,
-                onTap: () => onSelected(index),
+                isSelected: index == widget.selectedIndex,
+                onTap: () => widget.onSelected(index),
               ),
           ],
         ),
@@ -68,6 +112,7 @@ class _ReactionTab extends StatelessWidget {
   final VoidCallback onTap;
 
   const _ReactionTab({
+    super.key,
     required this.tab,
     required this.isSelected,
     required this.onTap,
