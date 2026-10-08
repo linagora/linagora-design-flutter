@@ -93,27 +93,31 @@ class LinagoraFileTransferRow extends StatelessWidget {
     );
   }
 
-  Widget _buildChip(LinagoraFileTransferStyle tokens) => Container(
+  Widget _buildChip(LinagoraFileTransferStyle tokens) => SizedBox(
         width: tokens.chipWidth,
-        padding: tokens.chipPadding,
-        decoration: BoxDecoration(
-          color: tokens.chipBackgroundColor,
-          borderRadius: BorderRadius.circular(tokens.chipRadius),
-          border: Border.all(color: tokens.chipBorderColor),
-        ),
-        child: Row(
-          children: [
-            leading,
-            const SizedBox(width: 8),
-            Expanded(
-              child: Text(
-                fileName,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: tokens.fileNameTextStyle,
-              ),
+        child: DecoratedBox(
+          decoration: BoxDecoration(
+            color: tokens.chipBackgroundColor,
+            borderRadius: BorderRadius.circular(tokens.chipRadius),
+            border: Border.all(color: tokens.chipBorderColor),
+          ),
+          child: Padding(
+            padding: tokens.chipPadding,
+            child: Row(
+              children: [
+                leading,
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    fileName,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: tokens.fileNameTextStyle,
+                  ),
+                ),
+              ],
             ),
-          ],
+          ),
         ),
       );
 
