@@ -145,7 +145,7 @@ class LinagoraFileTransferStyle {
       ),
       BoxShadow(color: Color(0x1F424244), spreadRadius: 0.5),
     ],
-    maxWidth: 629,
+    maxWidth: 527,
     maxListHeight: 264,
     headerPadding: const EdgeInsetsDirectional.symmetric(
       horizontal: 16,
