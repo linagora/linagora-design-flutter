@@ -159,6 +159,14 @@ void main() {
       expect(t.getTopLeft(close).dx - t.getTopRight(bar).dx, 9);
     });
 
+    testWidgets('wide bar starts right after the label column', (t) async {
+      await t.pumpWidget(_host(_row(progress: 0.5, onCancel: () {})));
+      expect(
+        t.getTopLeft(find.byType(LinearProgressIndicator)).dx,
+        t.getTopRight(find.text('332M')).dx,
+      );
+    });
+
     testWidgets('the bar rounds its fill as well as its track', (t) async {
       await t.pumpWidget(_host(_row(progress: 0.5)));
       final bar =
@@ -329,6 +337,25 @@ void main() {
       final label = t.getSize(find.text('OK'));
       expect(cancel, Size(label.width + 16, 40));
       expect(cancel.width, lessThan(64));
+    });
+
+    testWidgets('wide card is 527 wide, Cancel on the row, 10 above the edge',
+        (t) async {
+      await t.pumpWidget(_host(LinagoraFileTransferSurface(
+        child: dialog(count: 1),
+      )));
+      final card = t.getRect(find
+          .descendant(
+            of: find.byType(LinagoraFileTransferSurface),
+            matching: find.byType(DecoratedBox),
+          )
+          .first);
+      final row = t.getRect(find.byType(LinagoraFileTransferRow));
+      final cancel =
+          t.getRect(find.byKey(LinagoraFileTransferDialog.cancelAllButtonKey));
+      expect(card.width, 527);
+      expect(cancel.top, row.bottom);
+      expect(card.bottom - cancel.bottom, 10);
     });
 
     testWidgets('cancel aligns end on wide and start on compact', (t) async {
