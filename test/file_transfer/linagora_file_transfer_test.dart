@@ -289,6 +289,20 @@ void main() {
     });
   });
 
+  group('LinagoraFileTransferLeading', () {
+    testWidgets('defaults to the theme primary, takes a custom color',
+        (t) async {
+      Color? iconColor() => t.widget<Icon>(find.byType(Icon)).color;
+      await t.pumpWidget(_host(const LinagoraFileTransferLeading()));
+      final context = t.element(find.byType(LinagoraFileTransferLeading));
+      expect(iconColor(), Theme.of(context).colorScheme.primary);
+      await t.pumpWidget(_host(const LinagoraFileTransferLeading(
+        color: Color(0xFF123456),
+      )));
+      expect(iconColor(), const Color(0xFF123456));
+    });
+  });
+
   group('LinagoraFileTransferSurface', () {
     testWidgets('wide caps its width', (t) async {
       await t.pumpWidget(_host(const LinagoraFileTransferSurface(
