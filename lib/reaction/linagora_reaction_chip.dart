@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:linagora_design_flutter/colors/linagora_ref_colors.dart';
 import 'package:linagora_design_flutter/colors/linagora_sys_colors.dart';
@@ -13,8 +14,16 @@ class LinagoraReactionChip extends StatelessWidget {
   static const double _contentSize = LinagoraSpacing.base * 2.5;
   // Draws an emoji glyph of about 18px, as in Figma. The forced strut gives
   // the line the height of the glyph, so that centering the line centers it.
-  static const double _emojiFontSize = 19;
-  static const StrutStyle _emojiStrut = StrutStyle(
+  //
+  // Apple Color Emoji draws its glyph at the start of a wider advance, which
+  // fits the content box. The other emoji fonts center a larger glyph in an
+  // advance wider than the box: it is drawn smaller, centered past the box.
+  static bool get _hasAppleEmoji =>
+      !kIsWeb &&
+      (defaultTargetPlatform == TargetPlatform.iOS ||
+          defaultTargetPlatform == TargetPlatform.macOS);
+  static double get _emojiFontSize => _hasAppleEmoji ? 19 : 17.5;
+  static StrutStyle get _emojiStrut => StrutStyle(
     fontFamily: 'TwakeInter',
     package: 'linagora_design_flutter',
     fontSize: _emojiFontSize,
@@ -104,25 +113,32 @@ class LinagoraReactionChip extends StatelessWidget {
   Widget? get _content {
     final emoji = _emoji;
     return switch (_kind) {
-      _ChipKind.reaction =>
-        emoji != null
-            ? Center(
-                child: Text(
-                  emoji,
-                  softWrap: false,
-                  overflow: TextOverflow.visible,
-                  textScaler: TextScaler.noScaling,
-                  strutStyle: _emojiStrut,
-                  style: const TextStyle(fontSize: _emojiFontSize),
-                ),
-              )
-            : _image,
+      _ChipKind.reaction => emoji != null ? _emojiText(emoji) : _image,
       _ChipKind.remaining => null,
       _ChipKind.more => const Icon(
         Icons.more_horiz_rounded,
         size: _contentSize,
       ),
     };
+  }
+
+  Widget _emojiText(String emoji) {
+    final text = Text(
+      emoji,
+      softWrap: false,
+      overflow: TextOverflow.visible,
+      textScaler: TextScaler.noScaling,
+      strutStyle: _emojiStrut,
+      style: TextStyle(fontSize: _emojiFontSize),
+    );
+    if (_hasAppleEmoji) return Center(child: text);
+
+    return OverflowBox(
+      minWidth: 0,
+      minHeight: 0,
+      maxWidth: double.infinity,
+      child: text,
+    );
   }
 
   String? get _label => switch (_kind) {
