@@ -13,6 +13,7 @@ import 'package:widgetbook_workspace/components/event/linagora_event_date_icon_u
 import 'package:widgetbook_workspace/components/event/event_activity_badge_use_case.dart';
 import 'package:widgetbook_workspace/components/event/linagora_event_info_row_use_case.dart';
 import 'package:widgetbook_workspace/components/file_transfer/linagora_file_transfer_use_case.dart';
+import 'package:widgetbook_workspace/components/file_transfer/linagora_file_transfer_simulated_use_case.dart';
 import 'package:widgetbook_workspace/components/list_item/linagora_radio_item_use_case.dart';
 import 'package:widgetbook_workspace/components/list_item/linagora_setting_item_use_case.dart';
 import 'package:widgetbook_workspace/components/list_item/session_device_list_item_use_case.dart';
@@ -346,6 +347,11 @@ class WidgetbookApp extends StatelessWidget {
                   name: 'Default',
                   builder: (context) =>
                       linagoraFileTransferDialogUseCase(context),
+                ),
+                WidgetbookUseCase(
+                  name: 'Simulated transfer',
+                  builder: (context) =>
+                      linagoraFileTransferSimulatedUseCase(context),
                 ),
               ],
             ),
