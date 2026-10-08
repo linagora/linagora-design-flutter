@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:linagora_design_flutter/linagora_design_flutter.dart';
@@ -134,6 +135,24 @@ void main() {
       expect(t.getTopLeft(bar).dx - left, 24);
       expect(t.getTopRight(bar).dx - left, 345);
       expect(t.getTopRight(find.text('332M')).dx - left, 299);
+    });
+
+    testWidgets('compact label text ends at the right of its column',
+        (t) async {
+      await t.pumpWidget(_host(SizedBox(
+        width: 361,
+        child: _row(
+          progress: 0.5,
+          onCancel: () {},
+          layout: LinagoraFileTransferLayout.compact,
+        ),
+      )));
+      final label = t.renderObject<RenderParagraph>(find.text('332M'));
+      final glyphs = label.getBoxesForSelection(
+        const TextSelection(baseOffset: 0, extentOffset: 4),
+      );
+      expect(glyphs.last.right, label.size.width);
+      expect(glyphs.first.left, greaterThan(0));
     });
 
     testWidgets('chip keeps the 191x36 frame size despite its border',
