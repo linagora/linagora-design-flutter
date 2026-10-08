@@ -24,20 +24,16 @@ Widget linagoraFileTransferDialogUseCase(BuildContext context) {
   );
   final indeterminate = context.knobs.boolean(label: 'Indeterminate');
   final settled = context.knobs.boolean(label: 'Settled (no cancel buttons)');
-  final style = LinagoraFileTransferStyle.forLayout(layout);
+  final showClose = context.knobs.boolean(label: 'Close button');
 
   return LinagoraFileTransferSurface(
     layout: layout,
     child: LinagoraFileTransferDialog(
       layout: layout,
       title: 'Attaching file',
-      description: TextSpan(
-        children: [
-          const TextSpan(text: 'Your file is larger than 10 MB. It will be '
-              'uploaded in your Drive and added as '),
-          TextSpan(text: 'link', style: style.emphasisTextStyle),
-          const TextSpan(text: ' in your email.'),
-        ],
+      description: const TextSpan(
+        text: 'Your file is larger than 10 MB. It will be uploaded in your '
+            'Drive and added as link in your email.',
       ),
       itemCount: count,
       itemBuilder: (_, index) => LinagoraFileTransferRow(
@@ -48,7 +44,7 @@ Widget linagoraFileTransferDialogUseCase(BuildContext context) {
         onCancel: settled ? null : () {},
       ),
       cancelLabel: 'Cancel',
-      onClose: () {},
+      onClose: showClose ? () {} : null,
       onCancelAll: () {},
       showCancelAll: !settled,
     ),
