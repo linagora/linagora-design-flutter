@@ -24,3 +24,25 @@ Widget linagoraReactionItemUseCase(BuildContext context) {
     ),
   );
 }
+
+@widgetbook.UseCase(name: 'Custom emoji', type: LinagoraReactionItem)
+Widget linagoraReactionItemImageUseCase(BuildContext context) {
+  final size = context.knobs.object.dropdown(
+    label: 'Size',
+    options: LinagoraReactionItemSize.values,
+    initialOption: LinagoraReactionItemSize.small,
+    labelBuilder: (size) => size.name,
+  );
+  final name = context.knobs.string(label: 'Name', initialValue: 'Name');
+
+  return Padding(
+    padding: const EdgeInsets.all(LinagoraSpacing.base * 2),
+    child: LinagoraReactionItem.image(
+      name: name,
+      image: const FlutterLogo(),
+      avatar: RoundAvatar(text: name, size: size.avatarSize),
+      size: size,
+      onTap: () {},
+    ),
+  );
+}

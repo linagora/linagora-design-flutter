@@ -2,10 +2,30 @@
 
 ### Added
 
+* `MessageBubble.reactions`: lays the reactions row over the bottom of the
+  bubble and lets it extend past a bubble narrower than the row (towards the
+  start with `isAlignedToEnd`).
+* `MessageBubble.plain`: a message without bubble decoration.
+* `LinagoraReactionItem.image`: a reaction row showing a custom emoji image.
+* `LinagoraReactionTabs`: the tabs filtering the list of who reacted to a
+  message, scrolling the selected one into view.
+* `LinagoraReactions`: the reactions row under a message bubble, showing up
+  to 3 reactions, or fewer when they do not fit its width, then a `+N` chip or
+  the "more" button, opening the full list on tap.
+* `LinagoraReactionChip`: a pill of the reactions row under a message bubble,
+  for a unicode or custom emoji with optional count, the tappable `+N`
+  remaining counter and the "more" button, each with an optional
+  `semanticLabel`.
 * `LinagoraFileTransferDialog`, `LinagoraFileTransferRow`,
   `LinagoraFileTransferSurface`, `LinagoraFileTransferLeading` and
   `LinagoraFileTransferStyle`: the Figma "Attaching file" dialog (web card and
   mobile sheet) with per-file progress, cancel and fully overridable tokens.
+
+### Changed
+
+* `LinagoraReactionItem` in large size shows its emoji in `headlineMedium`.
+* **Breaking:** `MessageBubble.hasReactions` is replaced by
+  `MessageBubble.reactions`.
 
 ## 0.3.4
 

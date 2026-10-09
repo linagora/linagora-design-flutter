@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:linagora_design_flutter/chat/bubble_shape.dart';
+import 'package:linagora_design_flutter/chat/bubble_with_reactions.dart';
 import 'package:linagora_design_flutter/colors/linagora_ref_colors.dart';
 import 'package:linagora_design_flutter/colors/linagora_sys_colors.dart';
 import 'package:linagora_design_flutter/spacings/linagora_spacing.dart';
@@ -42,11 +43,13 @@ const double kMessageReactionsOverlayHeight = LinagoraSpacing.base * 3;
 ///
 /// When [color] is null it falls back to the design-system default (own vs
 /// received color from [isOwnMessage]). When [padding] is null the inner
-/// padding is resolved from [contentType]. [hasReactions] reserves
-/// [kMessageReactionsOverlayHeight] below the bubble for the reactions overlay.
+/// padding is resolved from [contentType]. [reactions] is laid over the bottom
+/// of the bubble, with [kMessageReactionsOverlayHeight] reserved below it.
 class MessageBubble extends StatelessWidget {
   final Widget child;
 
+  /// Picks the default [color] only. It says nothing about the side the bubble
+  /// sits on: see [isAlignedToEnd].
   final bool isOwnMessage;
 
   final Color? color;
@@ -65,7 +68,18 @@ class MessageBubble extends StatelessWidget {
 
   final BoxConstraints? constraints;
 
-  final bool hasReactions;
+  /// The reactions row. When wider than the bubble, it extends past it.
+  final Widget? reactions;
+
+  /// Whether the bubble is aligned to the end of its row, so that wider
+  /// [reactions] extend towards the start.
+  ///
+  /// Cannot be derived from [tailDirection], which is
+  /// [BubbleTailDirection.none] for a message without tail, nor from
+  /// [isOwnMessage], as own messages may be aligned to the start.
+  final bool isAlignedToEnd;
+
+  final bool _isDecorated;
 
   const MessageBubble({
     super.key,
@@ -78,8 +92,25 @@ class MessageBubble extends StatelessWidget {
     this.contentType = BubbleContentType.other,
     this.shadows = kBubbleShadow,
     this.constraints,
-    this.hasReactions = false,
-  });
+    this.reactions,
+    this.isAlignedToEnd = false,
+  }) : _isDecorated = true;
+
+  /// A message without bubble decoration, such as an emoji-only message.
+  const MessageBubble.plain({
+    super.key,
+    required this.child,
+    this.constraints,
+    this.reactions,
+    this.isAlignedToEnd = false,
+  }) : isOwnMessage = false,
+       color = null,
+       tailDirection = BubbleTailDirection.none,
+       borderRadius = BubbleRadius.all,
+       padding = EdgeInsets.zero,
+       contentType = BubbleContentType.other,
+       shadows = const [],
+       _isDecorated = false;
 
   EdgeInsetsGeometry get _resolvedPadding =>
       padding ??
@@ -96,21 +127,31 @@ class MessageBubble extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    final reactions = this.reactions;
+    final bubble = Container(
       constraints: constraints,
-      margin: hasReactions
+      margin: reactions != null
           ? const EdgeInsets.only(bottom: kMessageReactionsOverlayHeight)
           : null,
       padding: _resolvedPadding,
-      decoration: ShapeDecoration(
-        color: _resolvedColor,
-        shadows: shadows,
-        shape: BubbleShape(
-          borderRadius: borderRadius,
-          tailDirection: tailDirection,
-        ),
-      ),
+      decoration: _isDecorated
+          ? ShapeDecoration(
+              color: _resolvedColor,
+              shadows: shadows,
+              shape: BubbleShape(
+                borderRadius: borderRadius,
+                tailDirection: tailDirection,
+              ),
+            )
+          : null,
       child: child,
+    );
+    if (reactions == null) return bubble;
+
+    return BubbleWithReactions(
+      isBubbleAlignedToEnd: isAlignedToEnd,
+      bubble: bubble,
+      reactions: reactions,
     );
   }
 }
