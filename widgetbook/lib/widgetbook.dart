@@ -4,6 +4,7 @@ import 'package:widgetbook/widgetbook.dart' hide AlignmentAddon;
 import 'package:widgetbook_workspace/components/banners/linagora_alert_use_case.dart';
 import 'package:widgetbook_workspace/components/banners/linagora_banner_use_case.dart';
 import 'package:widgetbook_workspace/components/buttons/linagora_button_use_case.dart';
+import 'package:widgetbook_workspace/components/empty_state/linagora_empty_state_use_case.dart';
 import 'package:widgetbook_workspace/components/chat/message_bubble_use_case.dart';
 import 'package:widgetbook_workspace/components/contact_component/matrix_contact_use_case.dart';
 import 'package:widgetbook_workspace/components/contact_component/phonebook_contact_use_case.dart';
@@ -14,7 +15,10 @@ import 'package:widgetbook_workspace/components/event/event_activity_badge_use_c
 import 'package:widgetbook_workspace/components/event/linagora_event_info_row_use_case.dart';
 import 'package:widgetbook_workspace/components/file_transfer/linagora_file_transfer_use_case.dart';
 import 'package:widgetbook_workspace/components/file_transfer/linagora_file_transfer_simulated_use_case.dart';
+import 'package:widgetbook_workspace/components/chips/linagora_filter_chip_use_case.dart';
 import 'package:widgetbook_workspace/components/list_item/linagora_radio_item_use_case.dart';
+import 'package:widgetbook_workspace/components/list_item/linagora_avatar_list_item_use_case.dart';
+import 'package:widgetbook_workspace/components/list_item/linagora_section_header_use_case.dart';
 import 'package:widgetbook_workspace/components/list_item/linagora_setting_item_use_case.dart';
 import 'package:widgetbook_workspace/components/list_item/session_device_list_item_use_case.dart';
 import 'package:widgetbook_workspace/components/reaction/linagora_reaction_item_use_case.dart';
@@ -175,6 +179,20 @@ class WidgetbookApp extends StatelessWidget {
           ],
         ),
         WidgetbookFolder(
+          name: 'Empty state',
+          children: [
+            WidgetbookComponent(
+              name: 'Linagora empty state',
+              useCases: [
+                WidgetbookUseCase(
+                  name: 'Default',
+                  builder: (context) => linagoraEmptyStateUseCase(context),
+                ),
+              ],
+            ),
+          ],
+        ),
+        WidgetbookFolder(
           name: 'List item',
           children: [
             WidgetbookComponent(
@@ -212,6 +230,43 @@ class WidgetbookApp extends StatelessWidget {
                 WidgetbookUseCase(
                   name: 'Group',
                   builder: (context) => linagoraRadioItemUseCase(context),
+                ),
+              ],
+            ),
+            WidgetbookComponent(
+              name: 'Linagora section header',
+              useCases: [
+                WidgetbookUseCase(
+                  name: 'Default',
+                  builder: (context) => linagoraSectionHeaderUseCase(context),
+                ),
+              ],
+            ),
+            WidgetbookComponent(
+              name: 'Linagora avatar list item',
+              useCases: [
+                WidgetbookUseCase(
+                  name: 'Default',
+                  builder: (context) => linagoraAvatarListItemUseCase(context),
+                ),
+                WidgetbookUseCase(
+                  name: 'Section',
+                  builder: (context) =>
+                      linagoraAvatarListItemSectionUseCase(context),
+                ),
+              ],
+            ),
+          ],
+        ),
+        WidgetbookFolder(
+          name: 'Chips',
+          children: [
+            WidgetbookComponent(
+              name: 'Linagora filter chip',
+              useCases: [
+                WidgetbookUseCase(
+                  name: 'Group',
+                  builder: (context) => linagoraFilterChipUseCase(context),
                 ),
               ],
             ),
@@ -393,11 +448,13 @@ class WidgetbookApp extends StatelessWidget {
               useCases: [
                 WidgetbookUseCase(
                   name: 'All states',
-                  builder: (context) => eventActivityBadgeStatesUseCase(context),
+                  builder: (context) =>
+                      eventActivityBadgeStatesUseCase(context),
                 ),
                 WidgetbookUseCase(
                   name: 'Custom',
-                  builder: (context) => eventActivityBadgeCustomUseCase(context),
+                  builder: (context) =>
+                      eventActivityBadgeCustomUseCase(context),
                 ),
               ],
             ),
