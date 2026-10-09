@@ -67,14 +67,16 @@ class LinagoraFileTransferDialog extends StatelessWidget {
             TextSpan(style: tokens.bodyTextStyle, children: [description]),
           ),
         ),
-        ConstrainedBox(
-          constraints: BoxConstraints(maxHeight: tokens.maxListHeight),
-          child: ListView.builder(
-            shrinkWrap: true,
-            primary: false,
-            padding: EdgeInsets.zero,
-            itemCount: itemCount,
-            itemBuilder: itemBuilder,
+        Flexible(
+          child: ConstrainedBox(
+            constraints: BoxConstraints(maxHeight: tokens.maxListHeight),
+            child: ListView.builder(
+              shrinkWrap: true,
+              primary: false,
+              padding: EdgeInsets.zero,
+              itemCount: itemCount,
+              itemBuilder: itemBuilder,
+            ),
           ),
         ),
         _buildFooter(tokens),
