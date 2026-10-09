@@ -16,6 +16,10 @@
   for a unicode or custom emoji with optional count, the tappable `+N`
   remaining counter and the "more" button, each with an optional
   `semanticLabel`.
+* `LinagoraFileTransferDialog`, `LinagoraFileTransferRow`,
+  `LinagoraFileTransferSurface`, `LinagoraFileTransferLeading` and
+  `LinagoraFileTransferStyle`: the Figma "Attaching file" dialog (web card and
+  mobile sheet) with per-file progress, cancel and fully overridable tokens.
 
 ### Changed
 
