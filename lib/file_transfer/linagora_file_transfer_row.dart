@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:linagora_design_flutter/file_transfer/linagora_file_transfer_layout.dart';
@@ -13,6 +15,9 @@ import 'package:vector_graphics/vector_graphics.dart';
 /// The widget is stateless: the caller owns [progress] and the label text.
 class LinagoraFileTransferRow extends StatelessWidget {
   static const Key cancelButtonKey = ValueKey('linagora_file_transfer_cancel');
+
+  /// Bar width the wide row keeps when the chip has to shrink.
+  static const double _minBarWidth = 48;
 
   final String fileName;
 
@@ -48,28 +53,40 @@ class LinagoraFileTransferRow extends StatelessWidget {
   Widget build(BuildContext context) {
     final tokens = style ?? LinagoraFileTransferStyle.forLayout(layout);
     final wide = layout == LinagoraFileTransferLayout.wide;
-    final topLine = Row(
-      children: [
-        _buildChip(tokens),
-        if (wide) SizedBox(width: tokens.itemGap) else const Spacer(),
-        SizedBox(
-          width: tokens.statusLabelWidth,
-          child: Text(
-            statusLabel,
-            textAlign: wide ? TextAlign.start : TextAlign.end,
-            style: tokens.statusTextStyle,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-            softWrap: false,
-          ),
-        ),
-        SizedBox(width: tokens.labelTrailingGap),
-        if (wide) ...[
-          Expanded(child: _buildBar(tokens)),
-          SizedBox(width: tokens.barEndGap),
-        ],
-        _buildCancel(tokens),
-      ],
+    final topLine = LayoutBuilder(
+      builder: (_, constraints) {
+        final fixed = tokens.statusLabelWidth +
+            tokens.labelTrailingGap +
+            tokens.closeButtonSize +
+            (wide ? tokens.itemGap + tokens.barEndGap + _minBarWidth : 0);
+        final chipWidth = math.max(
+          0.0,
+          math.min(tokens.chipWidth, constraints.maxWidth - fixed),
+        );
+        return Row(
+          children: [
+            _buildChip(tokens, chipWidth),
+            if (wide) SizedBox(width: tokens.itemGap) else const Spacer(),
+            SizedBox(
+              width: tokens.statusLabelWidth,
+              child: Text(
+                statusLabel,
+                textAlign: wide ? TextAlign.start : TextAlign.end,
+                style: tokens.statusTextStyle,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                softWrap: false,
+              ),
+            ),
+            SizedBox(width: tokens.labelTrailingGap),
+            if (wide) ...[
+              Expanded(child: _buildBar(tokens)),
+              SizedBox(width: tokens.barEndGap),
+            ],
+            _buildCancel(tokens),
+          ],
+        );
+      },
     );
     return Semantics(
       container: true,
@@ -94,8 +111,9 @@ class LinagoraFileTransferRow extends StatelessWidget {
     );
   }
 
-  Widget _buildChip(LinagoraFileTransferStyle tokens) => SizedBox(
-        width: tokens.chipWidth,
+  Widget _buildChip(LinagoraFileTransferStyle tokens, double width) =>
+      SizedBox(
+        width: width,
         child: DecoratedBox(
           decoration: BoxDecoration(
             color: tokens.chipBackgroundColor,
