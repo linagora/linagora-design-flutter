@@ -29,9 +29,9 @@ class SessionDeviceAvatar extends StatelessWidget {
     required this.verified,
     required this.size,
   }) : assert(
-          icon != null || iconWidget != null,
-          'Provide either icon or iconWidget',
-        );
+         icon != null || iconWidget != null,
+         'Provide either icon or iconWidget',
+       );
 
   @override
   Widget build(BuildContext context) {
@@ -55,11 +55,7 @@ class SessionDeviceAvatar extends StatelessWidget {
             child: Center(
               child: iconWidget != null
                   ? SizedBox.square(dimension: glyphSize, child: iconWidget)
-                  : Icon(
-                      icon,
-                      size: glyphSize,
-                      color: colors.onSuccess,
-                    ),
+                  : Icon(icon, size: glyphSize, color: colors.onSuccess),
             ),
           ),
           if (!verified)

@@ -1,6 +1,9 @@
 import 'dart:ui';
 
 class LinagoraStateLayer {
+  /// Opacity of the content of a disabled component.
+  static const double disabledContentOpacity = 0.38;
+
   final Color opacityLayer1;
   final Color opacityLayer2;
   final Color opacityLayer3;
