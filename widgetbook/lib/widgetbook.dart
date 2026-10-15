@@ -11,6 +11,7 @@ import 'package:widgetbook_workspace/components/event/event_conference_actions_u
 import 'package:widgetbook_workspace/components/event/linagora_event_card_use_case.dart';
 import 'package:widgetbook_workspace/components/event/linagora_event_date_icon_use_case.dart';
 import 'package:widgetbook_workspace/components/event/event_activity_badge_use_case.dart';
+import 'package:widgetbook_workspace/components/dialog/linagora_dialog_use_case.dart';
 import 'package:widgetbook_workspace/components/event/linagora_event_info_row_use_case.dart';
 import 'package:widgetbook_workspace/components/file_transfer/linagora_file_transfer_use_case.dart';
 import 'package:widgetbook_workspace/components/file_transfer/linagora_file_transfer_simulated_use_case.dart';
@@ -332,6 +333,20 @@ class WidgetbookApp extends StatelessWidget {
                 WidgetbookUseCase(
                   name: 'Matrix contact style',
                   builder: (context) => matrixContactUseCase(context),
+                ),
+              ],
+            ),
+          ],
+        ),
+        WidgetbookFolder(
+          name: 'Dialog',
+          children: [
+            WidgetbookComponent(
+              name: 'Linagora dialog',
+              useCases: [
+                WidgetbookUseCase(
+                  name: 'Default',
+                  builder: (context) => linagoraDialogUseCase(context),
                 ),
               ],
             ),
