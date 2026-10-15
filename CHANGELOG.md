@@ -6,6 +6,10 @@
   `LinagoraFileTransferSurface`, `LinagoraFileTransferLeading` and
   `LinagoraFileTransferStyle`: the Figma "Attaching file" dialog (web card and
   mobile sheet) with per-file progress, cancel and fully overridable tokens.
+* `LinagoraDialog`, `LinagoraDialogAction` and `LinagoraDialogStyle`: the
+  Figma `🔷 dialog` with optional back and close buttons, a message with extra
+  content, primary/secondary (or destructive) actions and an optional divided
+  footer.
 
 ## 0.3.4
 
