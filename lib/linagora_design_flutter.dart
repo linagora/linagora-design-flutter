@@ -6,6 +6,8 @@ export 'package:linagora_design_flutter/colors/linagora_key_colors.dart';
 export 'package:linagora_design_flutter/colors/linagora_state_layer.dart';
 export 'package:linagora_design_flutter/avatar/avatar.dart';
 export 'package:linagora_design_flutter/event/linagora_event_date_icon.dart';
+export 'package:linagora_design_flutter/dialog/linagora_dialog.dart';
+export 'package:linagora_design_flutter/dialog/linagora_dialog_style.dart';
 export 'package:linagora_design_flutter/file_transfer/linagora_file_transfer_dialog.dart';
 export 'package:linagora_design_flutter/file_transfer/linagora_file_transfer_layout.dart';
 export 'package:linagora_design_flutter/file_transfer/linagora_file_transfer_leading.dart';
