@@ -48,10 +48,16 @@ class LinagoraDialog extends StatelessWidget {
 
   /// Header back button. Null hides it.
   final VoidCallback? onBack;
+
+  /// Also the back button's screen-reader name. Defaults to
+  /// [MaterialLocalizations.backButtonTooltip].
   final String? backTooltip;
 
   /// Header close button. Null hides it.
   final VoidCallback? onClose;
+
+  /// Also the close button's screen-reader name. Defaults to
+  /// [MaterialLocalizations.closeButtonTooltip].
   final String? closeTooltip;
 
   /// Separates the footer from the content with a divider, for content long
@@ -111,7 +117,7 @@ class LinagoraDialog extends StatelessWidget {
                     mainAxisSize: MainAxisSize.min,
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
-                      _buildHeader(tokens),
+                      _buildHeader(context, tokens),
                       Flexible(child: _buildContent(tokens)),
                       if (_hasActions && fixedActions)
                         Divider(
@@ -131,7 +137,8 @@ class LinagoraDialog extends StatelessWidget {
     );
   }
 
-  Widget _buildHeader(LinagoraDialogStyle tokens) {
+  Widget _buildHeader(BuildContext context, LinagoraDialogStyle tokens) {
+    final localizations = MaterialLocalizations.of(context);
     final onBack = this.onBack;
     final onClose = this.onClose;
     return Padding(
@@ -145,7 +152,7 @@ class LinagoraDialog extends StatelessWidget {
               _LinagoraDialogIconButton(
                 buttonKey: backButtonKey,
                 icon: Icons.arrow_back,
-                tooltip: backTooltip,
+                tooltip: backTooltip ?? localizations.backButtonTooltip,
                 onPressed: onBack,
                 tokens: tokens,
               ),
@@ -162,7 +169,7 @@ class LinagoraDialog extends StatelessWidget {
               _LinagoraDialogIconButton(
                 buttonKey: closeButtonKey,
                 icon: Icons.close,
-                tooltip: closeTooltip,
+                tooltip: closeTooltip ?? localizations.closeButtonTooltip,
                 onPressed: onClose,
                 tokens: tokens,
               ),
@@ -268,7 +275,7 @@ class LinagoraDialog extends StatelessWidget {
 class _LinagoraDialogIconButton extends StatelessWidget {
   final Key buttonKey;
   final IconData icon;
-  final String? tooltip;
+  final String tooltip;
   final VoidCallback onPressed;
   final LinagoraDialogStyle tokens;
 
