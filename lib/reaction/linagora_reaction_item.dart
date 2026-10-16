@@ -20,10 +20,13 @@ class LinagoraReactionItem extends StatelessWidget {
     vertical: LinagoraSpacing.base,
   );
   static const double _gap = LinagoraSpacing.base;
-  static const double _emojiWidth = LinagoraSpacing.base * 3;
+  static const double _emojiSize = LinagoraSpacing.base * 3;
 
   final String name;
-  final String emoji;
+  final String? emoji;
+
+  /// A custom emoji, displayed instead of [emoji].
+  final Widget? emojiImage;
 
   /// Clipped to a circle.
   final Widget avatar;
@@ -34,17 +37,33 @@ class LinagoraReactionItem extends StatelessWidget {
   const LinagoraReactionItem({
     super.key,
     required this.name,
-    required this.emoji,
+    required String this.emoji,
     required this.avatar,
     this.size = LinagoraReactionItemSize.small,
     this.onTap,
-  });
+  }) : emojiImage = null;
+
+  /// A reaction row showing a custom emoji [image].
+  const LinagoraReactionItem.image({
+    super.key,
+    required this.name,
+    required Widget image,
+    required this.avatar,
+    this.size = LinagoraReactionItemSize.small,
+    this.onTap,
+  }) : emoji = null,
+       emojiImage = image;
 
   @override
   Widget build(BuildContext context) {
     final onSurface = LinagoraSysColors.material().onSurface;
     final hoverStyle = LinagoraHoverStyle.material();
     final avatarSize = size.avatarSize;
+    final textTheme = LinagoraTextTheme.material();
+    final emojiStyle = switch (size) {
+      LinagoraReactionItemSize.small => textTheme.titleMedium,
+      LinagoraReactionItemSize.large => textTheme.headlineMedium,
+    };
 
     return Material(
       color: Colors.transparent,
@@ -74,16 +93,19 @@ class LinagoraReactionItem extends StatelessWidget {
                 ),
               ),
               const SizedBox(width: _gap),
-              SizedBox(
-                width: _emojiWidth,
-                child: Text(
-                  emoji,
-                  textAlign: TextAlign.center,
-                  style: LinagoraTextTheme.material().titleMedium?.copyWith(
-                    color: onSurface,
+              if (emojiImage != null)
+                SizedBox.square(dimension: _emojiSize, child: emojiImage)
+              else
+                SizedBox(
+                  width: _emojiSize,
+                  child: Text(
+                    emoji ?? '',
+                    textAlign: TextAlign.center,
+                    softWrap: false,
+                    overflow: TextOverflow.visible,
+                    style: emojiStyle?.copyWith(color: onSurface),
                   ),
                 ),
-              ),
             ],
           ),
         ),
