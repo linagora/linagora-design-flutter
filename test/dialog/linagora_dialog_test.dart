@@ -642,6 +642,87 @@ void main() {
     });
   });
 
+  group('LinagoraDialog accessibility', () {
+    testWidgets('labels close and back for screen readers without tooltips', (
+      t,
+    ) async {
+      final semantics = t.ensureSemantics();
+      await t.pumpWidget(
+        _host(
+          LinagoraDialog(
+            title: _title,
+            message: _message,
+            onBack: () {},
+            onClose: () {},
+          ),
+        ),
+      );
+
+      final localizations = MaterialLocalizations.of(
+        t.element(find.byType(LinagoraDialog)),
+      );
+      // A screen reader announces an icon button by its label or, when the
+      // name comes from a Tooltip, by its tooltip.
+      List<String> accessibleName(Key key) {
+        final data = t.getSemantics(find.byKey(key)).getSemanticsData();
+        return [data.label, data.tooltip];
+      }
+
+      expect(
+        accessibleName(LinagoraDialog.closeButtonKey),
+        contains(localizations.closeButtonTooltip),
+      );
+      expect(
+        accessibleName(LinagoraDialog.backButtonKey),
+        contains(localizations.backButtonTooltip),
+      );
+      semantics.dispose();
+    });
+
+    testWidgets('lays out at 2x text scale on a phone without overflowing', (
+      t,
+    ) async {
+      await _setSurface(t, const Size(360, 720));
+      await t.pumpWidget(
+        MaterialApp(
+          home: MediaQuery(
+            data: const MediaQueryData(
+              size: Size(360, 720),
+              textScaler: TextScaler.linear(2),
+            ),
+            child: Scaffold(
+              body: LinagoraDialog(
+                title: _title,
+                message:
+                    'You cannot send emails at this time. Contact your '
+                    'administrator if the problem persists.',
+                onBack: () {},
+                backTooltip: 'Back',
+                onClose: () {},
+                closeTooltip: 'Close',
+                fixedActions: true,
+                secondaryAction: _action('Cancel'),
+                primaryAction: _action('Remove access'),
+              ),
+            ),
+          ),
+        ),
+      );
+
+      expect(t.takeException(), isNull);
+      final surface = t.getRect(_surface);
+      expect(surface.top, greaterThanOrEqualTo(0));
+      expect(surface.bottom, lessThanOrEqualTo(720));
+      for (final key in [
+        LinagoraDialog.closeButtonKey,
+        LinagoraDialog.primaryActionKey,
+        LinagoraDialog.secondaryActionKey,
+      ]) {
+        expect(surface.contains(t.getCenter(find.byKey(key))), isTrue);
+      }
+    });
+  });
+
   group('LinagoraDialogStyle', () {
     testWidgets('overrides only the tokens it is given', (t) async {
       final style = LinagoraDialogStyle.material().copyWith(
