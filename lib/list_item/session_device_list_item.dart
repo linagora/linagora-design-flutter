@@ -77,8 +77,9 @@ class SessionDeviceListItem extends StatelessWidget {
         final row = Padding(
           padding: EdgeInsets.symmetric(
             horizontal: LinagoraSpacing.base,
-            vertical:
-            isMobile ? LinagoraSpacing.base * 2 : LinagoraSpacing.base,
+            vertical: isMobile
+                ? LinagoraSpacing.base * 2
+                : LinagoraSpacing.base,
           ),
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.center,
@@ -112,7 +113,7 @@ class SessionDeviceListItem extends StatelessWidget {
                   ),
                 ),
               ],
-              if (onDelete != null) ... [
+              if (onDelete != null) ...[
                 const SizedBox(width: LinagoraSpacing.base),
                 _DeleteButton(
                   onDelete: onDelete,
@@ -136,19 +137,11 @@ class SessionDeviceListItem extends StatelessWidget {
           children: [
             row,
             Padding(
-              padding: const EdgeInsets.only(
-                left: LinagoraSpacing.base * 5,
-              ),
+              padding: const EdgeInsets.only(left: LinagoraSpacing.base * 5),
               child: Divider(
-                height: LinagoraDividerStyle
-                    .material()
-                    .thickness,
-                thickness: LinagoraDividerStyle
-                    .material()
-                    .thickness,
-                color: LinagoraDividerStyle
-                    .material()
-                    .color,
+                height: LinagoraDividerStyle.material().thickness,
+                thickness: LinagoraDividerStyle.material().thickness,
+                color: LinagoraDividerStyle.material().color,
               ),
             ),
           ],
@@ -178,10 +171,9 @@ class _Content extends StatelessWidget {
     final colors = LinagoraSysColors.material();
     final textTheme = LinagoraTextTheme.material();
     final textThemeExtension = LinagoraTextThemeExtension.material();
-    final titleStyle = (isMobile
-            ? textThemeExtension.bodyMedium2
-            : textTheme.bodyMedium)
-        ?.copyWith(color: colors.onSurface);
+    final titleStyle =
+        (isMobile ? textThemeExtension.bodyMedium2 : textTheme.bodyMedium)
+            ?.copyWith(color: colors.onSurface);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -195,8 +187,9 @@ class _Content extends StatelessWidget {
         ),
         Text(
           lastActiveText,
-          style: textTheme.bodyMedium
-              ?.copyWith(color: LinagoraRefColors.material().tertiary[30]),
+          style: textTheme.bodyMedium?.copyWith(
+            color: LinagoraRefColors.material().tertiary[30],
+          ),
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
         ),
