@@ -503,13 +503,11 @@ class WidgetbookApp extends StatelessWidget {
               useCases: [
                 WidgetbookUseCase(
                   name: 'All states',
-                  builder: (context) =>
-                      eventActivityBadgeStatesUseCase(context),
+                  builder: (context) => eventActivityBadgeStatesUseCase(context),
                 ),
                 WidgetbookUseCase(
                   name: 'Custom',
-                  builder: (context) =>
-                      eventActivityBadgeCustomUseCase(context),
+                  builder: (context) => eventActivityBadgeCustomUseCase(context),
                 ),
               ],
             ),
