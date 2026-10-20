@@ -2,6 +2,15 @@
 
 ### Added
 
+* `LinagoraAvatarListItem`: a row of a list of people or groups, with avatar,
+  title and detail, optional title icons, heading line, multi-line detail and
+  trailing label; its divider hides on hover and when selected.
+* `LinagoraSectionHeader`: a caption above a section of a list, with an
+  optional trailing text action. The label is shown as given.
+* `LinagoraFilterChip`: a filter chip with a check mark when selected, 32 high
+  in both states.
+* `LinagoraEmptyState`: a translucent card with an illustration, optional
+  description and title, with a `compact` variant.
 * `LinagoraFileTransferDialog`, `LinagoraFileTransferRow`,
   `LinagoraFileTransferSurface`, `LinagoraFileTransferLeading` and
   `LinagoraFileTransferStyle`: the Figma "Attaching file" dialog (web card and
