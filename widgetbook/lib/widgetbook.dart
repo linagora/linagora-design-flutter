@@ -12,6 +12,7 @@ import 'package:widgetbook_workspace/components/event/event_conference_actions_u
 import 'package:widgetbook_workspace/components/event/linagora_event_card_use_case.dart';
 import 'package:widgetbook_workspace/components/event/linagora_event_date_icon_use_case.dart';
 import 'package:widgetbook_workspace/components/event/event_activity_badge_use_case.dart';
+import 'package:widgetbook_workspace/components/dialog/linagora_dialog_use_case.dart';
 import 'package:widgetbook_workspace/components/event/linagora_event_info_row_use_case.dart';
 import 'package:widgetbook_workspace/components/file_transfer/linagora_file_transfer_use_case.dart';
 import 'package:widgetbook_workspace/components/file_transfer/linagora_file_transfer_simulated_use_case.dart';
@@ -21,6 +22,9 @@ import 'package:widgetbook_workspace/components/list_item/linagora_avatar_list_i
 import 'package:widgetbook_workspace/components/list_item/linagora_section_header_use_case.dart';
 import 'package:widgetbook_workspace/components/list_item/linagora_setting_item_use_case.dart';
 import 'package:widgetbook_workspace/components/list_item/session_device_list_item_use_case.dart';
+import 'package:widgetbook_workspace/components/reaction/linagora_reaction_chip_use_case.dart';
+import 'package:widgetbook_workspace/components/reaction/linagora_reaction_tabs_use_case.dart';
+import 'package:widgetbook_workspace/components/reaction/linagora_reactions_use_case.dart';
 import 'package:widgetbook_workspace/components/reaction/linagora_reaction_item_use_case.dart';
 import 'package:widgetbook_workspace/components/sidebar/linagora_sidebar_item_use_case.dart';
 import 'package:widgetbook_workspace/components/sidebar/linagora_sidebar_actions_use_case.dart';
@@ -174,6 +178,11 @@ class WidgetbookApp extends StatelessWidget {
                   name: 'Default',
                   builder: (context) => messageBubbleUseCase(context),
                 ),
+                WidgetbookUseCase(
+                  name: 'With reactions',
+                  builder: (context) =>
+                      messageBubbleWithReactionsUseCase(context),
+                ),
               ],
             ),
           ],
@@ -276,11 +285,43 @@ class WidgetbookApp extends StatelessWidget {
           name: 'Reaction',
           children: [
             WidgetbookComponent(
+              name: 'Linagora reaction chip',
+              useCases: [
+                WidgetbookUseCase(
+                  name: 'Default',
+                  builder: (context) => linagoraReactionChipUseCase(context),
+                ),
+              ],
+            ),
+            WidgetbookComponent(
+              name: 'Linagora reaction tabs',
+              useCases: [
+                WidgetbookUseCase(
+                  name: 'Default',
+                  builder: (context) => linagoraReactionTabsUseCase(context),
+                ),
+              ],
+            ),
+            WidgetbookComponent(
+              name: 'Linagora reactions',
+              useCases: [
+                WidgetbookUseCase(
+                  name: 'Default',
+                  builder: (context) => linagoraReactionsUseCase(context),
+                ),
+              ],
+            ),
+            WidgetbookComponent(
               name: 'Linagora reaction item',
               useCases: [
                 WidgetbookUseCase(
                   name: 'Default',
                   builder: (context) => linagoraReactionItemUseCase(context),
+                ),
+                WidgetbookUseCase(
+                  name: 'Custom emoji',
+                  builder: (context) =>
+                      linagoraReactionItemImageUseCase(context),
                 ),
               ],
             ),
@@ -387,6 +428,20 @@ class WidgetbookApp extends StatelessWidget {
                 WidgetbookUseCase(
                   name: 'Matrix contact style',
                   builder: (context) => matrixContactUseCase(context),
+                ),
+              ],
+            ),
+          ],
+        ),
+        WidgetbookFolder(
+          name: 'Dialog',
+          children: [
+            WidgetbookComponent(
+              name: 'Linagora dialog',
+              useCases: [
+                WidgetbookUseCase(
+                  name: 'Default',
+                  builder: (context) => linagoraDialogUseCase(context),
                 ),
               ],
             ),
