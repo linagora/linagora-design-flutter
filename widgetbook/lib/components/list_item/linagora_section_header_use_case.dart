@@ -6,7 +6,7 @@ import 'package:widgetbook_annotation/widgetbook_annotation.dart' as widgetbook;
 @widgetbook.UseCase(name: 'Default', type: LinagoraSectionHeader)
 Widget linagoraSectionHeaderUseCase(BuildContext context) {
   return LinagoraSectionHeader(
-    label: context.knobs.string(label: 'Label', initialValue: 'Results'),
+    label: context.knobs.string(label: 'Label', initialValue: 'RESULTS'),
     actionLabel: context.knobs.stringOrNull(
       label: 'Action label',
       initialValue: 'Show more',

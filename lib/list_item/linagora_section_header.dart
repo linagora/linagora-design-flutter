@@ -14,7 +14,8 @@ class LinagoraSectionHeader extends StatelessWidget {
     vertical: 6,
   );
 
-  /// Displayed in upper case.
+  /// Displayed as given. The design shows it in upper case: pass it already
+  /// cased, as upper-casing depends on the locale.
   final String label;
 
   final String? actionLabel;
@@ -44,7 +45,7 @@ class LinagoraSectionHeader extends StatelessWidget {
               child: Semantics(
                 header: true,
                 child: Text(
-                  label.toUpperCase(),
+                  label,
                   style: textTheme.bodySmall?.copyWith(color: color),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,

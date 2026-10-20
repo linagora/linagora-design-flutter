@@ -89,7 +89,7 @@ class _SectionDemoState extends State<_SectionDemo> {
       mainAxisSize: MainAxisSize.min,
       children: [
         LinagoraSectionHeader(
-          label: 'Results',
+          label: 'RESULTS',
           actionLabel: _expanded ? 'Show less' : 'Show more',
           onActionTap: () => setState(() => _expanded = !_expanded),
         ),

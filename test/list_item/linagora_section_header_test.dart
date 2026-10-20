@@ -7,7 +7,7 @@ void main() {
     return MaterialApp(
       home: Scaffold(
         body: LinagoraSectionHeader(
-          label: 'Results',
+          label: 'RESULTS',
           actionLabel: actionLabel,
           onActionTap: onActionTap,
         ),
@@ -15,7 +15,7 @@ void main() {
     );
   }
 
-  testWidgets('shows the label in upper case', (tester) async {
+  testWidgets('shows the label as given', (tester) async {
     await tester.pumpWidget(build());
 
     expect(find.text('RESULTS'), findsOneWidget);
@@ -55,7 +55,7 @@ void main() {
       MaterialApp(
         home: Scaffold(
           body: LinagoraSectionHeader(
-            label: 'Suggested results' * 4,
+            label: 'SUGGESTED RESULTS' * 4,
             actionLabel: 'Show more',
             onActionTap: () {},
           ),
