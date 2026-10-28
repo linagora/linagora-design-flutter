@@ -101,70 +101,73 @@ class _ReactionsDialogWidgetState extends State<ReactionsDialogWidget> {
   @override
   Widget build(BuildContext context) {
     return BackdropFilter(
-      filter: widget.filter ??
-          ImageFilter.blur(
-            sigmaX: 9,
-            sigmaY: 9,
-          ),
+      filter: widget.filter ?? ImageFilter.blur(sigmaX: 9, sigmaY: 9),
       child: Center(
         child: Padding(
           padding:
               widget.padding ?? const EdgeInsets.only(right: 20.0, left: 20.0),
-          child: KeyboardVisibilityBuilder(
-            builder: (context, isKeyboardVisible) {
-              return Column(
-                mainAxisSize:
-                    isKeyboardVisible ? MainAxisSize.max : MainAxisSize.min,
-                crossAxisAlignment: widget.isOwnMessage
-                    ? CrossAxisAlignment.end
-                    : CrossAxisAlignment.start,
-                children: [
-                  Padding(
-                    padding: widget.paddingReactionWidget ??
-                        const EdgeInsets.only(bottom: 8.0),
-                    child: Align(
-                      alignment: widget.widgetAlignment,
-                      child: Material(
-                        color: Colors.transparent,
-                        child: widget.reactionWidget ??
-                            ReactionsPicker(
-                              onClickEmojiReactionAction:
-                                  widget.onClickEmojiReactionAction,
-                              backgroundColor: widget.backgroundColor,
-                              animationDuration: widget.animationDuration,
-                              animationCurve: widget.animationCurve,
-                              height: widget.height,
-                              emojis: widget.emojis,
-                              myEmojiReacted: widget.myEmojiReacted,
-                              borderRadius: widget.borderRadius ?? 32,
-                              emojiTextStyle: widget.emojiTextStyle,
-                              boxShadow: widget.boxShadow,
-                              moreEmojiWidget: widget.moreEmojiWidget,
-                              enableMoreEmojiWidget:
-                                  widget.enableMoreEmojiWidget,
-                              onPickEmojiReactionAction:
-                                  widget.onPickEmojiReactionAction,
-                              emojiSize: widget.emojiSize,
-                            ),
+          child: LayoutBuilder(
+            builder: (context, constraints) => KeyboardVisibilityBuilder(
+              builder: (context, isKeyboardVisible) {
+                return Column(
+                  mainAxisSize:
+                      // max under unbounded height makes the Flexible assert.
+                      isKeyboardVisible && constraints.hasBoundedHeight
+                      ? MainAxisSize.max
+                      : MainAxisSize.min,
+                  crossAxisAlignment: widget.isOwnMessage
+                      ? CrossAxisAlignment.end
+                      : CrossAxisAlignment.start,
+                  children: [
+                    Padding(
+                      padding:
+                          widget.paddingReactionWidget ??
+                          const EdgeInsets.only(bottom: 8.0),
+                      child: Align(
+                        alignment: widget.widgetAlignment,
+                        child: Material(
+                          color: Colors.transparent,
+                          child:
+                              widget.reactionWidget ??
+                              ReactionsPicker(
+                                onClickEmojiReactionAction:
+                                    widget.onClickEmojiReactionAction,
+                                backgroundColor: widget.backgroundColor,
+                                animationDuration: widget.animationDuration,
+                                animationCurve: widget.animationCurve,
+                                height: widget.height,
+                                emojis: widget.emojis,
+                                myEmojiReacted: widget.myEmojiReacted,
+                                borderRadius: widget.borderRadius ?? 32,
+                                emojiTextStyle: widget.emojiTextStyle,
+                                boxShadow: widget.boxShadow,
+                                moreEmojiWidget: widget.moreEmojiWidget,
+                                enableMoreEmojiWidget:
+                                    widget.enableMoreEmojiWidget,
+                                onPickEmojiReactionAction:
+                                    widget.onPickEmojiReactionAction,
+                                emojiSize: widget.emojiSize,
+                              ),
+                        ),
                       ),
                     ),
-                  ),
-                  Flexible(
-                    child: ConstrainedBox(
-                      constraints: BoxConstraints(
-                        maxHeight: MediaQuery.sizeOf(context).height * 0.5,
+                    Flexible(
+                      child: ConstrainedBox(
+                        constraints: BoxConstraints(
+                          maxHeight: MediaQuery.sizeOf(context).height * 0.5,
+                        ),
+                        child: widget.messageWidget,
                       ),
-                      child: widget.messageWidget,
                     ),
-                  ),
-                  if (widget.contextMenuWidget != null)
-                    Align(
-                      alignment: widget.widgetAlignment,
-                      child: widget.contextMenuWidget!,
-                    ),
-                ],
-              );
-            },
+                    if (widget.contextMenuWidget != null)
+                      Align(
+                        alignment: widget.widgetAlignment,
+                        child: widget.contextMenuWidget!,
+                      ),
+                  ],
+                );
+              },
+            ),
           ),
         ),
       ),

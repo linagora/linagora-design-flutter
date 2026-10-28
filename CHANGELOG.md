@@ -1,3 +1,11 @@
+## 0.4.1
+
+### Fixed
+
+* `ReactionsDialogWidget` no longer throws "RenderFlex children have non-zero
+  flex but incoming height constraints are unbounded" when the keyboard is
+  visible and it is laid out under an unbounded height, such as a scroll view.
+
 ## 0.4.0
 
 ### Added
