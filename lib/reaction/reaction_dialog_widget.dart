@@ -109,9 +109,9 @@ class _ReactionsDialogWidgetState extends State<ReactionsDialogWidget> {
           child: LayoutBuilder(
             builder: (context, constraints) => KeyboardVisibilityBuilder(
               builder: (context, isKeyboardVisible) {
-                // The Flexible child asserts under max with unbounded height.
                 return Column(
                   mainAxisSize:
+                      // max under unbounded height makes the Flexible assert.
                       isKeyboardVisible && constraints.hasBoundedHeight
                       ? MainAxisSize.max
                       : MainAxisSize.min,
