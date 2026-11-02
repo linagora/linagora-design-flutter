@@ -43,6 +43,7 @@ class ImagePicker {
         hasAll: true,
         onlyAll: false,
         type: type,
+        filterOption: newestFirstFilterOption(),
       );
       if (assetsPath.isNotEmpty) {
         assetPath = assetsPath.first;
@@ -154,6 +155,15 @@ class ImagePicker {
           ],
         ),
       ),
+    );
+  }
+
+  /// Filter that sorts assets by creation date, newest first.
+  static PMFilter newestFirstFilterOption() {
+    return FilterOptionGroup(
+      orders: [
+        const OrderOption(type: OrderOptionType.createDate, asc: false),
+      ],
     );
   }
 
