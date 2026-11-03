@@ -1,3 +1,9 @@
+## 0.4.2
+
+### Fixed
+
+* The image picker lists the newest photos first on Android.
+
 ## 0.4.1
 
 ### Fixed
