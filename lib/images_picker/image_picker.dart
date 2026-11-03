@@ -162,14 +162,24 @@ class ImagePicker {
   /// Filter that sorts assets by creation date, newest first, on Android.
   ///
   /// Without a filter Android has no `ORDER BY`. iOS already lists the newest
-  /// first, so it keeps the default (`null`). [PMFilter.defaultValue] has no
-  /// size or duration constraint, so no asset leaves the picker.
+  /// first, so it keeps the default (`null`).
+  ///
+  /// This is [PMFilter.defaultValue] on Android: no size or duration
+  /// constraint, so no asset leaves the picker. It is built here because
+  /// `PMFilter.defaultValue` reads the host platform and throws on a non
+  /// Android host with photo_manager 3.0.0-dev.5.
   static PMFilter? newestFirstFilterOption() {
     if (defaultTargetPlatform != TargetPlatform.android) {
       return null;
     }
-    return PMFilter.defaultValue();
+    return CustomFilter.sql(
+      where: '',
+      orderBy: [const OrderByItem.desc(_androidDateAddedColumn)],
+    );
   }
+
+  /// `MediaStore.MediaColumns.DATE_ADDED`.
+  static const _androidDateAddedColumn = 'date_added';
 
   static Future<List<AssetPathEntity>> getAllAssetPaths({
     bool hasAll = true,

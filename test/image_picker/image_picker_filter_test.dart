@@ -16,7 +16,7 @@ void main() {
       expect(custom.makeWhere(), isEmpty);
       final orderBy = custom.makeOrderBy();
       expect(orderBy, hasLength(1));
-      expect(orderBy.first.column, CustomColumns.base.createDate);
+      expect(orderBy.first.column, 'date_added');
       expect(orderBy.first.isAsc, isFalse);
     });
 
