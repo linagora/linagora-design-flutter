@@ -16,8 +16,11 @@ class LinagoraSidebarSectionHeader extends StatelessWidget {
   /// Gap between the caption and its disclosure chevron.
   static const double titleSpacing = 4;
 
-  /// Visual gap between [actions] glyphs.
-  static const double actionSpacing = 8;
+  /// Default visual gap between the symbols of [actions]: 4 between the
+  /// XSmall icon buttons plus the padding inside each of them.
+  ///
+  /// [LinagoraSidebarStyle.sectionHeaderActionSpacing] sets the gap in use.
+  static const double actionSpacing = 10.25;
 
   const LinagoraSidebarSectionHeader({
     super.key,
@@ -87,7 +90,7 @@ class LinagoraSidebarSectionHeader extends StatelessWidget {
           child: Row(
             children: [
               Expanded(child: _title(style, foreground)),
-              if (actions.isNotEmpty) _actions(foreground),
+              if (actions.isNotEmpty) _actions(style, foreground),
             ],
           ),
         ),
@@ -185,29 +188,60 @@ class LinagoraSidebarSectionHeader extends StatelessWidget {
     }
   }
 
-  Widget _actions(Color foreground) {
-    // Plain icons inherit the header's colour and size.
-    return IconTheme.merge(
-      data: IconThemeData(
-        color: foreground,
-        size: LinagoraSidebarSectionHeaderAction.size,
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          for (var index = 0; index < actions.length; index++) ...[
-            if (index > 0) const SizedBox(width: actionSpacing),
-            actions[index],
+  Widget _actions(LinagoraSidebarStyle style, Color foreground) {
+    final target = style.sectionHeaderActionTargetSize;
+    final pitch =
+        style.sectionHeaderActionIconSize + style.sectionHeaderActionSpacing;
+    final last = actions.length - 1;
+
+    // Actions read the header's style, and plain icons its colour and size.
+    return LinagoraSidebarTheme(
+      data: style,
+      child: IconTheme.merge(
+        data: IconThemeData(
+          color: foreground,
+          size: style.sectionHeaderActionSize,
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            for (var index = 0; index <= last; index++)
+              // Each slot ends halfway to its neighbour, so targets wider than
+              // the gap split the space between them instead of overlapping.
+              SizedBox(
+                width: (index == 0 ? target : pitch) / 2 +
+                    (index == last ? target : pitch) / 2,
+                height: target,
+                child: OverflowBox(
+                  minWidth: 0,
+                  minHeight: 0,
+                  maxWidth: target,
+                  maxHeight: target,
+                  alignment: index == 0
+                      ? AlignmentDirectional.centerStart
+                      : index == last
+                      ? AlignmentDirectional.centerEnd
+                      : Alignment.center,
+                  child: SizedBox.square(
+                    dimension: target,
+                    child: Center(child: actions[index]),
+                  ),
+                ),
+              ),
           ],
-        ],
+        ),
       ),
     );
   }
 }
 
 /// A compact icon control for [LinagoraSidebarSectionHeader.actions].
+///
+/// The glyph keeps [LinagoraSidebarStyle.sectionHeaderActionSize] and an
+/// interactive action pads its circular ink to
+/// [LinagoraSidebarStyle.sectionHeaderActionTargetSize].
 class LinagoraSidebarSectionHeaderAction extends StatelessWidget {
-  /// Figma's XSmall icon-button dimension.
+  /// Default glyph box, the XSmall icon-button dimension.
   static const double size = 16.67;
 
   const LinagoraSidebarSectionHeaderAction({
@@ -228,9 +262,13 @@ class LinagoraSidebarSectionHeaderAction extends StatelessWidget {
        );
 
   /// Material icon used when no [iconWidget] or [child] is supplied.
+  ///
+  /// A font glyph keeps its own padding, so two glyphs can differ in size.
+  /// An [iconWidget] drawn edge to edge keeps the exact symbol size.
   final IconData? icon;
 
-  /// Replaces [icon], allowing a product to provide an SVG or another widget.
+  /// Replaces [icon] with a symbol drawn at
+  /// [LinagoraSidebarStyle.sectionHeaderActionIconSize], such as an SVG.
   final Widget? iconWidget;
 
   /// Generic visual content for the action.
@@ -246,61 +284,56 @@ class LinagoraSidebarSectionHeaderAction extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final icon = this.icon;
-    if (child == null && iconWidget == null && icon != null) {
-      return _legacyIconAction(context, icon);
-    }
+    final style = LinagoraSidebarStyle.of(context);
+    final glyph = _glyph(context, style);
+    if (onTap == null) return glyph;
 
-    final glyph = _glyph(context);
-    final control = onTap == null
-        ? glyph
-        : Semantics(
-            button: true,
-            label: semanticLabel,
-            child: InkResponse(
-              onTap: onTap,
-              containedInkWell: true,
-              highlightShape: BoxShape.circle,
-              radius: size / 2,
-              customBorder: const CircleBorder(),
-              child: SizedBox.square(
-                dimension: size,
-                child: Center(child: glyph),
-              ),
-            ),
-          );
-
-    final tooltip = semanticLabel;
-    if (onTap == null || tooltip == null) return control;
-    return Tooltip(message: tooltip, child: control);
-  }
-
-  Widget _legacyIconAction(BuildContext context, IconData icon) {
-    final control = LinagoraSidebarControl(
-      icon: icon,
-      iconSize: size,
-      color: color ?? IconTheme.of(context).color,
-      onTap: onTap,
-      semanticLabel: semanticLabel,
-      targetSize: size,
+    final target = style.sectionHeaderActionTargetSize;
+    final control = Semantics(
+      button: true,
+      label: semanticLabel,
+      child: Material(
+        type: MaterialType.transparency,
+        child: InkResponse(
+          onTap: onTap,
+          containedInkWell: true,
+          highlightShape: BoxShape.circle,
+          radius: target / 2,
+          customBorder: const CircleBorder(),
+          child: SizedBox.square(
+            dimension: target,
+            child: Center(child: glyph),
+          ),
+        ),
+      ),
     );
 
     final tooltip = semanticLabel;
-    if (onTap == null || tooltip == null) return control;
+    if (tooltip == null) return control;
     return Tooltip(message: tooltip, child: control);
   }
 
-  Widget _glyph(BuildContext context) {
+  Widget _glyph(BuildContext context, LinagoraSidebarStyle style) {
     final icon = this.icon;
+    final iconWidget = this.iconWidget;
+    final box = style.sectionHeaderActionSize;
     final foreground = color ?? IconTheme.of(context).color;
     final visual =
-        child ?? iconWidget ?? Icon(icon!, size: size, color: foreground);
+        child ??
+        (iconWidget == null
+            ? Icon(icon!, size: box, color: foreground)
+            : Center(
+                child: SizedBox.square(
+                  dimension: style.sectionHeaderActionIconSize,
+                  child: iconWidget,
+                ),
+              ));
     return SizedBox.square(
-      dimension: size,
+      dimension: box,
       child: IconTheme.merge(
         data: IconThemeData(
           color: foreground,
-          size: size,
+          size: box,
         ),
         child: visual,
       ),

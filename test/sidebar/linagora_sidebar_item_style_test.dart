@@ -122,6 +122,10 @@ const _itemOverride = LinagoraSidebarItemStyleOverride(
 const _sectionOverride = LinagoraSidebarSectionStyleOverride(
   headerMinHeight: 44,
   headerForeground: Color(0xFF090909),
+  actionSize: 20,
+  actionIconSize: 14,
+  actionSpacing: 10,
+  actionTargetSize: 36,
 );
 
 const _storageOverride = LinagoraSidebarStorageStyleOverride(
@@ -211,6 +215,22 @@ void _expectSectionOverride(LinagoraSidebarStyle style) =>
       'sectionHeaderForeground': (
         style.sectionHeaderForeground,
         _sectionOverride.headerForeground,
+      ),
+      'sectionHeaderActionSize': (
+        style.sectionHeaderActionSize,
+        _sectionOverride.actionSize,
+      ),
+      'sectionHeaderActionIconSize': (
+        style.sectionHeaderActionIconSize,
+        _sectionOverride.actionIconSize,
+      ),
+      'sectionHeaderActionSpacing': (
+        style.sectionHeaderActionSpacing,
+        _sectionOverride.actionSpacing,
+      ),
+      'sectionHeaderActionTargetSize': (
+        style.sectionHeaderActionTargetSize,
+        _sectionOverride.actionTargetSize,
       ),
     });
 
