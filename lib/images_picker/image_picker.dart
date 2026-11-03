@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:linagora_design_flutter/images_picker/image_item_widget.dart';
 import 'package:linagora_design_flutter/images_picker/image_picker_grid_with_counter.dart';
@@ -158,13 +159,16 @@ class ImagePicker {
     );
   }
 
-  /// Filter that sorts assets by creation date, newest first.
-  static PMFilter newestFirstFilterOption() {
-    return FilterOptionGroup(
-      orders: [
-        const OrderOption(type: OrderOptionType.createDate, asc: false),
-      ],
-    );
+  /// Filter that sorts assets by creation date, newest first, on Android.
+  ///
+  /// Without a filter Android has no `ORDER BY`. iOS already lists the newest
+  /// first, so it keeps the default (`null`). [PMFilter.defaultValue] has no
+  /// size or duration constraint, so no asset leaves the picker.
+  static PMFilter? newestFirstFilterOption() {
+    if (defaultTargetPlatform != TargetPlatform.android) {
+      return null;
+    }
+    return PMFilter.defaultValue();
   }
 
   static Future<List<AssetPathEntity>> getAllAssetPaths({
