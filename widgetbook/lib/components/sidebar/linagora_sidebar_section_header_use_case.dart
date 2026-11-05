@@ -28,25 +28,40 @@ Widget linagoraSidebarSectionHeaderUseCase(BuildContext context) {
       ? context.knobs.object.dropdown<_SidebarHeaderActionVisual>(
           label: 'Add action visual',
           options: _SidebarHeaderActionVisual.values,
-          initialOption: _SidebarHeaderActionVisual.material,
+          initialOption: _SidebarHeaderActionVisual.symbol,
           labelBuilder: (visual) => visual.label,
         )
-      : _SidebarHeaderActionVisual.material;
+      : _SidebarHeaderActionVisual.symbol;
+  final drawerLayout = context.knobs.boolean(
+    label: 'Drawer layout',
+    initialValue: false,
+  );
+
+  final preview = _SidebarSectionHeaderPreview(
+    key: ValueKey(
+      '$label-$showDisclosure-$initiallyExpanded-'
+      '$showSearchAction-$showAddAction',
+    ),
+    label: label,
+    showDisclosure: showDisclosure,
+    initiallyExpanded: initiallyExpanded,
+    showSearchAction: showSearchAction,
+    showAddAction: showAddAction,
+    addActionVisual: addActionVisual,
+  );
 
   return SidebarPreviewSurface(
     width: SidebarPreviewSurface.widthKnob(context),
-    child: _SidebarSectionHeaderPreview(
-      key: ValueKey(
-        '$label-$showDisclosure-$initiallyExpanded-'
-        '$showSearchAction-$showAddAction',
-      ),
-      label: label,
-      showDisclosure: showDisclosure,
-      initiallyExpanded: initiallyExpanded,
-      showSearchAction: showSearchAction,
-      showAddAction: showAddAction,
-      addActionVisual: addActionVisual,
-    ),
+    child: drawerLayout
+        ? Builder(
+            builder: (context) => LinagoraSidebarTheme(
+              data: LinagoraSidebarStyle.of(context).copyWith(
+                section: LinagoraSidebarSectionStyleOverride.drawer,
+              ),
+              child: preview,
+            ),
+          )
+        : preview,
   );
 }
 
@@ -93,7 +108,9 @@ class _SidebarSectionHeaderPreviewState
           actions: [
             if (widget.showSearchAction)
               LinagoraSidebarSectionHeaderAction(
-                icon: Icons.search,
+                iconWidget: const SidebarPreviewSvgIcon.asset(
+                  LinagoraDesignImages.sidebarSearchIcon,
+                ),
                 semanticLabel: 'Search ${widget.label}',
                 onTap: _search,
               ),
@@ -130,6 +147,7 @@ class _SidebarSectionHeaderPreviewState
 }
 
 enum _SidebarHeaderActionVisual {
+  symbol('Design system symbol'),
   material('Material icon'),
   svgWidget('SVG widget'),
   genericChild('Generic child');
@@ -144,6 +162,9 @@ enum _SidebarHeaderActionVisual {
       };
 
   Widget? get iconWidget => switch (this) {
+        _SidebarHeaderActionVisual.symbol => const SidebarPreviewSvgIcon.asset(
+            LinagoraDesignImages.sidebarAddIcon,
+          ),
         _SidebarHeaderActionVisual.svgWidget => const SidebarPreviewSvgIcon(),
         _ => null,
       };

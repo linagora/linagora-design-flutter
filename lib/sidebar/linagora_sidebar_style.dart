@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:linagora_design_flutter/colors/linagora_sys_colors.dart';
 import 'package:linagora_design_flutter/sidebar/linagora_sidebar_control.dart';
+import 'package:linagora_design_flutter/sidebar/linagora_sidebar_section_header.dart';
 import 'package:linagora_design_flutter/spacings/linagora_spacing.dart';
 import 'package:linagora_design_flutter/style/linagora_text_theme.dart';
 
@@ -29,6 +30,18 @@ class LinagoraSidebarStyle {
 
   /// Minimum height of a section header.
   final double sectionHeaderMinHeight;
+
+  /// Box of a section header action glyph.
+  final double sectionHeaderActionSize;
+
+  /// Symbol of an `iconWidget` action, centred in [sectionHeaderActionSize].
+  final double sectionHeaderActionIconSize;
+
+  /// Visual gap between the symbols of neighbouring section header actions.
+  final double sectionHeaderActionSpacing;
+
+  /// Tap target of an interactive section header action.
+  final double sectionHeaderActionTargetSize;
 
   final Color hoverBackground;
   final Color selectedBackground;
@@ -134,6 +147,10 @@ class LinagoraSidebarStyle {
     this.actionActiveBackground,
     this.actionIconPadding = LinagoraSpacing.base / 2,
     this.sectionHeaderMinHeight = LinagoraSidebarControl.tapTarget,
+    this.sectionHeaderActionSize = LinagoraSidebarSectionHeaderAction.size,
+    this.sectionHeaderActionIconSize = 10.42,
+    this.sectionHeaderActionSpacing = LinagoraSidebarSectionHeader.actionSpacing,
+    this.sectionHeaderActionTargetSize = LinagoraSidebarControl.tapTarget,
     this.sectionHeaderForeground,
     this.progressHeight = 3,
     this.storageForeground,
@@ -166,6 +183,13 @@ class LinagoraSidebarStyle {
              actionIconPadding >= 0 &&
              progressHeight > 0,
          'Sidebar control dimensions must be positive',
+       ),
+       assert(
+         sectionHeaderActionIconSize > 0 &&
+             sectionHeaderActionIconSize <= sectionHeaderActionSize &&
+             sectionHeaderActionSize <= sectionHeaderActionTargetSize &&
+             sectionHeaderActionSpacing >= 0,
+         'A section header action symbol fits its box, which fits its target',
        ),
        assert(
          disabledOpacity >= 0 && disabledOpacity <= 1,
@@ -322,6 +346,10 @@ class LinagoraSidebarStyle {
     chevronSize: chevronSize,
     itemSpacing: itemSpacing,
     sectionHeaderMinHeight: sectionHeaderMinHeight,
+    sectionHeaderActionSize: sectionHeaderActionSize,
+    sectionHeaderActionIconSize: sectionHeaderActionIconSize,
+    sectionHeaderActionSpacing: sectionHeaderActionSpacing,
+    sectionHeaderActionTargetSize: sectionHeaderActionTargetSize,
     hoverBackground: hoverBackground,
     selectedBackground: selectedBackground,
     badgeBackground: badgeBackground,
@@ -481,10 +509,26 @@ class LinagoraSidebarSectionStyleOverride {
   const LinagoraSidebarSectionStyleOverride({
     this.headerMinHeight,
     this.headerForeground,
+    this.actionSize,
+    this.actionIconSize,
+    this.actionSpacing,
+    this.actionTargetSize,
   });
+
+  /// Borderless symbols with a touch target, for a sidebar shown in a drawer.
+  static const drawer = LinagoraSidebarSectionStyleOverride(
+    actionSize: 16,
+    actionIconSize: 16,
+    actionSpacing: 12,
+    actionTargetSize: 40,
+  );
 
   final double? headerMinHeight;
   final Color? headerForeground;
+  final double? actionSize;
+  final double? actionIconSize;
+  final double? actionSpacing;
+  final double? actionTargetSize;
 }
 
 /// Related overrides for storage and promotional footer content.
@@ -581,6 +625,10 @@ class _LinagoraSidebarStyleBuilder {
     actionActiveBackground: _item.actionActiveBackground,
     actionIconPadding: _item.actionIconPadding,
     sectionHeaderMinHeight: _section.headerMinHeight,
+    sectionHeaderActionSize: _section.actionSize,
+    sectionHeaderActionIconSize: _section.actionIconSize,
+    sectionHeaderActionSpacing: _section.actionSpacing,
+    sectionHeaderActionTargetSize: _section.actionTargetSize,
     sectionHeaderForeground: _section.headerForeground,
     progressHeight: _storage.progressHeight,
     storageForeground: _storage.foreground,
@@ -670,15 +718,27 @@ class _LinagoraSidebarItemStyleBuilder {
 class _LinagoraSidebarSectionStyleBuilder {
   _LinagoraSidebarSectionStyleBuilder(LinagoraSidebarStyle style)
     : headerMinHeight = style.sectionHeaderMinHeight,
-      headerForeground = style.sectionHeaderForeground;
+      headerForeground = style.sectionHeaderForeground,
+      actionSize = style.sectionHeaderActionSize,
+      actionIconSize = style.sectionHeaderActionIconSize,
+      actionSpacing = style.sectionHeaderActionSpacing,
+      actionTargetSize = style.sectionHeaderActionTargetSize;
 
   double headerMinHeight;
   Color? headerForeground;
+  double actionSize;
+  double actionIconSize;
+  double actionSpacing;
+  double actionTargetSize;
 
   void apply(LinagoraSidebarSectionStyleOverride? override) {
     if (override == null) return;
     headerMinHeight = override.headerMinHeight ?? headerMinHeight;
     headerForeground = override.headerForeground ?? headerForeground;
+    actionSize = override.actionSize ?? actionSize;
+    actionIconSize = override.actionIconSize ?? actionIconSize;
+    actionSpacing = override.actionSpacing ?? actionSpacing;
+    actionTargetSize = override.actionTargetSize ?? actionTargetSize;
   }
 }
 
@@ -783,6 +843,10 @@ typedef _SidebarStyleValues = ({
   double chevronSize,
   double itemSpacing,
   double sectionHeaderMinHeight,
+  double sectionHeaderActionSize,
+  double sectionHeaderActionIconSize,
+  double sectionHeaderActionSpacing,
+  double sectionHeaderActionTargetSize,
   Color hoverBackground,
   Color selectedBackground,
   Color badgeBackground,

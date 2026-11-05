@@ -11,4 +11,10 @@ class LinagoraDesignImages {
   static const String videoConferenceIcon =
       'assets/images/video_conference_icon.svg';
   static const String copyLinkIcon = 'assets/images/copy_link_icon.svg';
+
+  /// Borderless symbols whose drawing fills the view box, so a
+  /// `LinagoraSidebarSectionHeaderAction.iconWidget` shows them at its exact
+  /// symbol size.
+  static const String sidebarSearchIcon = 'assets/images/sidebar_search.svg';
+  static const String sidebarAddIcon = 'assets/images/sidebar_add.svg';
 }

@@ -1,3 +1,28 @@
+## Unreleased
+
+### Added
+
+* `LinagoraSidebarStyle` gains section header action tokens:
+  `sectionHeaderActionSize` (16.67), `sectionHeaderActionIconSize` (10.42),
+  `sectionHeaderActionSpacing` (10.25) and `sectionHeaderActionTargetSize` (24),
+  overridable through `LinagoraSidebarSectionStyleOverride`.
+  `LinagoraSidebarSectionStyleOverride.drawer` sets 16, 16, 12 and 40 for a
+  sidebar shown in a drawer.
+* `LinagoraDesignImages.sidebarSearchIcon` and
+  `LinagoraDesignImages.sidebarAddIcon`: borderless search and add symbols
+  drawn edge to edge, so both show at the exact symbol size.
+
+### Changed
+
+* `LinagoraSidebarSectionHeaderAction` pads its circular `InkResponse` to
+  `sectionHeaderActionTargetSize` around the glyph box, and draws an
+  `iconWidget` at `sectionHeaderActionIconSize`.
+* `LinagoraSidebarSectionHeader` keeps `sectionHeaderActionSpacing` between
+  action symbols and gives each action a slot ending halfway to its
+  neighbour, so wide targets split the space instead of overlapping.
+* `LinagoraSidebarSectionHeader.actionSpacing` is 10.25 between symbols
+  instead of 8 between glyph boxes.
+
 ## 0.4.2
 
 ### Fixed

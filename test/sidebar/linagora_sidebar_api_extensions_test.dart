@@ -116,6 +116,7 @@ Future<void> _headerSlots(WidgetTester tester) async {
   const svgKey = Key('header-svg');
   const childKey = Key('header-child');
   final recorder = _TapRecorder();
+  final style = LinagoraSidebarStyle.light();
 
   await pumpSidebar(
     tester,
@@ -143,15 +144,21 @@ Future<void> _headerSlots(WidgetTester tester) async {
       icon: tester.getSize(find.byKey(svgKey)),
       child: tester.getSize(find.byKey(childKey)),
     ),
-    (icon: const Size.square(16.67), child: const Size.square(16.67)),
+    (
+      icon: Size.square(style.sectionHeaderActionIconSize),
+      child: Size.square(style.sectionHeaderActionSize),
+    ),
   );
   final actionFinder = find.ancestor(
     of: find.byKey(svgKey),
     matching: find.byType(InkResponse),
   );
   expect(actionFinder, findsOneWidget);
-  expect(tester.getSize(actionFinder).width, closeTo(16.67, 0.01));
-  expect(tester.getSize(actionFinder).height, closeTo(16.67, 0.01));
+  // Interactive actions pad the glyph to the style's target.
+  expect(
+    tester.getSize(actionFinder),
+    Size.square(style.sectionHeaderActionTargetSize),
+  );
 
   await tester.tap(find.byKey(svgKey));
 

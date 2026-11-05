@@ -4,6 +4,7 @@ import 'package:widgetbook/widgetbook.dart';
 import 'package:widgetbook_annotation/widgetbook_annotation.dart' as widgetbook;
 
 import 'sidebar_preview_surface.dart';
+import 'sidebar_preview_svg_icon.dart';
 import 'sidebar_storage_reload_preview.dart';
 
 @widgetbook.UseCase(name: 'Complete menu', type: LinagoraSidebarMenu)
@@ -495,13 +496,17 @@ class _SidebarMenuPreviewState extends State<_SidebarMenuPreview> {
         actions: [
           if (folders.showSearch)
             LinagoraSidebarSectionHeaderAction(
-              icon: Icons.search,
+              iconWidget: const SidebarPreviewSvgIcon.asset(
+                LinagoraDesignImages.sidebarSearchIcon,
+              ),
               semanticLabel: 'Search folders',
               onTap: () {},
             ),
           if (folders.showAdd)
             LinagoraSidebarSectionHeaderAction(
-              icon: Icons.add,
+              iconWidget: const SidebarPreviewSvgIcon.asset(
+                LinagoraDesignImages.sidebarAddIcon,
+              ),
               semanticLabel: 'Add folder',
               onTap: () {},
             ),
@@ -639,7 +644,9 @@ class _SidebarMenuPreviewState extends State<_SidebarMenuPreview> {
         actions: [
           if (labels.showAdd)
             LinagoraSidebarSectionHeaderAction(
-              icon: Icons.add,
+              iconWidget: const SidebarPreviewSvgIcon.asset(
+                LinagoraDesignImages.sidebarAddIcon,
+              ),
               semanticLabel: 'Add label',
               onTap: () {},
             ),

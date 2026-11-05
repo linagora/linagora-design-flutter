@@ -17,10 +17,18 @@ void main() {
   testWidgets('keeps the disclosure beside the caption either way', _disclosureSpacing);
   testWidgets('forwards disclosure taps with accessible semantics', _disclosureTap);
   testWidgets('publishes a decorative disclosure to semantics', _decorativeDisclosureSemantics);
-  testWidgets('places compact actions flush at the trailing edge', _actions);
-  testWidgets('preserves action semantics in the compact target', _actionSemantics);
+  testWidgets('places padded actions flush at the trailing edge', _actions);
+  testWidgets('preserves action semantics in the padded target', _actionSemantics);
   testWidgets('creates one hover tooltip for an interactive action', _actionTooltip);
-  testWidgets('keeps disclosure and compact action targets distinct', _tapTargets);
+  testWidgets('keeps disclosure and action targets on the sidebar control size', _tapTargets);
+  testWidgets('owns circular ink under a local transparent Material', _actionMaterialInk);
+  testWidgets('keeps the symbol gap between plain icon actions', _plainIconActionGap);
+  testWidgets('keeps the symbol gap between widget symbols', _widgetSymbolGap);
+  testWidgets('keeps the symbol gap beside a decorative action', _decorativeActionGap);
+  testWidgets('applies the drawer section tokens to its actions', _drawerActions);
+  testWidgets('routes a tap on either side of each gap to its own action', _tapSplit);
+  testWidgets('keeps the action gap in right-to-left layouts', _rightToLeftActionGap);
+  test('rejects an action symbol larger than its box', _symbolLargerThanBox);
   testWidgets('keeps actions visible for scaled long titles', _scaledLongTitle);
   testWidgets('omits optional affordances when they are not supplied', _noAffordances);
   testWidgets('mirrors the title and actions in right-to-left layouts', _rightToLeft);
@@ -328,22 +336,27 @@ Future<void> _actions(WidgetTester tester) async {
 
   final search = tester.getRect(find.byIcon(Icons.search));
   final add = tester.getRect(find.byIcon(Icons.add));
-  final searchTarget = _targetFor(Icons.search);
   final addTarget = _targetFor(Icons.add);
+  final style = LinagoraSidebarStyle.light();
 
   expect(searchCount, 1);
   expect(addCount, 1);
-  _expectSquareSize(tester.getSize(searchTarget), 16.67);
-  _expectSquareSize(tester.getSize(addTarget), 16.67);
-  _expectSquareSize(search.size, 16.67);
-  _expectSquareSize(add.size, 16.67);
-  expect(
-    tester.getRect(addTarget).left - tester.getRect(searchTarget).right,
-    LinagoraSidebarSectionHeader.actionSpacing,
+  _expectSquareSize(
+    tester.getSize(_targetFor(Icons.search)),
+    style.sectionHeaderActionTargetSize,
   );
+  _expectSquareSize(
+    tester.getSize(addTarget),
+    style.sectionHeaderActionTargetSize,
+  );
+  _expectSquareSize(search.size, style.sectionHeaderActionSize);
+  _expectSquareSize(add.size, style.sectionHeaderActionSize);
   expect(
-    add.left - search.right,
-    LinagoraSidebarSectionHeader.actionSpacing,
+    add.center.dx - search.center.dx,
+    closeTo(
+      style.sectionHeaderActionIconSize + style.sectionHeaderActionSpacing,
+      0.01,
+    ),
   );
   expect(tester.getRect(addTarget).right, sidebarWidth);
 }
@@ -400,8 +413,8 @@ Future<void> _actionTooltip(WidgetTester tester) async {
   expect(tester.widget<Tooltip>(find.byType(Tooltip)).message, 'Search folders');
 }
 
-/// Disclosure retains its accessible target; Figma section actions do not add
-/// invisible padding around their 16px glyphs.
+/// Disclosure and section actions share the compact sidebar control target.
+/// Only the action glyph keeps its smaller box.
 Future<void> _tapTargets(WidgetTester tester) async {
   await pumpSidebar(
     tester,
@@ -422,21 +435,58 @@ Future<void> _tapTargets(WidgetTester tester) async {
 
   final toggleFinder = _targetFor(Icons.keyboard_arrow_down);
   final actionFinder = _targetFor(Icons.add);
-  final legacyActionFinder = find.ancestor(
-    of: find.byIcon(Icons.add),
-    matching: find.byType(LinagoraSidebarControl),
-  );
   final toggle = tester.widget<InkResponse>(toggleFinder);
   final action = tester.widget<InkResponse>(actionFinder);
 
-  expect(legacyActionFinder, findsOneWidget);
   expect(tester.getSize(toggleFinder), const Size.square(24));
-  _expectSquareSize(tester.getSize(actionFinder), 16.67);
+  expect(
+    tester.getSize(actionFinder),
+    Size.square(LinagoraSidebarStyle.light().sectionHeaderActionTargetSize),
+  );
+  _expectSquareSize(
+    tester.getSize(find.byIcon(Icons.add)),
+    LinagoraSidebarSectionHeaderAction.size,
+  );
   for (final control in [toggle, action]) {
     expect(control.containedInkWell, isTrue);
     expect(control.highlightShape, BoxShape.circle);
     expect(control.customBorder, isA<CircleBorder>());
   }
+}
+
+
+
+Future<void> _actionMaterialInk(WidgetTester tester) async {
+  await pumpSidebar(
+    tester,
+    const LinagoraSidebarSectionHeader(
+      label: 'Folders',
+      actions: [
+        LinagoraSidebarSectionHeaderAction(
+          icon: Icons.add,
+          semanticLabel: 'Add folder',
+          onTap: _noop,
+        ),
+      ],
+    ),
+  );
+
+  final materialFinder = find.ancestor(
+    of: _targetFor(Icons.add),
+    matching: find.byWidgetPredicate(
+      (widget) =>
+          widget is Material && widget.type == MaterialType.transparency,
+    ),
+  );
+  final ink = tester.widget<InkResponse>(_targetFor(Icons.add));
+
+  expect(materialFinder, findsWidgets);
+  expect(
+    ink.radius,
+    LinagoraSidebarStyle.light().sectionHeaderActionTargetSize / 2,
+  );
+  expect(ink.highlightShape, BoxShape.circle);
+  expect(ink.customBorder, isA<CircleBorder>());
 }
 
 Future<void> _scaledLongTitle(WidgetTester tester) async {
@@ -505,10 +555,19 @@ Future<void> _rightToLeft(WidgetTester tester) async {
   );
 
   final title = tester.getRect(find.text('Folders'));
-  final action = tester.getRect(find.byIcon(Icons.add));
+  final actionTarget = tester.getRect(_targetFor(Icons.add));
+  final actionGlyph = tester.getRect(find.byIcon(Icons.add));
 
   expect(title.right, sidebarWidth);
-  expect(action.left, 0);
+  // The padded target is flush at the leading edge and the glyph sits inset.
+  expect(actionTarget.left, 0);
+  expect(
+    actionGlyph.left,
+    closeTo(
+      LinagoraSidebarControl.overhang(LinagoraSidebarSectionHeaderAction.size),
+      0.01,
+    ),
+  );
 }
 
 Finder _targetFor(IconData icon) {
@@ -552,3 +611,214 @@ Future<void> _expectCaptionSemantics(
 }
 
 void _noop() {}
+
+/// Gap between the symbols drawn at the style's symbol size around the
+/// centres of the [leading] and [trailing] glyphs.
+Future<double> _symbolGap(
+  WidgetTester tester,
+  List<Widget> actions,
+  IconData leading,
+  IconData trailing, {
+  LinagoraSidebarStyle? style,
+  TextDirection textDirection = TextDirection.ltr,
+}) async {
+  await pumpSidebar(
+    tester,
+    LinagoraSidebarSectionHeader(
+      label: 'Folders',
+      actions: actions,
+      style: style,
+    ),
+    surface: SidebarSurface(textDirection: textDirection),
+  );
+  final pitch = (tester.getCenter(find.byIcon(trailing)).dx -
+          tester.getCenter(find.byIcon(leading)).dx)
+      .abs();
+  return pitch -
+      (style ?? LinagoraSidebarStyle.light()).sectionHeaderActionIconSize;
+}
+
+Future<void> _plainIconActionGap(WidgetTester tester) async {
+  final gap = await _symbolGap(
+    tester,
+    const [Icon(Icons.search), Icon(Icons.add)],
+    Icons.search,
+    Icons.add,
+  );
+
+  expect(
+    gap,
+    closeTo(LinagoraSidebarStyle.light().sectionHeaderActionSpacing, 0.01),
+  );
+}
+
+
+Future<void> _decorativeActionGap(WidgetTester tester) async {
+  final gap = await _symbolGap(
+    tester,
+    const [
+      LinagoraSidebarSectionHeaderAction(icon: Icons.lock, onTap: null),
+      LinagoraSidebarSectionHeaderAction(
+        icon: Icons.add,
+        semanticLabel: 'Add folder',
+        onTap: _noop,
+      ),
+    ],
+    Icons.lock,
+    Icons.add,
+  );
+
+  expect(
+    gap,
+    closeTo(LinagoraSidebarStyle.light().sectionHeaderActionSpacing, 0.01),
+  );
+}
+
+LinagoraSidebarStyle get _drawerStyle => LinagoraSidebarStyle.light().copyWith(
+  section: LinagoraSidebarSectionStyleOverride.drawer,
+);
+
+List<Widget> _searchAndAdd({Widget? addIcon}) => [
+  const LinagoraSidebarSectionHeaderAction(
+    icon: Icons.search,
+    semanticLabel: 'Search folders',
+    onTap: _noop,
+  ),
+  LinagoraSidebarSectionHeaderAction(
+    icon: Icons.add,
+    iconWidget: addIcon,
+    semanticLabel: 'Add folder',
+    onTap: _noop,
+  ),
+];
+
+Future<void> _drawerActions(WidgetTester tester) async {
+  const addSymbol = Key('add-symbol');
+  final style = _drawerStyle;
+  final gap = await _symbolGap(
+    tester,
+    _searchAndAdd(),
+    Icons.search,
+    Icons.add,
+    style: style,
+  );
+
+  expect(gap, closeTo(style.sectionHeaderActionSpacing, 0.01));
+  _expectSquareSize(
+    tester.getSize(_targetFor(Icons.search)),
+    style.sectionHeaderActionTargetSize,
+  );
+  _expectSquareSize(
+    tester.getSize(find.byIcon(Icons.search)),
+    style.sectionHeaderActionSize,
+  );
+  expect(
+    tester.getSize(find.byType(LinagoraSidebarSectionHeader)).height,
+    style.sectionHeaderActionTargetSize,
+  );
+
+  await pumpSidebar(
+    tester,
+    LinagoraSidebarSectionHeader(
+      label: 'Folders',
+      actions: _searchAndAdd(addIcon: const SizedBox.expand(key: addSymbol)),
+      style: style,
+    ),
+  );
+
+  _expectSquareSize(
+    tester.getSize(find.byKey(addSymbol)),
+    style.sectionHeaderActionIconSize,
+  );
+}
+
+Future<void> _tapSplit(WidgetTester tester) async {
+  for (final style in [LinagoraSidebarStyle.light(), _drawerStyle]) {
+    final taps = <String>[];
+    await pumpSidebar(
+      tester,
+      LinagoraSidebarSectionHeader(
+        label: 'Folders',
+        style: style,
+        actions: [
+          LinagoraSidebarSectionHeaderAction(
+            icon: Icons.search,
+            semanticLabel: 'Search folders',
+            onTap: () => taps.add('search'),
+          ),
+          LinagoraSidebarSectionHeaderAction(
+            icon: Icons.add,
+            semanticLabel: 'Add folder',
+            onTap: () => taps.add('add'),
+          ),
+        ],
+      ),
+    );
+    final search = tester.getCenter(find.byIcon(Icons.search));
+    final add = tester.getCenter(find.byIcon(Icons.add));
+    final halfSymbol = style.sectionHeaderActionIconSize / 2;
+
+    // One pixel inside the gap from each symbol's edge.
+    await tester.tapAt(search + Offset(halfSymbol + 1, 0));
+    await tester.tapAt(add - Offset(halfSymbol + 1, 0));
+    await tester.pumpAndSettle();
+
+    expect(taps, ['search', 'add']);
+  }
+}
+
+Future<void> _rightToLeftActionGap(WidgetTester tester) async {
+  for (final style in [LinagoraSidebarStyle.light(), _drawerStyle]) {
+    final gap = await _symbolGap(
+      tester,
+      _searchAndAdd(),
+      Icons.add,
+      Icons.search,
+      style: style,
+      textDirection: TextDirection.rtl,
+    );
+
+    expect(gap, closeTo(style.sectionHeaderActionSpacing, 0.01));
+  }
+}
+
+void _symbolLargerThanBox() {
+  expect(
+    () => LinagoraSidebarStyle.light().copyWith(
+      section: const LinagoraSidebarSectionStyleOverride(actionIconSize: 20),
+    ),
+    throwsAssertionError,
+  );
+}
+
+Future<void> _widgetSymbolGap(WidgetTester tester) async {
+  const search = Key('search-symbol');
+  const add = Key('add-symbol');
+  for (final style in [LinagoraSidebarStyle.light(), _drawerStyle]) {
+    await pumpSidebar(
+      tester,
+      LinagoraSidebarSectionHeader(
+        label: 'Folders',
+        style: style,
+        actions: const [
+          LinagoraSidebarSectionHeaderAction(
+            iconWidget: SizedBox.expand(key: search),
+            semanticLabel: 'Search folders',
+            onTap: _noop,
+          ),
+          LinagoraSidebarSectionHeaderAction(
+            iconWidget: SizedBox.expand(key: add),
+            semanticLabel: 'Add folder',
+            onTap: _noop,
+          ),
+        ],
+      ),
+    );
+
+    expect(
+      tester.getRect(find.byKey(add)).left -
+          tester.getRect(find.byKey(search)).right,
+      closeTo(style.sectionHeaderActionSpacing, 0.01),
+    );
+  }
+}
