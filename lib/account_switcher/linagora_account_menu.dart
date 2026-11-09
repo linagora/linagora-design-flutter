@@ -119,22 +119,25 @@ class LinagoraAccountMenu<T> extends StatelessWidget {
     LinagoraAccountItem<T> item,
   ) {
     final selected = item.id == selectedId;
-    return LinagoraPersonTile(
-      key: itemKey(item.id),
-      name: item.name,
-      subtitle: item.email,
-      subtitleMaxLines: 1,
-      avatar: item.avatar,
-      selected: selected,
-      onTap: () => onSelected(item.id),
-      style: tokens.tileStyle,
-      trailing: selected
-          ? Icon(
-              Icons.check,
-              size: tokens.checkIconSize,
-              color: tokens.checkIconColor,
-            )
-          : null,
+    return Padding(
+      padding: tokens.itemPadding,
+      child: LinagoraPersonTile(
+        key: itemKey(item.id),
+        name: item.name,
+        subtitle: item.email,
+        subtitleMaxLines: 1,
+        avatar: item.avatar,
+        selected: selected,
+        onTap: () => onSelected(item.id),
+        style: tokens.tileStyle,
+        trailing: selected
+            ? Icon(
+                Icons.check,
+                size: tokens.checkIconSize,
+                color: tokens.checkIconColor,
+              )
+            : null,
+      ),
     );
   }
 }
