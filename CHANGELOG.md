@@ -2,6 +2,7 @@
 
 ### Added
 
+* `LinagoraSegmentedTabs`: a 32 high pill that switches between two or more views, expanded to share the width or sized per segment, with arrow, Home and End keys, styled by `LinagoraSegmentedTabsStyle.material()` or `.dark()`.
 * `LinagoraSidebarStyle` gains section header action tokens:
   `sectionHeaderActionSize` (16.67), `sectionHeaderActionIconSize` (10.42),
   `sectionHeaderActionSpacing` (10.25) and `sectionHeaderActionTargetSize` (24),
