@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:linagora_design_flutter/linagora_design_flutter.dart';
 import 'package:widgetbook/widgetbook.dart' hide AlignmentAddon;
+import 'package:widgetbook_workspace/components/avatar/linagora_stacked_avatars_use_case.dart';
 import 'package:widgetbook_workspace/components/banners/linagora_alert_use_case.dart';
+import 'package:widgetbook_workspace/components/chips/linagora_dismissible_chip_use_case.dart';
+import 'package:widgetbook_workspace/components/chips/linagora_status_badge_use_case.dart';
 import 'package:widgetbook_workspace/components/banners/linagora_banner_use_case.dart';
 import 'package:widgetbook_workspace/components/buttons/linagora_button_use_case.dart';
 import 'package:widgetbook_workspace/components/empty_state/linagora_empty_state_use_case.dart';
@@ -99,6 +102,20 @@ class WidgetbookApp extends StatelessWidget {
         ),
       ],
       directories: [
+        WidgetbookFolder(
+          name: 'Avatar',
+          children: [
+            WidgetbookComponent(
+              name: 'Linagora stacked avatars',
+              useCases: [
+                WidgetbookUseCase(
+                  name: 'Default',
+                  builder: (context) => linagoraStackedAvatarsUseCase(context),
+                ),
+              ],
+            ),
+          ],
+        ),
         WidgetbookFolder(
           name: 'Banners',
           children: [
@@ -270,6 +287,24 @@ class WidgetbookApp extends StatelessWidget {
         WidgetbookFolder(
           name: 'Chips',
           children: [
+            WidgetbookComponent(
+              name: 'Linagora dismissible chip',
+              useCases: [
+                WidgetbookUseCase(
+                  name: 'Default',
+                  builder: (context) => linagoraDismissibleChipUseCase(context),
+                ),
+              ],
+            ),
+            WidgetbookComponent(
+              name: 'Linagora status badge',
+              useCases: [
+                WidgetbookUseCase(
+                  name: 'Default',
+                  builder: (context) => linagoraStatusBadgeUseCase(context),
+                ),
+              ],
+            ),
             WidgetbookComponent(
               name: 'Linagora filter chip',
               useCases: [
@@ -503,11 +538,13 @@ class WidgetbookApp extends StatelessWidget {
               useCases: [
                 WidgetbookUseCase(
                   name: 'All states',
-                  builder: (context) => eventActivityBadgeStatesUseCase(context),
+                  builder: (context) =>
+                      eventActivityBadgeStatesUseCase(context),
                 ),
                 WidgetbookUseCase(
                   name: 'Custom',
-                  builder: (context) => eventActivityBadgeCustomUseCase(context),
+                  builder: (context) =>
+                      eventActivityBadgeCustomUseCase(context),
                 ),
               ],
             ),
