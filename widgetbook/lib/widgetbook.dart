@@ -35,6 +35,7 @@ import 'package:widgetbook_workspace/components/sidebar/linagora_sidebar_section
 import 'package:widgetbook_workspace/components/sidebar/linagora_sidebar_storage_use_case.dart';
 import 'package:widgetbook_workspace/components/sidebar/linagora_sidebar_tree_list_use_case.dart';
 import 'package:widgetbook_workspace/components/sidebar/linagora_sidebar_version_use_case.dart';
+import 'package:widgetbook_workspace/components/tabs/linagora_segmented_tabs_use_case.dart';
 import 'package:widgetbook_workspace/components/text_field/linagora_text_field_use_case.dart';
 import 'package:widgetbook_workspace/components/typography/linagora_text_theme_use_case.dart';
 import 'package:widgetbook_workspace/custom/github_addon.dart';
@@ -54,7 +55,7 @@ class WidgetbookApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return Widgetbook.material(
       themeMode: ThemeMode.light,
-      darkTheme: ThemeData.light(),
+      darkTheme: ThemeData.dark(),
       addons: [
         GitHubAddon('widgetbook'),
         ViewportAddon(Viewports.all),
@@ -74,12 +75,13 @@ class WidgetbookApp extends StatelessWidget {
               data: TwakeThemes.buildTheme(
                 context,
                 Brightness.dark,
-                LinagoraSysColors.material().onPrimary,
+                LinagoraSysColors.material().onPrimaryDark,
               ),
             ),
           ],
+          // Preview chrome must follow the selected theme.
           themeBuilder: (context, theme, child) => ColoredBox(
-            color: LinagoraSysColors.material().onPrimary,
+            color: theme.scaffoldBackgroundColor,
             child: DefaultTextStyle(
               style: theme.textTheme.bodyLarge ?? const TextStyle(),
               child: Theme(
@@ -149,6 +151,20 @@ class WidgetbookApp extends StatelessWidget {
                 WidgetbookUseCase(
                   name: 'Default',
                   builder: (context) => linagoraTextFieldUseCase(context),
+                ),
+              ],
+            ),
+          ],
+        ),
+        WidgetbookFolder(
+          name: 'Tabs',
+          children: [
+            WidgetbookComponent(
+              name: 'Linagora segmented tabs',
+              useCases: [
+                WidgetbookUseCase(
+                  name: 'Default',
+                  builder: (context) => linagoraSegmentedTabsUseCase(context),
                 ),
               ],
             ),
@@ -503,11 +519,13 @@ class WidgetbookApp extends StatelessWidget {
               useCases: [
                 WidgetbookUseCase(
                   name: 'All states',
-                  builder: (context) => eventActivityBadgeStatesUseCase(context),
+                  builder: (context) =>
+                      eventActivityBadgeStatesUseCase(context),
                 ),
                 WidgetbookUseCase(
                   name: 'Custom',
-                  builder: (context) => eventActivityBadgeCustomUseCase(context),
+                  builder: (context) =>
+                      eventActivityBadgeCustomUseCase(context),
                 ),
               ],
             ),
