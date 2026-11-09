@@ -179,11 +179,12 @@ class LinagoraAccountSwitcherStyle {
       menuOffset: 6,
       sectionTextStyle: text.labelMedium!.copyWith(color: colors.textColor),
       // Space between "Your mailbox" and "Delegated to you" (Figma stand-alone).
-      sectionPadding: const EdgeInsetsDirectional.fromSTEB(12, 8, 12, 4),
+      // 16 matches the previous menuPadding horizontal so text inset is unchanged.
+      sectionPadding: const EdgeInsetsDirectional.fromSTEB(16, 8, 16, 4),
       sectionGap: 12,
       checkIconSize: 24,
       checkIconColor: colors.accentColor,
-      headerPadding: const EdgeInsets.fromLTRB(12, 8, 12, 16),
+      headerPadding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
       headerAvatarSize: 48,
       headerAvatarGap: 12,
       headerNameTextStyle: text.titleMedium!.copyWith(
@@ -208,7 +209,7 @@ class LinagoraAccountSwitcherStyle {
       tileStyle: colors.tileStyle.copyWith(
         minHeight: 44,
         avatarSize: 28,
-        padding: const EdgeInsetsDirectional.fromSTEB(12, 6, 12, 6),
+        padding: const EdgeInsetsDirectional.fromSTEB(16, 6, 16, 6),
         avatarGap: 8,
         trailingGap: 8,
         subtitleGap: 2,

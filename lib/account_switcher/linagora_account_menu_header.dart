@@ -12,7 +12,8 @@ class LinagoraAccountMenuHeader extends StatelessWidget {
   final String name;
   final String? email;
 
-  /// Copies [email]. Null hides the copy control.
+  /// Copies [email], or [name] when the host is address-only (`email` null /
+  /// equal to [name]). Null hides the copy control.
   final VoidCallback? onCopyEmail;
 
   /// Tooltip and screen-reader name of the copy control.
@@ -39,7 +40,9 @@ class LinagoraAccountMenuHeader extends StatelessWidget {
     final tokens = style ?? LinagoraAccountSwitcherStyle.material();
     final email = this.email?.trim();
     final badge = this.badge;
-    final showCopy = onCopyEmail != null && email != null && email.isNotEmpty;
+    final hasEmail = email != null && email.isNotEmpty;
+    final addressOnly = !hasEmail || email == name.trim();
+    final showCopy = onCopyEmail != null;
 
     return Padding(
       padding: tokens.headerPadding,
@@ -48,54 +51,27 @@ class LinagoraAccountMenuHeader extends StatelessWidget {
         children: [
           SizedBox.square(dimension: tokens.headerAvatarSize, child: avatar),
           SizedBox(height: tokens.headerAvatarGap),
-          Text(
-            name,
-            textAlign: TextAlign.center,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-            style: tokens.headerNameTextStyle,
-          ),
-          if (email != null && email.isNotEmpty) ...[
+          if (addressOnly)
+            _addressRow(
+              tokens,
+              text: name,
+              textStyle: tokens.headerNameTextStyle,
+              showCopy: showCopy,
+            )
+          else ...[
+            Text(
+              name,
+              textAlign: TextAlign.center,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: tokens.headerNameTextStyle,
+            ),
             SizedBox(height: tokens.headerEmailGap),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Flexible(
-                  child: Text(
-                    email,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: tokens.headerEmailTextStyle,
-                  ),
-                ),
-                if (showCopy) ...[
-                  SizedBox(width: tokens.headerCopyGap),
-                  IconButton(
-                    key: copyKey,
-                    tooltip: copyTooltip,
-                    onPressed: onCopyEmail,
-                    padding: EdgeInsets.zero,
-                    constraints: BoxConstraints.tight(
-                      Size.square(tokens.headerCopySize),
-                    ),
-                    style: IconButton.styleFrom(
-                      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                      minimumSize: Size.square(tokens.headerCopySize),
-                    ),
-                    icon: SvgPicture.asset(
-                      LinagoraDesignImages.copyLinkIcon,
-                      package: LinagoraDesignImages.packageName,
-                      width: tokens.headerCopyIconSize,
-                      height: tokens.headerCopyIconSize,
-                      colorFilter: ColorFilter.mode(
-                        tokens.headerCopyColor,
-                        BlendMode.srcIn,
-                      ),
-                    ),
-                  ),
-                ],
-              ],
+            _addressRow(
+              tokens,
+              text: email,
+              textStyle: tokens.headerEmailTextStyle,
+              showCopy: showCopy,
             ),
           ],
           if (badge != null) ...[
@@ -104,6 +80,53 @@ class LinagoraAccountMenuHeader extends StatelessWidget {
           ],
         ],
       ),
+    );
+  }
+
+  Widget _addressRow(
+    LinagoraAccountSwitcherStyle tokens, {
+    required String text,
+    required TextStyle textStyle,
+    required bool showCopy,
+  }) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Flexible(
+          child: Text(
+            text,
+            textAlign: TextAlign.center,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: textStyle,
+          ),
+        ),
+        if (showCopy) ...[
+          SizedBox(width: tokens.headerCopyGap),
+          IconButton(
+            key: copyKey,
+            tooltip: copyTooltip,
+            onPressed: onCopyEmail,
+            padding: EdgeInsets.zero,
+            constraints: BoxConstraints.tight(Size.square(tokens.headerCopySize)),
+            style: IconButton.styleFrom(
+              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+              minimumSize: Size.square(tokens.headerCopySize),
+            ),
+            icon: SvgPicture.asset(
+              LinagoraDesignImages.copyLinkIcon,
+              package: LinagoraDesignImages.packageName,
+              width: tokens.headerCopyIconSize,
+              height: tokens.headerCopyIconSize,
+              colorFilter: ColorFilter.mode(
+                tokens.headerCopyColor,
+                BlendMode.srcIn,
+              ),
+            ),
+          ),
+        ],
+      ],
     );
   }
 }
