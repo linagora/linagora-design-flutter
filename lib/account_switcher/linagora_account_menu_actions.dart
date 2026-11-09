@@ -38,26 +38,32 @@ class LinagoraAccountMenuActions extends StatelessWidget {
           color: tokens.footerDividerColor,
         ),
         if (showManage)
-          LinagoraPersonTile(
-            key: manageKey,
-            name: manageLabel,
-            onTap: onManageAccount,
+          Padding(
+            padding: tokens.itemPadding,
+            child: LinagoraPersonTile(
+              key: manageKey,
+              name: manageLabel,
+              onTap: onManageAccount,
+              style: tokens.tileStyle,
+              avatar: _icon(
+                LinagoraDesignImages.accountManageIcon,
+                tokens.footerIconSize,
+                tokens.footerIconColor,
+              ),
+            ),
+          ),
+        Padding(
+          padding: tokens.itemPadding,
+          child: LinagoraPersonTile(
+            key: signOutKey,
+            name: signOutLabel,
+            onTap: onSignOut,
             style: tokens.tileStyle,
             avatar: _icon(
-              LinagoraDesignImages.accountManageIcon,
+              LinagoraDesignImages.accountSignOutIcon,
               tokens.footerIconSize,
               tokens.footerIconColor,
             ),
-          ),
-        LinagoraPersonTile(
-          key: signOutKey,
-          name: signOutLabel,
-          onTap: onSignOut,
-          style: tokens.tileStyle,
-          avatar: _icon(
-            LinagoraDesignImages.accountSignOutIcon,
-            tokens.footerIconSize,
-            tokens.footerIconColor,
           ),
         ),
       ],

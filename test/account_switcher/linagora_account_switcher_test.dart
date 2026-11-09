@@ -225,13 +225,20 @@ Future<void> _listsSections(WidgetTester tester) async {
     tester.getRect(find.text('Your mailbox')).top,
     lessThan(tester.getRect(find.text('Delegated to you')).top),
   );
-  // Title and row text share the menu's horizontal inset (full-bleed dividers).
-  expect(
-    tester.getRect(find.text('Nora Hale')).left,
-    tester.getRect(find.text('Your mailbox')).left,
-  );
+  // Selected highlight is inset; section title keeps the same content rhythm.
+  final style = LinagoraAccountSwitcherStyle.material();
   final mira = find.byKey(LinagoraAccountMenu.itemKey('mira'));
   final me = find.byKey(LinagoraAccountMenu.itemKey('me'));
+  final menuLeft = tester.getRect(find.byType(LinagoraAccountMenu<String>)).left;
+  expect(
+    tester.getRect(mira).left - menuLeft,
+    style.itemPadding.resolve(TextDirection.ltr).left,
+  );
+  expect(
+    tester.getRect(find.text('Nora Hale')).left,
+    tester.getRect(find.text('Your mailbox')).left +
+        style.tileStyle.padding.resolve(TextDirection.ltr).left,
+  );
   expect(tester.widget<LinagoraPersonTile>(mira).selected, isTrue);
   expect(tester.widget<LinagoraPersonTile>(me).selected, isFalse);
   expect(tester.widget<LinagoraPersonTile>(mira).subtitleMaxLines, 1);

@@ -35,6 +35,10 @@ class LinagoraAccountSwitcherStyle {
   final EdgeInsetsGeometry sectionPadding;
   final double sectionGap;
 
+  /// Horizontal inset around each account / footer row so the selected
+  /// highlight stays off the menu edge while dividers stay full-bleed.
+  final EdgeInsetsGeometry itemPadding;
+
   final double checkIconSize;
   final Color checkIconColor;
 
@@ -80,6 +84,7 @@ class LinagoraAccountSwitcherStyle {
     required this.sectionTextStyle,
     required this.sectionPadding,
     required this.sectionGap,
+    required this.itemPadding,
     required this.checkIconSize,
     required this.checkIconColor,
     required this.headerPadding,
@@ -173,7 +178,7 @@ class LinagoraAccountSwitcherStyle {
           blurRadius: 3,
         ),
       ],
-      // Horizontal inset lives on header / sections / tiles so footer
+      // Horizontal inset lives on header / sections / itemPadding so footer
       // dividers can paint edge-to-edge (Figma stand-alone menu).
       menuPadding: const EdgeInsets.fromLTRB(0, 12, 0, 12),
       menuOffset: 6,
@@ -182,6 +187,8 @@ class LinagoraAccountSwitcherStyle {
       // 16 matches the previous menuPadding horizontal so text inset is unchanged.
       sectionPadding: const EdgeInsetsDirectional.fromSTEB(16, 8, 16, 4),
       sectionGap: 12,
+      // Keeps the selected soft-rect highlight ~16px off the menu border.
+      itemPadding: const EdgeInsets.symmetric(horizontal: 16),
       checkIconSize: 24,
       checkIconColor: colors.accentColor,
       headerPadding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
@@ -209,7 +216,8 @@ class LinagoraAccountSwitcherStyle {
       tileStyle: colors.tileStyle.copyWith(
         minHeight: 44,
         avatarSize: 28,
-        padding: const EdgeInsetsDirectional.fromSTEB(16, 6, 16, 6),
+        // Inner content pad; horizontal inset from the menu is [itemPadding].
+        padding: const EdgeInsetsDirectional.fromSTEB(8, 6, 8, 6),
         avatarGap: 8,
         trailingGap: 8,
         subtitleGap: 2,
@@ -264,6 +272,7 @@ class LinagoraAccountSwitcherStyle {
     TextStyle? sectionTextStyle,
     EdgeInsetsGeometry? sectionPadding,
     double? sectionGap,
+    EdgeInsetsGeometry? itemPadding,
     double? checkIconSize,
     Color? checkIconColor,
     EdgeInsetsGeometry? headerPadding,
@@ -305,6 +314,7 @@ class LinagoraAccountSwitcherStyle {
       sectionTextStyle: sectionTextStyle ?? this.sectionTextStyle,
       sectionPadding: sectionPadding ?? this.sectionPadding,
       sectionGap: sectionGap ?? this.sectionGap,
+      itemPadding: itemPadding ?? this.itemPadding,
       checkIconSize: checkIconSize ?? this.checkIconSize,
       checkIconColor: checkIconColor ?? this.checkIconColor,
       headerPadding: headerPadding ?? this.headerPadding,
