@@ -2,6 +2,8 @@
 # Each URL must include a ?node-id= so the Figma MCP can resolve one component.
 EventActivityBadge: "https://www.figma.com/design/XqLqMINlZw09BdEHI8yLb9/Teammail---1.1?node-id=10953-7723&t=v6U2ekksIq4SKGe9-1"
 EventConferenceActions: "https://www.figma.com/design/XqLqMINlZw09BdEHI8yLb9/Teammail---1.1?node-id=10952-24730&t=v6U2ekksIq4SKGe9-1"
+LinagoraAccountMenu: "https://www.figma.com/design/XqLqMINlZw09BdEHI8yLb9/Teammail---1.1?node-id=12517-13643"
+LinagoraAccountSwitcher: "https://www.figma.com/design/XqLqMINlZw09BdEHI8yLb9/Teammail---1.1?node-id=12772-38323"
 LinagoraAlert: "https://www.figma.com/design/XqLqMINlZw09BdEHI8yLb9/Teammail---1.1?node-id=11156-37791"
 LinagoraAvatarListItem: "https://www.figma.com/design/Cu4NB44bcURKEy40DEfwWi/Design-system-1.0?node-id=62000-33975"
 LinagoraButton: "https://www.figma.com/design/XqLqMINlZw09BdEHI8yLb9/Teammail---1.1?node-id=11101-1090"

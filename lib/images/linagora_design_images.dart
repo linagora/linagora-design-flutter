@@ -15,6 +15,10 @@ class LinagoraDesignImages {
   /// Person-tile remove control (Material delete, outline, `#7A7781`).
   static const String deleteIcon = 'assets/images/delete_icon.svg';
 
+  /// Account menu footer: manage account and sign out (20×20, Text/icon 64%).
+  static const String accountManageIcon = 'assets/images/account_manage.svg';
+  static const String accountSignOutIcon = 'assets/images/account_sign_out.svg';
+
   /// Borderless symbols whose drawing fills the view box, so a
   /// `LinagoraSidebarSectionHeaderAction.iconWidget` shows them at its exact
   /// symbol size.
