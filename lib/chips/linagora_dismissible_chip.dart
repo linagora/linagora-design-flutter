@@ -22,6 +22,9 @@ class LinagoraDismissibleChip extends StatelessWidget {
   /// Tooltip and screen-reader name of the close button.
   final String dismissTooltip;
 
+  /// Overrides [dismissKey] when the host needs a product-specific finder.
+  final Key? dismissButtonKey;
+
   final LinagoraDismissibleChipStyle? style;
 
   const LinagoraDismissibleChip({
@@ -30,6 +33,7 @@ class LinagoraDismissibleChip extends StatelessWidget {
     required this.onDismissed,
     required this.dismissTooltip,
     this.leading,
+    this.dismissButtonKey,
     this.style,
   });
 
@@ -91,7 +95,7 @@ class LinagoraDismissibleChip extends StatelessWidget {
 
   Widget _dismissButton(LinagoraDismissibleChipStyle tokens, double target) {
     return IconButton(
-      key: dismissKey,
+      key: dismissButtonKey ?? dismissKey,
       tooltip: dismissTooltip,
       onPressed: onDismissed,
       padding: EdgeInsets.zero,
