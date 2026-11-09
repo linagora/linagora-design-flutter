@@ -19,6 +19,7 @@ import 'package:widgetbook_workspace/components/file_transfer/linagora_file_tran
 import 'package:widgetbook_workspace/components/chips/linagora_filter_chip_use_case.dart';
 import 'package:widgetbook_workspace/components/list_item/linagora_radio_item_use_case.dart';
 import 'package:widgetbook_workspace/components/list_item/linagora_avatar_list_item_use_case.dart';
+import 'package:widgetbook_workspace/components/list_item/linagora_person_tile_use_case.dart';
 import 'package:widgetbook_workspace/components/list_item/linagora_section_header_use_case.dart';
 import 'package:widgetbook_workspace/components/list_item/linagora_setting_item_use_case.dart';
 import 'package:widgetbook_workspace/components/list_item/session_device_list_item_use_case.dart';
@@ -248,6 +249,24 @@ class WidgetbookApp extends StatelessWidget {
                 WidgetbookUseCase(
                   name: 'Default',
                   builder: (context) => linagoraSectionHeaderUseCase(context),
+                ),
+              ],
+            ),
+            WidgetbookComponent(
+              name: 'Linagora person tile',
+              useCases: [
+                WidgetbookUseCase(
+                  name: 'Default',
+                  builder: (context) => linagoraPersonTileUseCase(context),
+                ),
+              ],
+            ),
+            WidgetbookComponent(
+              name: 'Linagora tile group',
+              useCases: [
+                WidgetbookUseCase(
+                  name: 'Default',
+                  builder: (context) => linagoraTileGroupUseCase(context),
                 ),
               ],
             ),
