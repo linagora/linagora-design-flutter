@@ -41,6 +41,11 @@ class LinagoraAccountSection<T> {
 /// The menu is data-driven: append or omit sections at the call site when the
 /// product gains new mailbox kinds. The switcher popover uses the list as-is.
 /// An avatar menu can also pass [header] and [footer].
+///
+/// Height and scrolling are owned by [LinagoraAccountMenuShell], not by this
+/// widget or its section columns. Wrap the menu in the shell (as
+/// [LinagoraAccountSwitcher] does) so the panel caps to the available height
+/// and scrolls as one unit when content is taller.
 class LinagoraAccountMenu<T> extends StatelessWidget {
   final List<LinagoraAccountSection<T>> sections;
   final T? selectedId;
