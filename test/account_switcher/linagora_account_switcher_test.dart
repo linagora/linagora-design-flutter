@@ -228,7 +228,7 @@ Future<void> _listsSections(WidgetTester tester) async {
   expect(
     tester.getRect(find.text('Nora Hale')).left -
         tester.getRect(find.text('Your mailbox')).left,
-    16,
+    LinagoraAccountSwitcherStyle.material().tileStyle.padding.start,
   );
   final mira = find.byKey(LinagoraAccountMenu.itemKey('mira'));
   final me = find.byKey(LinagoraAccountMenu.itemKey('me'));
