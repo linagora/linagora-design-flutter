@@ -8,6 +8,8 @@ class LinagoraDismissibleChipStyle {
   final double height;
   final double radius;
   final Color color;
+  final Color borderColor;
+  final double borderWidth;
   final EdgeInsetsGeometry padding;
 
   /// Gap between the leading widget and the label.
@@ -24,6 +26,8 @@ class LinagoraDismissibleChipStyle {
     required this.height,
     required this.radius,
     required this.color,
+    required this.borderColor,
+    required this.borderWidth,
     required this.padding,
     required this.gap,
     required this.textStyle,
@@ -34,12 +38,14 @@ class LinagoraDismissibleChipStyle {
 
   static final LinagoraDismissibleChipStyle _material = _build(
     color: const Color(0xFFF3F6F9),
+    borderColor: const Color(0x29424244),
     textColor: const Color(0xE5424244),
     iconColor: const Color(0xA3424244),
   );
 
   static final LinagoraDismissibleChipStyle _dark = _build(
     color: const Color(0x14FFFFFF),
+    borderColor: const Color(0x1FFFFFFF),
     textColor: Colors.white,
     iconColor: const Color(0xA3FFFFFF),
   );
@@ -50,13 +56,16 @@ class LinagoraDismissibleChipStyle {
 
   static LinagoraDismissibleChipStyle _build({
     required Color color,
+    required Color borderColor,
     required Color textColor,
     required Color iconColor,
   }) {
     return LinagoraDismissibleChipStyle(
       height: 32,
-      radius: 8,
+      radius: 16,
       color: color,
+      borderColor: borderColor,
+      borderWidth: 1,
       padding: const EdgeInsetsDirectional.only(start: 8),
       gap: 6,
       textStyle: LinagoraTextTheme.material().bodyMedium!.copyWith(
@@ -75,6 +84,8 @@ class LinagoraDismissibleChipStyle {
     double? height,
     double? radius,
     Color? color,
+    Color? borderColor,
+    double? borderWidth,
     EdgeInsetsGeometry? padding,
     double? gap,
     TextStyle? textStyle,
@@ -86,6 +97,8 @@ class LinagoraDismissibleChipStyle {
       height: height ?? this.height,
       radius: radius ?? this.radius,
       color: color ?? this.color,
+      borderColor: borderColor ?? this.borderColor,
+      borderWidth: borderWidth ?? this.borderWidth,
       padding: padding ?? this.padding,
       gap: gap ?? this.gap,
       textStyle: textStyle ?? this.textStyle,
