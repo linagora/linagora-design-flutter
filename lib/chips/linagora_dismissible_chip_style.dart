@@ -36,16 +36,17 @@ class LinagoraDismissibleChipStyle {
     required this.dismissTargetSize,
   });
 
+  // Fill sampled from Twake Mail stand-alone Figma (#F5F6FA); soft square, no stroke.
   static final LinagoraDismissibleChipStyle _material = _build(
-    color: const Color(0xFFF3F6F9),
-    borderColor: const Color(0x29424244),
+    color: const Color(0xFFF5F6FA),
+    borderColor: const Color(0x00000000),
     textColor: const Color(0xE5424244),
     iconColor: const Color(0xA3424244),
   );
 
   static final LinagoraDismissibleChipStyle _dark = _build(
     color: const Color(0x14FFFFFF),
-    borderColor: const Color(0x1FFFFFFF),
+    borderColor: const Color(0x00000000),
     textColor: Colors.white,
     iconColor: const Color(0xA3FFFFFF),
   );
@@ -62,10 +63,11 @@ class LinagoraDismissibleChipStyle {
   }) {
     return LinagoraDismissibleChipStyle(
       height: 32,
-      radius: 16,
+      // Soft square (Figma Viewing chip); not a stadium/pill.
+      radius: 6,
       color: color,
       borderColor: borderColor,
-      borderWidth: 1,
+      borderWidth: 0,
       padding: const EdgeInsetsDirectional.only(start: 8),
       gap: 6,
       textStyle: LinagoraTextTheme.material().bodyMedium!.copyWith(
