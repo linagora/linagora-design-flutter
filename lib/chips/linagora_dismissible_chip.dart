@@ -65,6 +65,12 @@ class LinagoraDismissibleChip extends StatelessWidget {
                     decoration: BoxDecoration(
                       color: tokens.color,
                       borderRadius: BorderRadius.circular(tokens.radius),
+                      border: tokens.borderWidth <= 0
+                          ? null
+                          : Border.all(
+                              color: tokens.borderColor,
+                              width: tokens.borderWidth,
+                            ),
                     ),
                   ),
                 ),

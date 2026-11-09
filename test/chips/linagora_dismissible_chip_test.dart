@@ -69,7 +69,8 @@ Future<void> _pill(WidgetTester tester) async {
               )
               .decoration
           as BoxDecoration;
-  expect(decoration.borderRadius, BorderRadius.circular(8));
+  expect(decoration.borderRadius, BorderRadius.circular(16));
+  expect(decoration.border, isNotNull);
 
   await tester.tapAt(close.center);
   expect(dismissed, 1);
