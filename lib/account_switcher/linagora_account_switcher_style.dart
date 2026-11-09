@@ -173,16 +173,18 @@ class LinagoraAccountSwitcherStyle {
           blurRadius: 3,
         ),
       ],
-      menuPadding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
+      // Horizontal inset lives on header / sections / tiles so footer
+      // dividers can paint edge-to-edge (Figma stand-alone menu).
+      menuPadding: const EdgeInsets.fromLTRB(0, 12, 0, 12),
       menuOffset: 6,
       sectionTextStyle: text.labelMedium!.copyWith(color: colors.textColor),
       // Space between "Your mailbox" and "Delegated to you" (Figma stand-alone).
-      sectionPadding: const EdgeInsetsDirectional.only(top: 8, bottom: 4),
+      sectionPadding: const EdgeInsetsDirectional.fromSTEB(12, 8, 12, 4),
       sectionGap: 12,
       checkIconSize: 24,
       checkIconColor: colors.accentColor,
-      headerPadding: const EdgeInsets.fromLTRB(8, 8, 8, 16),
-      headerAvatarSize: 56,
+      headerPadding: const EdgeInsets.fromLTRB(12, 8, 12, 16),
+      headerAvatarSize: 48,
       headerAvatarGap: 12,
       headerNameTextStyle: text.titleMedium!.copyWith(
         fontWeight: FontWeight.w600,
@@ -204,7 +206,8 @@ class LinagoraAccountSwitcherStyle {
       footerIconSize: 20,
       footerIconColor: colors.secondaryColor,
       tileStyle: colors.tileStyle.copyWith(
-        minHeight: 48,
+        minHeight: 44,
+        avatarSize: 28,
         padding: const EdgeInsetsDirectional.fromSTEB(12, 6, 12, 6),
         avatarGap: 8,
         trailingGap: 8,
@@ -233,7 +236,7 @@ class LinagoraAccountSwitcherStyle {
   LinagoraAccountSwitcherStyle avatarMenu() {
     return copyWith(
       menuWidth: 326,
-      menuPadding: const EdgeInsets.fromLTRB(12, 8, 12, 12),
+      menuPadding: const EdgeInsets.fromLTRB(0, 8, 0, 12),
     );
   }
 
