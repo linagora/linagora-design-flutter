@@ -2,6 +2,9 @@
 
 ### Added
 
+* `LinagoraEmptyCard`: a short bordered card with a title, an optional message and an optional action, styled by `LinagoraEmptyCardStyle.material()` or `.dark()`. Distinct from `LinagoraEmptyState`, which stays the tall filled illustration card.
+* `LinagoraDesignImages.emptyCardShareIcon` and `emptyCardMailIcon`:
+  empty-card illustrations for the access “by me” and “with me” states.
 * `LinagoraSidebarStyle` gains section header action tokens:
   `sectionHeaderActionSize` (16.67), `sectionHeaderActionIconSize` (10.42),
   `sectionHeaderActionSpacing` (10.25) and `sectionHeaderActionTargetSize` (24),
@@ -14,6 +17,11 @@
 
 ### Changed
 
+* `LinagoraEmptyCard` matches the access empty-state layout: 16 radius,
+  16 padding, 8 gaps, `titleMedium` / `bodyMedium` copy, and a filled 48
+  action pill (`32×14` padding, 20 icon) with
+  `actionBackgroundColor` / `actionForegroundColor`. It fills the parent
+  width by default; pass `width` for a fixed size.
 * `LinagoraSidebarSectionHeaderAction` pads its circular `InkResponse` to
   `sectionHeaderActionTargetSize` around the glyph box, and draws an
   `iconWidget` at `sectionHeaderActionIconSize`.

@@ -47,6 +47,8 @@ export 'package:linagora_design_flutter/buttons/linagora_icon_button.dart';
 export 'package:linagora_design_flutter/event/event_conference_actions.dart';
 export 'package:linagora_design_flutter/chat/bubble_shape.dart';
 export 'package:linagora_design_flutter/chat/message_bubble.dart';
+export 'package:linagora_design_flutter/empty_state/linagora_empty_card.dart';
+export 'package:linagora_design_flutter/empty_state/linagora_empty_card_style.dart';
 export 'package:linagora_design_flutter/empty_state/linagora_empty_state.dart';
 export 'package:linagora_design_flutter/behaviors/right_click_focus.dart';
 export 'package:linagora_design_flutter/banners/linagora_alert.dart';
