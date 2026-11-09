@@ -27,6 +27,7 @@ class LinagoraAccountMenuActions extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final tokens = style ?? LinagoraAccountSwitcherStyle.material();
+    final showManage = onManageAccount != null;
     return Column(
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -36,17 +37,18 @@ class LinagoraAccountMenuActions extends StatelessWidget {
           thickness: 1,
           color: tokens.footerDividerColor,
         ),
-        LinagoraPersonTile(
-          key: manageKey,
-          name: manageLabel,
-          onTap: onManageAccount,
-          style: tokens.tileStyle,
-          avatar: _icon(
-            LinagoraDesignImages.accountManageIcon,
-            tokens.footerIconSize,
-            tokens.footerIconColor,
+        if (showManage)
+          LinagoraPersonTile(
+            key: manageKey,
+            name: manageLabel,
+            onTap: onManageAccount,
+            style: tokens.tileStyle,
+            avatar: _icon(
+              LinagoraDesignImages.accountManageIcon,
+              tokens.footerIconSize,
+              tokens.footerIconColor,
+            ),
           ),
-        ),
         LinagoraPersonTile(
           key: signOutKey,
           name: signOutLabel,

@@ -176,8 +176,9 @@ class LinagoraAccountSwitcherStyle {
       menuPadding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
       menuOffset: 6,
       sectionTextStyle: text.labelMedium!.copyWith(color: colors.textColor),
-      sectionPadding: const EdgeInsetsDirectional.only(top: 4, bottom: 8),
-      sectionGap: 0,
+      // Space between "Your mailbox" and "Delegated to you" (Figma stand-alone).
+      sectionPadding: const EdgeInsetsDirectional.only(top: 8, bottom: 4),
+      sectionGap: 12,
       checkIconSize: 24,
       checkIconColor: colors.accentColor,
       headerPadding: const EdgeInsets.fromLTRB(8, 8, 8, 16),
@@ -196,16 +197,18 @@ class LinagoraAccountSwitcherStyle {
       headerCopyIconSize: 16,
       headerCopyColor: colors.secondaryColor,
       headerBadgeGap: 12,
-      footerDividerGap: 17,
+      // Divider + breathing room before Manage / Sign out; rows stay tight.
+      footerDividerGap: 16,
       footerDividerColor: colors.dividerColor,
       // Icon frame is 20 (glyph ~16.67).
       footerIconSize: 20,
       footerIconColor: colors.secondaryColor,
       tileStyle: colors.tileStyle.copyWith(
-        padding: const EdgeInsetsDirectional.fromSTEB(16, 8, 12, 8),
+        minHeight: 48,
+        padding: const EdgeInsetsDirectional.fromSTEB(12, 6, 12, 6),
         avatarGap: 8,
         trailingGap: 8,
-        subtitleGap: 4,
+        subtitleGap: 2,
         tileRadius: 8,
         nameTextStyle: text.bodyMedium!.copyWith(color: colors.textColor),
       ),
