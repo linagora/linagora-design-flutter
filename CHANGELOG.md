@@ -11,9 +11,19 @@
 * `LinagoraDesignImages.sidebarSearchIcon` and
   `LinagoraDesignImages.sidebarAddIcon`: borderless search and add symbols
   drawn edge to edge, so both show at the exact symbol size.
+* `LinagoraDesignImages.deleteIcon`: outline trash glyph for
+  `LinagoraPersonTile` remove actions.
+* `LinagoraPersonTile` and `LinagoraTileGroup`: a person or account row (avatar, name, detail, remove button or custom trailing, selected state) and the outlined or filled card that stacks those rows, styled by `LinagoraPersonTileStyle.material()` or `.dark()`.
+* `String.initials` and `String.isVisuallyBlank`: up to two grapheme-safe initials from a name or email local-part, and a blank check that treats whitespace and format characters as empty.
 
 ### Changed
 
+* `LinagoraPersonTileAction` always draws the package delete SVG
+  (`LinagoraDesignImages.deleteIcon`) at `#7A7781` in material style; the
+  caller no longer passes an `IconData`.
+* `LinagoraTileGroup` draws a divider between each pair of children so a
+  multi-row card matches the access-list outline (single outer border,
+  shared separators).
 * `LinagoraSidebarSectionHeaderAction` pads its circular `InkResponse` to
   `sectionHeaderActionTargetSize` around the glyph box, and draws an
   `iconWidget` at `sectionHeaderActionIconSize`.
