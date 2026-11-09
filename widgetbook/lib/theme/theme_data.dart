@@ -30,7 +30,11 @@ abstract class TwakeThemes {
       snackBarTheme: const SnackBarThemeData(
         behavior: SnackBarBehavior.floating,
       ),
-      scaffoldBackgroundColor: LinagoraSysColors.material().onPrimary,
+      scaffoldBackgroundColor: _pick(
+        brightness,
+        (c) => c.onPrimary,
+        (c) => c.surfaceDark,
+      ),
       dividerColor: brightness == Brightness.light
           ? Colors.blueGrey.shade50
           : Colors.blueGrey.shade900,
