@@ -44,7 +44,7 @@ class LinagoraAccountMenuActions extends StatelessWidget {
               key: manageKey,
               name: manageLabel,
               onTap: onManageAccount,
-              style: tokens.tileStyle,
+              style: tokens.footerTileStyle,
               avatar: _icon(
                 LinagoraDesignImages.accountManageIcon,
                 tokens.footerIconSize,
@@ -58,7 +58,7 @@ class LinagoraAccountMenuActions extends StatelessWidget {
             key: signOutKey,
             name: signOutLabel,
             onTap: onSignOut,
-            style: tokens.tileStyle,
+            style: tokens.footerTileStyle,
             avatar: _icon(
               LinagoraDesignImages.accountSignOutIcon,
               tokens.footerIconSize,

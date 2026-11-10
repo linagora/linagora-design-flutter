@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:linagora_design_flutter/colors/linagora_sys_colors.dart';
 import 'package:linagora_design_flutter/list_item/linagora_person_tile_style.dart';
 import 'package:linagora_design_flutter/style/linagora_text_theme.dart';
+import 'package:linagora_design_flutter/style/linagora_typography.dart';
 
 /// Tokens for [LinagoraAccountSwitcher] and [LinagoraAccountMenu].
 ///
@@ -59,8 +60,11 @@ class LinagoraAccountSwitcherStyle {
   final double footerIconSize;
   final Color footerIconColor;
 
-  /// Rows of the menu.
+  /// Rows of the account list.
   final LinagoraPersonTileStyle tileStyle;
+
+  /// Manage / Sign out rows: shorter than account rows, with a tighter start inset.
+  final LinagoraPersonTileStyle footerTileStyle;
 
   const LinagoraAccountSwitcherStyle({
     required this.chipHeight,
@@ -103,6 +107,7 @@ class LinagoraAccountSwitcherStyle {
     required this.footerIconSize,
     required this.footerIconColor,
     required this.tileStyle,
+    required this.footerTileStyle,
   });
 
   static final LinagoraAccountSwitcherStyle _material = _build((
@@ -113,7 +118,8 @@ class LinagoraAccountSwitcherStyle {
     chipHoverColor: const Color(0x0A424244),
     surfaceColor: Colors.white,
     accentColor: LinagoraSysColors.material().primary,
-    dividerColor: const Color(0x29424244),
+    dividerColor:
+        LinagoraSysColors.material().surfaceTint.withValues(alpha: 0.16),
     tileStyle: LinagoraPersonTileStyle.material(),
   ));
 
@@ -145,6 +151,8 @@ class LinagoraAccountSwitcherStyle {
     }) colors,
   ) {
     final text = LinagoraTextTheme.material();
+    final type = LinagoraTypography.material();
+    final rowText = type.body2.copyWith(color: colors.textColor);
     return LinagoraAccountSwitcherStyle(
       chipHeight: 32,
       chipRadius: 8,
@@ -179,32 +187,27 @@ class LinagoraAccountSwitcherStyle {
         ),
       ],
       // Horizontal inset lives on header / sections / itemPadding so footer
-      // dividers can paint edge-to-edge (Figma stand-alone menu).
-      menuPadding: const EdgeInsets.fromLTRB(0, 12, 0, 12),
+      // dividers can paint edge-to-edge.
+      menuPadding: const EdgeInsets.fromLTRB(0, 12, 0, 16),
       menuOffset: 6,
       sectionTextStyle: text.labelMedium!.copyWith(color: colors.textColor),
-      // Space between "Your mailbox" and "Delegated to you" (Figma stand-alone).
-      // 16 matches the previous menuPadding horizontal so text inset is unchanged.
-      sectionPadding: const EdgeInsetsDirectional.fromSTEB(16, 8, 16, 4),
-      sectionGap: 12,
+      // Top 4 + menu top 12 → first title at 16; bottom 8 is title→row.
+      // sectionGap 0 → row→next title stays 4 (section top only).
+      sectionPadding: const EdgeInsetsDirectional.fromSTEB(16, 4, 16, 8),
+      sectionGap: 0,
       // Keeps the selected soft-rect highlight ~16px off the menu border.
       itemPadding: const EdgeInsets.symmetric(horizontal: 16),
       checkIconSize: 24,
       checkIconColor: colors.accentColor,
-      headerPadding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
-      headerAvatarSize: 48,
-      headerAvatarGap: 12,
-      headerNameTextStyle: text.titleMedium!.copyWith(
-        fontWeight: FontWeight.w600,
-        color: colors.textColor,
-      ),
-      headerEmailGap: 4,
-      headerEmailTextStyle: text.bodyMedium!.copyWith(
-        color: colors.secondaryColor,
-      ),
+      headerPadding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
+      headerAvatarSize: 32,
+      headerAvatarGap: 8,
+      headerNameTextStyle: type.h4.copyWith(color: colors.textColor),
+      headerEmailGap: 8,
+      headerEmailTextStyle: type.body2.copyWith(color: colors.secondaryColor),
       headerCopyGap: 4,
       headerCopySize: 24,
-      headerCopyIconSize: 16,
+      headerCopyIconSize: 24,
       headerCopyColor: colors.secondaryColor,
       headerBadgeGap: 12,
       // Divider + breathing room before Manage / Sign out; rows stay tight.
@@ -213,16 +216,26 @@ class LinagoraAccountSwitcherStyle {
       // Icon frame is 20 (glyph ~16.67).
       footerIconSize: 20,
       footerIconColor: colors.secondaryColor,
+      // Person-tile defaults already match account rows (56 / 32 / py 8).
+      // End pad 8 + a trailing box of avatarSize centres the 24 check 12 from the edge.
       tileStyle: colors.tileStyle.copyWith(
-        minHeight: 44,
-        avatarSize: 28,
-        // Inner content pad; horizontal inset from the menu is [itemPadding].
-        padding: const EdgeInsetsDirectional.fromSTEB(8, 6, 8, 6),
+        padding: const EdgeInsetsDirectional.fromSTEB(16, 8, 8, 8),
         avatarGap: 8,
         trailingGap: 8,
-        subtitleGap: 2,
+        subtitleGap: 4,
         tileRadius: 8,
-        nameTextStyle: text.bodyMedium!.copyWith(color: colors.textColor),
+        nameTextStyle: rowText,
+      ),
+      // Footer items are 40 high (py 4); start 8 + itemPadding 16 and a 20
+      // avatar slot put the manage / sign-out glyph at x24.
+      footerTileStyle: colors.tileStyle.copyWith(
+        minHeight: 40,
+        avatarSize: 20,
+        padding: const EdgeInsetsDirectional.fromSTEB(8, 4, 8, 4),
+        avatarGap: 8,
+        trailingGap: 8,
+        tileRadius: 8,
+        nameTextStyle: rowText,
       ),
     );
   }
@@ -245,7 +258,17 @@ class LinagoraAccountSwitcherStyle {
   LinagoraAccountSwitcherStyle avatarMenu() {
     return copyWith(
       menuWidth: 326,
-      menuPadding: const EdgeInsets.fromLTRB(0, 8, 0, 12),
+      menuRadius: 14,
+      menuPadding: const EdgeInsets.fromLTRB(0, 16, 0, 8),
+      // Titles at x24; sectionGap 8 + title top 4 → 12 from a row to the next title.
+      sectionPadding: const EdgeInsetsDirectional.fromSTEB(24, 4, 24, 8),
+      sectionGap: 8,
+      // Rows at ~x19.5 so the highlight is 287 wide in a 326 panel.
+      itemPadding: const EdgeInsets.symmetric(horizontal: 19.5),
+      // 19.5 + 4.5 keeps footer icons at x24 after the wider row inset.
+      footerTileStyle: footerTileStyle.copyWith(
+        padding: const EdgeInsetsDirectional.fromSTEB(4.5, 4, 8, 4),
+      ),
     );
   }
 
@@ -291,6 +314,7 @@ class LinagoraAccountSwitcherStyle {
     double? footerIconSize,
     Color? footerIconColor,
     LinagoraPersonTileStyle? tileStyle,
+    LinagoraPersonTileStyle? footerTileStyle,
   }) {
     return LinagoraAccountSwitcherStyle(
       chipHeight: chipHeight ?? this.chipHeight,
@@ -333,6 +357,7 @@ class LinagoraAccountSwitcherStyle {
       footerIconSize: footerIconSize ?? this.footerIconSize,
       footerIconColor: footerIconColor ?? this.footerIconColor,
       tileStyle: tileStyle ?? this.tileStyle,
+      footerTileStyle: footerTileStyle ?? this.footerTileStyle,
     );
   }
 }

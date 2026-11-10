@@ -131,10 +131,15 @@ class LinagoraAccountMenu<T> extends StatelessWidget {
         onTap: () => onSelected(item.id),
         style: tokens.tileStyle,
         trailing: selected
-            ? Icon(
-                Icons.check,
-                size: tokens.checkIconSize,
-                color: tokens.checkIconColor,
+            ? SizedBox.square(
+                dimension: tokens.tileStyle.avatarSize,
+                child: Center(
+                  child: Icon(
+                    Icons.check,
+                    size: tokens.checkIconSize,
+                    color: tokens.checkIconColor,
+                  ),
+                ),
               )
             : null,
       ),
