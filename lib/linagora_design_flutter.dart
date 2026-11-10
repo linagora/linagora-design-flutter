@@ -42,7 +42,11 @@ export 'package:linagora_design_flutter/account_switcher/linagora_account_switch
 export 'package:linagora_design_flutter/list_item/linagora_person_tile.dart';
 export 'package:linagora_design_flutter/list_item/linagora_person_tile_style.dart';
 export 'package:linagora_design_flutter/list_item/linagora_tile_group.dart';
+export 'package:linagora_design_flutter/chips/linagora_dismissible_chip.dart';
+export 'package:linagora_design_flutter/chips/linagora_dismissible_chip_style.dart';
 export 'package:linagora_design_flutter/chips/linagora_filter_chip.dart';
+export 'package:linagora_design_flutter/chips/linagora_status_badge.dart';
+export 'package:linagora_design_flutter/chips/linagora_status_badge_style.dart';
 export 'package:linagora_design_flutter/cozy_config_manager/cozy_config_manager.dart';
 export 'package:linagora_design_flutter/reaction/reaction_dialog.dart';
 export 'package:linagora_design_flutter/reaction/linagora_reaction_chip.dart';
