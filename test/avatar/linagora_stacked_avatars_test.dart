@@ -22,13 +22,14 @@ Widget _avatar(String id) {
 
 void main() {
   group('LinagoraStackedAvatars', () {
-    testWidgets('overlaps avatars by 4 and sizes the row to fit', _overlaps);
-    testWidgets('puts later avatars on top', _laterAvatarOnTop);
+    testWidgets('overlaps avatars by 6 and sizes the row to fit', _overlaps);
+    testWidgets('puts the first avatar on top', _firstAvatarOnTop);
     testWidgets(
       'sums up the avatars beyond maxVisible in a +N bubble',
       _overflow,
     );
     testWidgets('keeps a two-digit overflow count readable', _twoDigitOverflow);
+    testWidgets('scales the overflow count with text scale', _overflowScales);
     testWidgets('draws a white ring around each avatar', _ring);
     testWidgets('starts from the right in RTL', _rtl);
     testWidgets('keeps +N left-to-right in RTL', _overflowStaysLtrInRtl);
@@ -53,22 +54,22 @@ Future<void> _overlaps(WidgetTester tester) async {
 
   expect(
     tester.getSize(find.byType(LinagoraStackedAvatars)),
-    const Size(60, 32),
+    const Size(58, 32),
   );
-  expect(row.owner.left - row.me.left, 28);
+  expect(row.owner.left - row.me.left, 26);
 }
 
-Future<void> _laterAvatarOnTop(WidgetTester tester) async {
+Future<void> _firstAvatarOnTop(WidgetTester tester) async {
   await tester.pumpWidget(
     _host(LinagoraStackedAvatars(avatars: [_avatar('me'), _avatar('owner')])),
   );
 
   final hit = tester.hitTestOnBinding(
-    tester.getRect(find.byKey(const ValueKey('owner'))).centerLeft +
+    tester.getRect(find.byKey(const ValueKey('me'))).centerRight -
         const Offset(2, 0),
   );
-  final owner = tester.renderObject(find.byKey(const ValueKey('owner')));
-  expect(hit.path.any((entry) => entry.target == owner), isTrue);
+  final me = tester.renderObject(find.byKey(const ValueKey('me')));
+  expect(hit.path.any((entry) => entry.target == me), isTrue);
 }
 
 Future<void> _overflow(WidgetTester tester) async {
@@ -85,7 +86,7 @@ Future<void> _overflow(WidgetTester tester) async {
   expect(find.text('+2'), findsOneWidget);
   expect(
     tester.getSize(find.byType(LinagoraStackedAvatars)).width,
-    32 + 28 * 2,
+    32 + 26 * 2,
   );
 }
 
@@ -109,6 +110,29 @@ Future<void> _twoDigitOverflow(WidgetTester tester) async {
         .offset,
     greaterThan(1),
     reason: 'the tens digit must stay hittable inside the ring',
+  );
+}
+
+Future<void> _overflowScales(WidgetTester tester) async {
+  await tester.pumpWidget(
+    MediaQuery(
+      data: const MediaQueryData(textScaler: TextScaler.linear(2)),
+      child: _host(
+        LinagoraStackedAvatars(
+          maxVisible: 1,
+          avatars: [_avatar('a'), _avatar('b')],
+        ),
+      ),
+    ),
+  );
+
+  expect(tester.takeException(), isNull);
+  expect(find.text('+1'), findsOneWidget);
+  expect(
+    tester.getSize(find.text('+1')).height,
+    greaterThan(
+      LinagoraStackedAvatarsStyle.material().overflowTextStyle.fontSize!,
+    ),
   );
 }
 
@@ -160,7 +184,7 @@ Future<void> _ring(WidgetTester tester) async {
 Future<void> _rtl(WidgetTester tester) async {
   final row = await _twoAvatars(tester, textDirection: TextDirection.rtl);
 
-  expect(row.me.right - row.owner.right, 28);
+  expect(row.me.right - row.owner.right, 26);
 }
 
 Future<({Rect me, Rect owner})> _twoAvatars(

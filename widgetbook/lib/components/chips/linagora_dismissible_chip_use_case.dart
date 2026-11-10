@@ -30,7 +30,7 @@ Widget linagoraDismissibleChipUseCase(BuildContext context) {
           dismissTooltip: 'Back to my mailbox',
           onDismissed: () {},
           leading: showLeading
-              ? RoundAvatar(text: 'NH', size: 20, textStyle: _initialsStyle(20))
+              ? RoundAvatar(text: 'NH', size: 16, textStyle: _initialsStyle(16))
               : null,
         ),
       ),

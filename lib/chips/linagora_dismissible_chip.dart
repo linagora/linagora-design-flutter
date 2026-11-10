@@ -6,12 +6,13 @@ import 'package:linagora_design_flutter/chips/linagora_dismissible_chip_style.da
 /// A chip with a label and a close button, such as "Viewing Nora Hale", used
 /// to leave the account on screen.
 ///
-/// Ellipsis needs a finite max width. In a [Row], wrap the chip in [Flexible]
-/// (or [Expanded]); a loose [Align] inside a sized box also works.
+/// Ellipsis needs a finite max width. In a [Row], wrap the chip in [Flexible].
+/// A loose [Align] inside a sized box also works. Prefer [Flexible] over
+/// [Expanded] so a short label does not stretch across the row.
 ///
 /// The close control keeps a [LinagoraDismissibleChipStyle.dismissTargetSize]
-/// hit box. When that is taller than the painted pill, the layout height grows
-/// so taps above and below the pill still dismiss.
+/// hit box. The painted pill stays content-sized; the hit box may overhang
+/// past the pill so taps still meet the Android 48dp target.
 class LinagoraDismissibleChip extends StatelessWidget {
   static const Key dismissKey = ValueKey('linagora_dismissible_chip_dismiss');
 
@@ -41,78 +42,96 @@ class LinagoraDismissibleChip extends StatelessWidget {
   Widget build(BuildContext context) {
     final tokens = style ?? LinagoraDismissibleChipStyle.material();
     final leading = this.leading;
+    final textDirection = Directionality.of(context);
     final pillHeight = MediaQuery.textScalerOf(context).scale(tokens.height);
     final target = math.max(tokens.dismissTargetSize, pillHeight);
     final layoutHeight = math.max(pillHeight, target);
+    final endPad = _endInset(tokens.padding, textDirection);
+    // Keep the 48dp target; let it stick out past the pill's end padding.
+    final overhang = math.max(0.0, target / 2 - endPad - tokens.iconSize / 2);
 
-    return SizedBox(
-      height: layoutHeight,
-      child: LayoutBuilder(
-        builder: (context, constraints) {
-          final label = Text(
-            this.label,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-            style: tokens.textStyle,
-          );
-          return Stack(
-            alignment: Alignment.center,
-            children: [
-              Positioned.fill(
-                child: Center(
-                  child: Container(
-                    height: pillHeight,
-                    decoration: BoxDecoration(
-                      color: tokens.color,
-                      borderRadius: BorderRadius.circular(tokens.radius),
-                      border: tokens.borderWidth <= 0
-                          ? null
-                          : Border.all(
-                              color: tokens.borderColor,
-                              width: tokens.borderWidth,
-                            ),
-                    ),
-                  ),
-                ),
+    final pill = Container(
+      height: pillHeight,
+      padding: tokens.padding,
+      decoration: BoxDecoration(
+        color: tokens.color,
+        borderRadius: BorderRadius.circular(tokens.radius),
+        border: tokens.borderWidth <= 0
+            ? null
+            : Border.all(
+                color: tokens.borderColor,
+                width: tokens.borderWidth,
               ),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          if (leading != null) ...[
+            leading,
+            SizedBox(width: tokens.gap),
+          ],
+          Flexible(
+            fit: FlexFit.loose,
+            child: Text(
+              label,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: tokens.textStyle,
+            ),
+          ),
+          SizedBox(width: tokens.gap),
+          SizedBox(width: tokens.iconSize),
+        ],
+      ),
+    );
+
+    // Align drops a tight minWidth from Expanded/stretch so the Stack
+    // shrink-wraps the pill and the close control stays on its end slot.
+    return Align(
+      alignment: AlignmentDirectional.centerStart,
+      widthFactor: 1,
+      heightFactor: 1,
+      child: ConstrainedBox(
+        constraints: BoxConstraints(maxWidth: MediaQuery.sizeOf(context).width),
+        child: SizedBox(
+          height: layoutHeight,
+          child: Stack(
+            alignment: Alignment.center,
+            clipBehavior: Clip.none,
+            children: [
               Padding(
-                padding: tokens.padding,
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    if (leading != null) ...[
-                      leading,
-                      SizedBox(width: tokens.gap),
-                    ],
-                    if (constraints.hasBoundedWidth)
-                      Flexible(child: label)
-                    else
-                      label,
-                    _dismissButton(tokens, target),
-                  ],
+                padding: EdgeInsetsDirectional.only(end: overhang),
+                child: pill,
+              ),
+              PositionedDirectional(
+                end: 0,
+                top: (layoutHeight - target) / 2,
+                width: target,
+                height: target,
+                child: IconButton(
+                  key: dismissButtonKey ?? dismissKey,
+                  tooltip: dismissTooltip,
+                  onPressed: onDismissed,
+                  padding: EdgeInsets.zero,
+                  constraints: BoxConstraints.tight(Size.square(target)),
+                  style: IconButton.styleFrom(
+                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                    minimumSize: Size.square(target),
+                  ),
+                  iconSize: tokens.iconSize,
+                  color: tokens.iconColor,
+                  icon: const Icon(Icons.close),
                 ),
               ),
             ],
-          );
-        },
+          ),
+        ),
       ),
     );
   }
 
-  Widget _dismissButton(LinagoraDismissibleChipStyle tokens, double target) {
-    return IconButton(
-      key: dismissButtonKey ?? dismissKey,
-      tooltip: dismissTooltip,
-      onPressed: onDismissed,
-      padding: EdgeInsets.zero,
-      constraints: BoxConstraints.tight(Size.square(target)),
-      style: IconButton.styleFrom(
-        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-        minimumSize: Size.square(target),
-      ),
-      iconSize: tokens.iconSize,
-      color: tokens.iconColor,
-      icon: const Icon(Icons.close),
-    );
+  static double _endInset(EdgeInsetsGeometry padding, TextDirection direction) {
+    final resolved = padding.resolve(direction);
+    return direction == TextDirection.rtl ? resolved.left : resolved.right;
   }
 }

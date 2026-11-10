@@ -12,7 +12,7 @@ class LinagoraDismissibleChipStyle {
   final double borderWidth;
   final EdgeInsetsGeometry padding;
 
-  /// Gap between the leading widget and the label.
+  /// Gap between leading, label and the close icon slot.
   final double gap;
   final TextStyle textStyle;
   final double iconSize;
@@ -36,9 +36,9 @@ class LinagoraDismissibleChipStyle {
     required this.dismissTargetSize,
   });
 
-  // Fill sampled from Twake Mail stand-alone Figma (#F5F6FA); soft square, no stroke.
+  // Fill from Viewing chip 12517-22586 (background/default).
   static final LinagoraDismissibleChipStyle _material = _build(
-    color: const Color(0xFFF5F6FA),
+    color: const Color(0xFFF3F6F9),
     borderColor: const Color(0x00000000),
     textColor: const Color(0xE5424244),
     iconColor: const Color(0xA3424244),
@@ -63,19 +63,17 @@ class LinagoraDismissibleChipStyle {
   }) {
     return LinagoraDismissibleChipStyle(
       height: 32,
-      // Soft square (Figma Viewing chip); not a stadium/pill.
-      radius: 6,
+      // Soft square Viewing chip; not a stadium.
+      radius: 8,
       color: color,
       borderColor: borderColor,
       borderWidth: 0,
-      padding: const EdgeInsetsDirectional.only(start: 8),
-      gap: 6,
-      textStyle: LinagoraTextTheme.material().bodyMedium!.copyWith(
-        fontWeight: FontWeight.w400,
-        letterSpacing: 0,
+      padding: const EdgeInsetsDirectional.only(start: 12, end: 8),
+      gap: 4,
+      textStyle: LinagoraTextTheme.material().labelMedium!.copyWith(
         color: textColor,
       ),
-      iconSize: 18,
+      iconSize: 16,
       iconColor: iconColor,
       dismissTargetSize: 48,
     );

@@ -34,7 +34,7 @@ class LinagoraStatusBadgeStyle {
   }) {
     return LinagoraStatusBadgeStyle(
       color: color,
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       textStyle: LinagoraTextTheme.material().labelMedium!.copyWith(
         color: textColor,
       ),

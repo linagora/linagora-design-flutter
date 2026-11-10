@@ -27,9 +27,13 @@ ShapeDecoration _decoration(WidgetTester tester) {
 
 void main() {
   group('LinagoraStatusBadge', () {
-    testWidgets('is a 28 high blue pill with the label', _pill);
+    testWidgets('is a 32 high blue pill with the label', _pill);
     testWidgets('uses the dark tokens when given', _dark);
     testWidgets('ellipsizes a long label without overflow', _ellipsizes);
+    testWidgets(
+      'ellipsizes beside a sibling when wrapped in Flexible',
+      _ellipsizesInRow,
+    );
   });
   test('copyWith overrides one field and keeps the rest', _copyWith);
 }
@@ -40,7 +44,7 @@ Future<void> _pill(WidgetTester tester) async {
   );
 
   expect(find.text('Delegated mailbox'), findsOneWidget);
-  expect(tester.getSize(find.byType(LinagoraStatusBadge)).height, 28);
+  expect(tester.getSize(find.byType(LinagoraStatusBadge)).height, 32);
   final decoration = _decoration(tester);
   expect(decoration.shape, const StadiumBorder());
   expect(decoration.color, const Color(0x140A84FF));
@@ -76,6 +80,35 @@ Future<void> _ellipsizes(WidgetTester tester) async {
   );
 
   expect(tester.takeException(), isNull);
+  expect(
+    tester.renderObject<RenderParagraph>(find.text(label)).didExceedMaxLines,
+    isTrue,
+  );
+}
+
+Future<void> _ellipsizesInRow(WidgetTester tester) async {
+  const label = 'A very long state name that cannot fit in the badge';
+  await tester.pumpWidget(
+    MaterialApp(
+      home: Scaffold(
+        body: SizedBox(
+          width: 360,
+          child: Row(
+            children: [
+              const Text('Inbox'),
+              Flexible(child: LinagoraStatusBadge(label: label)),
+            ],
+          ),
+        ),
+      ),
+    ),
+  );
+
+  expect(tester.takeException(), isNull);
+  expect(
+    tester.getSize(find.byType(LinagoraStatusBadge)).width,
+    lessThan(360),
+  );
   expect(
     tester.renderObject<RenderParagraph>(find.text(label)).didExceedMaxLines,
     isTrue,

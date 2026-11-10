@@ -32,6 +32,11 @@ void main() {
       'keeps a 48dp close target around a 32 high pill',
       _tapTarget,
     );
+    testWidgets(
+      'keeps the close icon on the pill under a tight width',
+      _tightWidth,
+    );
+    testWidgets('lays out under IntrinsicHeight', _intrinsicHeight);
   });
   group('LinagoraDismissibleChipStyle', () {
     testWidgets('paints the dark tokens', _darkChip);
@@ -54,7 +59,7 @@ Future<void> _pill(WidgetTester tester) async {
   final chip = tester.getRect(find.byType(LinagoraDismissibleChip));
   final close = tester.getRect(find.byKey(LinagoraDismissibleChip.dismissKey));
   expect(chip.height, 48);
-  expect(_pillHeight(tester), 32);
+  expect(_pillRect(tester).height, 32);
   expect(find.text('Viewing Nora Hale'), findsOneWidget);
   expect(close.size, const Size(48, 48));
   expect(close.center.dy, closeTo(chip.center.dy, 0.5));
@@ -69,9 +74,9 @@ Future<void> _pill(WidgetTester tester) async {
               )
               .decoration
           as BoxDecoration;
-  expect(decoration.borderRadius, BorderRadius.circular(6));
+  expect(decoration.borderRadius, BorderRadius.circular(8));
   expect(decoration.border, isNull);
-  expect(decoration.color, const Color(0xFFF5F6FA));
+  expect(decoration.color, const Color(0xFFF3F6F9));
 
   await tester.tapAt(close.center);
   expect(dismissed, 1);
@@ -107,17 +112,6 @@ Future<void> _rtl(WidgetTester tester) async {
     tester.getRect(find.byKey(LinagoraDismissibleChip.dismissKey)).left,
     lessThan(tester.getRect(find.text('Viewing Nora Hale')).left),
   );
-}
-
-double _pillHeight(WidgetTester tester) {
-  return tester
-      .getSize(
-        find.descendant(
-          of: find.byType(LinagoraDismissibleChip),
-          matching: find.byType(Container),
-        ),
-      )
-      .height;
 }
 
 Future<void> _leading(WidgetTester tester) async {
@@ -282,12 +276,14 @@ Future<void> _tapTarget(WidgetTester tester) async {
   );
 
   expect(tester.getSize(find.byType(LinagoraDismissibleChip)).height, 48);
-  expect(_pillHeight(tester), 32);
+  expect(_pillRect(tester).height, 32);
   expect(
     tester.getSize(find.byKey(LinagoraDismissibleChip.dismissKey)),
     const Size(48, 48),
   );
   final close = tester.getRect(find.byKey(LinagoraDismissibleChip.dismissKey));
+  _expectIconOnPill(tester);
+  expect(close.right, greaterThan(_pillRect(tester).right));
   await tester.tapAt(Offset(close.center.dx, close.top + 1));
   await tester.tapAt(Offset(close.center.dx, close.bottom - 1));
   await tester.tapAt(Offset(close.left + 1, close.center.dy));
@@ -295,6 +291,122 @@ Future<void> _tapTarget(WidgetTester tester) async {
   expect(dismissed, 4);
   await expectLater(tester, meetsGuideline(androidTapTargetGuideline));
   handle.dispose();
+}
+
+Future<void> _tightWidth(WidgetTester tester) async {
+  await tester.pumpWidget(
+    MaterialApp(
+      home: Scaffold(
+        body: SizedBox(
+          width: 360,
+          child: Row(
+            children: [
+              const Text('Inbox'),
+              Expanded(
+                child: LinagoraDismissibleChip(
+                  label: 'Viewing Nora Hale',
+                  dismissTooltip: 'Back to my mailbox',
+                  onDismissed: () {},
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    ),
+  );
+
+  _expectIconOnPill(tester);
+
+  await tester.pumpWidget(
+    MaterialApp(
+      home: Directionality(
+        textDirection: TextDirection.rtl,
+        child: Scaffold(
+          body: SizedBox(
+            width: 360,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                LinagoraDismissibleChip(
+                  label: 'Viewing Nora Hale',
+                  dismissTooltip: 'Back to my mailbox',
+                  onDismissed: () {},
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    ),
+  );
+
+  _expectIconOnPill(tester);
+}
+
+Future<void> _intrinsicHeight(WidgetTester tester) async {
+  const label = 'Viewing a very long owner name that cannot fit here';
+  await tester.pumpWidget(
+    _host(
+      IntrinsicHeight(
+        child: Row(
+          children: [
+            const Text('Inbox'),
+            Flexible(
+              child: LinagoraDismissibleChip(
+                label: label,
+                dismissTooltip: 'Back to my mailbox',
+                onDismissed: () {},
+              ),
+            ),
+          ],
+        ),
+      ),
+    ),
+  );
+
+  expect(tester.takeException(), isNull);
+  expect(
+    tester.getSize(find.byType(LinagoraDismissibleChip)).width,
+    lessThanOrEqualTo(400),
+  );
+  expect(
+    tester.renderObject<RenderParagraph>(find.text(label)).didExceedMaxLines,
+    isTrue,
+  );
+}
+
+Rect _pillRect(WidgetTester tester) {
+  return tester.getRect(
+    find.descendant(
+      of: find.byType(LinagoraDismissibleChip),
+      matching: find.byType(Container),
+    ),
+  );
+}
+
+void _expectIconOnPill(WidgetTester tester) {
+  final tokens = LinagoraDismissibleChipStyle.material();
+  final direction = Directionality.of(
+    tester.element(find.byType(LinagoraDismissibleChip)),
+  );
+  final resolved = tokens.padding.resolve(direction);
+  final endPad =
+      direction == TextDirection.rtl ? resolved.left : resolved.right;
+  final pill = _pillRect(tester);
+  final close = tester.getRect(find.byKey(LinagoraDismissibleChip.dismissKey));
+  final label = tester.getRect(find.textContaining('Viewing'));
+  final iconStart = close.center.dx - tokens.iconSize / 2;
+  final iconEnd = close.center.dx + tokens.iconSize / 2;
+  if (direction == TextDirection.rtl) {
+    expect(label.left - iconEnd, closeTo(tokens.gap, 0.5));
+    expect(iconStart - pill.left, closeTo(endPad, 0.5));
+  } else {
+    expect(iconStart - label.right, closeTo(tokens.gap, 0.5));
+    expect(pill.right - iconEnd, closeTo(endPad, 0.5));
+  }
+  expect(close.center.dy, closeTo(pill.center.dy, 0.5));
+  expect(close.center.dy, closeTo(label.center.dy, 0.5));
 }
 
 void _copyWith() {

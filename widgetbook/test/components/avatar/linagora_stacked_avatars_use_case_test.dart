@@ -55,6 +55,7 @@ Future<void> _defaultChip(WidgetTester tester) async {
   );
   expect(chip.label, 'Viewing Nora Hale');
   expect(chip.leading, isA<RoundAvatar>());
+  expect((chip.leading! as RoundAvatar).size, 16);
 }
 
 Future<void> _leadingKnob(WidgetTester tester) async {

@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:linagora_design_flutter/avatar/linagora_stacked_avatars_style.dart';
 
 /// Overlapping round avatars, e.g. "me + the owner" while viewing a
-/// delegated mailbox. Later avatars sit on top; beyond [maxVisible] the rest
-/// are summed up in a "+N" bubble.
+/// delegated mailbox. The first avatar sits on top; beyond [maxVisible] the
+/// rest are summed up in a "+N" bubble.
 class LinagoraStackedAvatars extends StatelessWidget {
   final List<Widget> avatars;
   final int maxVisible;
@@ -46,11 +46,12 @@ class LinagoraStackedAvatars extends StatelessWidget {
       height: size,
       child: Stack(
         children: [
-          for (final (index, bubble) in bubbles.indexed)
+          // Paint last→first so index 0 ends on top.
+          for (var index = bubbles.length - 1; index >= 0; index--)
             PositionedDirectional(
               start: step * index,
               top: 0,
-              child: _ring(tokens, bubble),
+              child: _ring(tokens, bubbles[index]),
             ),
         ],
       ),
@@ -97,7 +98,6 @@ class _OverflowBubble extends StatelessWidget {
           '+$count',
           maxLines: 1,
           textDirection: TextDirection.ltr,
-          textScaler: TextScaler.noScaling,
           style: textStyle,
         ),
       ),

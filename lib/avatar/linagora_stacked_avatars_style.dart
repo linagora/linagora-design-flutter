@@ -6,7 +6,7 @@ import 'package:linagora_design_flutter/style/linagora_text_theme.dart';
 class LinagoraStackedAvatarsStyle {
   final double size;
 
-  /// How much each avatar covers the previous one.
+  /// How much each later avatar is tucked under the earlier one.
   final double overlap;
 
   /// Matches the surface behind the avatars so each one looks cut out.
@@ -47,7 +47,7 @@ class LinagoraStackedAvatarsStyle {
   }) {
     return LinagoraStackedAvatarsStyle(
       size: 32,
-      overlap: 4,
+      overlap: 6,
       ringColor: ringColor,
       ringWidth: 2,
       overflowColor: overflowColor,
