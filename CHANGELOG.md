@@ -13,7 +13,7 @@
   drawn edge to edge, so both show at the exact symbol size.
 * `LinagoraDesignImages.deleteIcon`: outline trash glyph for
   `LinagoraPersonTile` remove actions.
-* `LinagoraAccountSwitcher` and `LinagoraAccountMenu`: a chip that opens an end-aligned menu of host-defined account sections (any titles and item counts—own, delegated, team, …), with a check on the selected row and optional header and footer, styled by `LinagoraAccountSwitcherStyle.material()`, `.dark()`, `.compact()` for the avatar-only chip, or `.avatarMenu()` for the wider profile panel.
+* `LinagoraAccountSwitcher` and `LinagoraAccountMenu`: a chip that opens an end-aligned menu of host-defined account sections (any titles and item counts—own, delegated, team, …), with a check on the selected row and optional header and footer, styled by `LinagoraAccountSwitcherStyle.material()`, `.dark()`, `.compact()` for the avatar-only chip, or `.avatarMenu()` for the wider profile panel. Footer Manage / Sign out rows use `footerTileStyle` (shorter than account rows).
 * `LinagoraAccountMenuHeader`, `LinagoraAccountMenuActions` and `LinagoraAccountMenuShell`: the profile block (avatar, name, email with copy, optional badge), the manage / sign-out footer, and the wrapping panel that sizes to its content, caps to the available height and keeps the scrollbar on the panel edge.
 * `LinagoraDesignImages.accountManageIcon` and `accountSignOutIcon`: Figma account-menu icons at Text/icon `#424244` 64%.
 * `LinagoraPersonTile` and `LinagoraTileGroup`: a person or account row (avatar, name, detail, remove button or custom trailing, selected state) and the outlined or filled card that stacks those rows, styled by `LinagoraPersonTileStyle.material()` or `.dark()`.

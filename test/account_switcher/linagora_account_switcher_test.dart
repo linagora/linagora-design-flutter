@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:linagora_design_flutter/linagora_design_flutter.dart';
 
@@ -62,6 +63,12 @@ Future<void> _open(WidgetTester tester) async {
 }
 
 void main() {
+  _menuTests();
+  _styleTests();
+  _switcherTests();
+}
+
+void _menuTests() {
   group('LinagoraAccountMenu', () {
     testWidgets('lists sections in order and checks the selected account', (
       tester,
@@ -81,7 +88,16 @@ void main() {
     testWidgets('names each section for screen readers', _sectionSemantics);
     testWidgets('omits the email line when the account has none', _omitsEmail);
   });
+}
 
+void _styleTests() {
+  group('LinagoraAccountSwitcherStyle', () {
+    test('dropdown tokens match the stand-alone menu', _dropdownTokens);
+    test('avatarMenu widens and retokens the profile panel', _avatarMenuTokens);
+  });
+}
+
+void _switcherTests() {
   group('LinagoraAccountSwitcher', () {
     testWidgets('is a 32 high chip with the label', _chipHeight);
     testWidgets('grows past 32 when the text scale does', _chipGrowsWithText);
@@ -367,7 +383,7 @@ Future<void> _profileChrome(WidgetTester tester) async {
           onSelected: (_) {},
           style: style,
           header: LinagoraAccountMenuHeader(
-            avatar: const SizedBox.square(dimension: 56),
+            avatar: SizedBox.square(dimension: style.headerAvatarSize),
             name: 'Nora Hale',
             email: 'nora.hale@example.com',
             onCopyEmail: () => copied = true,
@@ -392,12 +408,93 @@ Future<void> _profileChrome(WidgetTester tester) async {
   expect(style.menuWidth, 326);
   expect(style.footerIconSize, 20);
   expect(style.footerIconColor, const Color(0xA3424244));
+  final manage = tester.widget<LinagoraPersonTile>(
+    find.byKey(LinagoraAccountMenuActions.manageKey),
+  );
+  expect(manage.style, same(style.footerTileStyle));
+  expect(manage.style!.minHeight, 40);
+  expect(manage.style!.avatarSize, style.footerIconSize);
+  final menuLeft = tester.getRect(find.byType(LinagoraAccountMenu<String>)).left;
+  final manageIcon = find.descendant(
+    of: find.byKey(LinagoraAccountMenuActions.manageKey),
+    matching: find.byType(SvgPicture),
+  );
+  expect(tester.getRect(manageIcon).left - menuLeft, 24);
+  final selectedRow = find.byKey(LinagoraAccountMenu.itemKey('me'));
+  final checkIcon = find.descendant(
+    of: selectedRow,
+    matching: find.byIcon(Icons.check),
+  );
+  expect(
+    tester.getRect(selectedRow).right - tester.getRect(checkIcon).right,
+    12,
+  );
   await tester.tap(find.byKey(LinagoraAccountMenuHeader.copyKey));
   await tester.tap(find.byKey(LinagoraAccountMenuActions.manageKey));
   await tester.tap(find.byKey(LinagoraAccountMenuActions.signOutKey));
   expect(copied, isTrue);
   expect(managed, isTrue);
   expect(signedOut, isTrue);
+}
+
+void _dropdownTokens() {
+  final style = LinagoraAccountSwitcherStyle.material();
+  final type = LinagoraTypography.material();
+  expect(style.menuPadding, const EdgeInsets.fromLTRB(0, 12, 0, 16));
+  expect(
+    style.sectionPadding,
+    const EdgeInsetsDirectional.fromSTEB(16, 4, 16, 8),
+  );
+  expect(style.sectionGap, 0);
+  expect(style.itemPadding, const EdgeInsets.symmetric(horizontal: 16));
+  expect(style.headerPadding, const EdgeInsets.fromLTRB(16, 8, 16, 8));
+  expect(style.headerAvatarSize, 32);
+  expect(style.headerAvatarGap, 8);
+  expect(style.headerEmailGap, 8);
+  expect(style.headerCopyIconSize, 24);
+  expect(style.headerNameTextStyle.fontSize, type.h4.fontSize);
+  expect(style.headerNameTextStyle.height, type.h4.height);
+  expect(style.headerEmailTextStyle.height, type.body2.height);
+  expect(
+    style.footerDividerColor,
+    LinagoraSysColors.material().surfaceTint.withValues(alpha: 0.16),
+  );
+  expect(style.tileStyle.minHeight, 56);
+  expect(style.tileStyle.avatarSize, 32);
+  expect(
+    style.tileStyle.padding,
+    const EdgeInsetsDirectional.fromSTEB(16, 8, 8, 8),
+  );
+  expect(style.tileStyle.subtitleGap, 4);
+  expect(style.tileStyle.nameTextStyle.height, type.body2.height);
+  expect(style.footerTileStyle.minHeight, 40);
+  expect(style.footerTileStyle.avatarSize, style.footerIconSize);
+  expect(
+    style.footerTileStyle.padding,
+    const EdgeInsetsDirectional.fromSTEB(8, 4, 8, 4),
+  );
+  expect(
+    LinagoraAccountSwitcherStyle.dark().footerDividerColor,
+    const Color(0x1FFFFFFF),
+  );
+}
+
+void _avatarMenuTokens() {
+  final style = LinagoraAccountSwitcherStyle.material().avatarMenu();
+  expect(style.menuWidth, 326);
+  expect(style.menuRadius, 14);
+  expect(style.menuPadding, const EdgeInsets.fromLTRB(0, 16, 0, 8));
+  expect(
+    style.sectionPadding,
+    const EdgeInsetsDirectional.fromSTEB(24, 4, 24, 8),
+  );
+  expect(style.sectionGap, 8);
+  expect(style.itemPadding, const EdgeInsets.symmetric(horizontal: 19.5));
+  expect(style.footerTileStyle.avatarSize, style.footerIconSize);
+  expect(
+    style.footerTileStyle.padding,
+    const EdgeInsetsDirectional.fromSTEB(4.5, 4, 8, 4),
+  );
 }
 
 Future<void> _sectionSemantics(WidgetTester tester) async {
