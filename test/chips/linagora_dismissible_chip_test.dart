@@ -36,6 +36,10 @@ void main() {
       'keeps the close icon on the pill under a tight width',
       _tightWidth,
     );
+    testWidgets(
+      'centres the close target on the icon slot when end padding is large',
+      _largeEndPadding,
+    );
     testWidgets('lays out under IntrinsicHeight', _intrinsicHeight);
   });
   group('LinagoraDismissibleChipStyle', () {
@@ -344,6 +348,27 @@ Future<void> _tightWidth(WidgetTester tester) async {
   _expectIconOnPill(tester);
 }
 
+Future<void> _largeEndPadding(WidgetTester tester) async {
+  await tester.pumpWidget(
+    _host(
+      LinagoraDismissibleChip(
+        label: 'Viewing Nora Hale',
+        dismissTooltip: 'Back to my mailbox',
+        onDismissed: () {},
+        style: LinagoraDismissibleChipStyle.material().copyWith(
+          padding: const EdgeInsetsDirectional.only(start: 12, end: 24),
+        ),
+      ),
+    ),
+  );
+
+  _expectIconOnPill(tester);
+  final pill = _pillRect(tester);
+  final close = tester.getRect(find.byKey(LinagoraDismissibleChip.dismissKey));
+  expect(close.right, lessThan(pill.right));
+  expect(close.left, greaterThan(pill.left));
+}
+
 Future<void> _intrinsicHeight(WidgetTester tester) async {
   const label = 'Viewing a very long owner name that cannot fit here';
   await tester.pumpWidget(
@@ -386,7 +411,10 @@ Rect _pillRect(WidgetTester tester) {
 }
 
 void _expectIconOnPill(WidgetTester tester) {
-  final tokens = LinagoraDismissibleChipStyle.material();
+  final chip = tester.widget<LinagoraDismissibleChip>(
+    find.byType(LinagoraDismissibleChip),
+  );
+  final tokens = chip.style ?? LinagoraDismissibleChipStyle.material();
   final direction = Directionality.of(
     tester.element(find.byType(LinagoraDismissibleChip)),
   );

@@ -89,13 +89,13 @@ Future<void> _ellipsizes(WidgetTester tester) async {
 Future<void> _ellipsizesInRow(WidgetTester tester) async {
   const label = 'A very long state name that cannot fit in the badge';
   await tester.pumpWidget(
-    MaterialApp(
+    const MaterialApp(
       home: Scaffold(
         body: SizedBox(
           width: 360,
           child: Row(
             children: [
-              const Text('Inbox'),
+              Text('Inbox'),
               Flexible(child: LinagoraStatusBadge(label: label)),
             ],
           ),

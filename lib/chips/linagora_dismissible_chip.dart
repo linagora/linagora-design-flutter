@@ -47,8 +47,11 @@ class LinagoraDismissibleChip extends StatelessWidget {
     final target = math.max(tokens.dismissTargetSize, pillHeight);
     final layoutHeight = math.max(pillHeight, target);
     final endPad = _endInset(tokens.padding, textDirection);
-    // Keep the 48dp target; let it stick out past the pill's end padding.
-    final overhang = math.max(0.0, target / 2 - endPad - tokens.iconSize / 2);
+    // Centre the 48dp target on the icon slot. Overhang past the pill when
+    // the slot is closer to the trailing edge than target/2, else inset the button.
+    final iconCenterFromEnd = endPad + tokens.iconSize / 2;
+    final overhang = math.max(0.0, target / 2 - iconCenterFromEnd);
+    final dismissEnd = math.max(0.0, iconCenterFromEnd - target / 2);
 
     final pill = Container(
       height: pillHeight,
@@ -104,7 +107,7 @@ class LinagoraDismissibleChip extends StatelessWidget {
                 child: pill,
               ),
               PositionedDirectional(
-                end: 0,
+                end: dismissEnd,
                 top: (layoutHeight - target) / 2,
                 width: target,
                 height: target,
