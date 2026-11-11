@@ -87,6 +87,11 @@ void _menuTests() {
     testWidgets('renders the profile header and action footer', _profileChrome);
     testWidgets('names each section for screen readers', _sectionSemantics);
     testWidgets('omits the email line when the account has none', _omitsEmail);
+    testWidgets('keeps the copy icon 8 after the header email', _headerCopyGap);
+    testWidgets(
+      'starts the footer labels at x60 in the avatar menu',
+      _footerLabelInset,
+    );
   });
 }
 
@@ -114,6 +119,10 @@ void _switcherTests() {
       );
     }
     testWidgets('caps the menu height to the room below', _capsMenuHeight);
+    testWidgets(
+      'caps the menu at menuMaxHeight on a tall screen',
+      _capsAtMenuMaxHeight,
+    );
     testWidgets(
       'opens the menu above when the chip sits at the bottom',
       _opensAboveAtBottom,
@@ -245,7 +254,9 @@ Future<void> _listsSections(WidgetTester tester) async {
   final style = LinagoraAccountSwitcherStyle.material();
   final mira = find.byKey(LinagoraAccountMenu.itemKey('mira'));
   final me = find.byKey(LinagoraAccountMenu.itemKey('me'));
-  final menuLeft = tester.getRect(find.byType(LinagoraAccountMenu<String>)).left;
+  final menuLeft = tester
+      .getRect(find.byType(LinagoraAccountMenu<String>))
+      .left;
   expect(
     tester.getRect(mira).left - menuLeft,
     style.itemPadding.resolve(TextDirection.ltr).left,
@@ -414,7 +425,9 @@ Future<void> _profileChrome(WidgetTester tester) async {
   expect(manage.style, same(style.footerTileStyle));
   expect(manage.style!.minHeight, 40);
   expect(manage.style!.avatarSize, style.footerIconSize);
-  final menuLeft = tester.getRect(find.byType(LinagoraAccountMenu<String>)).left;
+  final menuLeft = tester
+      .getRect(find.byType(LinagoraAccountMenu<String>))
+      .left;
   final manageIcon = find.descendant(
     of: find.byKey(LinagoraAccountMenuActions.manageKey),
     matching: find.byType(SvgPicture),
@@ -722,10 +735,7 @@ Future<void> _nullLabel(WidgetTester tester) async {
   );
 
   expect(find.text('Viewing Nora Hale'), findsNothing);
-  expect(
-    find.descendant(of: _chip, matching: find.byType(Text)),
-    findsNothing,
-  );
+  expect(find.descendant(of: _chip, matching: find.byType(Text)), findsNothing);
   expect(
     tester.getSemantics(_chip),
     containsSemantics(label: 'Switch mailbox', isButton: true),
@@ -822,8 +832,105 @@ RoundedRectangleBorder _chipShape(WidgetTester tester) =>
     tester.widget<Material>(_chipMaterial).shape! as RoundedRectangleBorder;
 
 Finder get _chipMaterial => find.ancestor(
-      of: _chip,
-      matching: find.byWidgetPredicate(
-        (widget) => widget is Material && widget.shape != null,
+  of: _chip,
+  matching: find.byWidgetPredicate(
+    (widget) => widget is Material && widget.shape != null,
+  ),
+);
+
+const _shellKey = ValueKey('account_menu_shell');
+
+Future<void> _pumpAvatarMenu(WidgetTester tester) async {
+  final style = LinagoraAccountSwitcherStyle.material().avatarMenu();
+  await tester.pumpWidget(
+    MaterialApp(
+      home: Scaffold(
+        body: Align(
+          alignment: Alignment.topLeft,
+          child: LinagoraAccountMenuShell(
+            key: _shellKey,
+            maxHeight: 900,
+            style: style,
+            child: LinagoraAccountMenu<String>(
+              sections: _sections,
+              selectedId: 'me',
+              onSelected: (_) {},
+              style: style,
+              header: LinagoraAccountMenuHeader(
+                avatar: const SizedBox(),
+                name: 'Nora Hale',
+                email: 'nora.hale@example.com',
+                onCopyEmail: () {},
+                style: style,
+              ),
+              footer: LinagoraAccountMenuActions(
+                manageLabel: 'Manage account',
+                signOutLabel: 'Sign out',
+                onManageAccount: () {},
+                onSignOut: () {},
+                style: style,
+              ),
+            ),
+          ),
+        ),
       ),
-    );
+    ),
+  );
+}
+
+Future<void> _headerCopyGap(WidgetTester tester) async {
+  await _pumpAvatarMenu(tester);
+
+  final email = tester.getRect(find.text('nora.hale@example.com').first);
+  final copyIcon = tester.getRect(
+    find.descendant(
+      of: find.byKey(LinagoraAccountMenuHeader.copyKey),
+      matching: find.byType(SvgPicture),
+    ),
+  );
+  // Design: email and content_copy sit in a row with an 8 gap.
+  expect(copyIcon.left - email.right, 8);
+}
+
+Future<void> _footerLabelInset(WidgetTester tester) async {
+  await _pumpAvatarMenu(tester);
+
+  final menuLeft = tester.getRect(find.byKey(_shellKey)).left;
+  // Design: icon at x24, 20 wide, then a 16 gap before the label.
+  for (final label in ['Manage account', 'Sign out']) {
+    expect(tester.getRect(find.text(label)).left - menuLeft, 60);
+  }
+}
+
+Future<void> _capsAtMenuMaxHeight(WidgetTester tester) async {
+  tester.view.physicalSize = const Size(800, 2000);
+  tester.view.devicePixelRatio = 1;
+  addTearDown(tester.view.reset);
+  final many = [
+    for (var i = 0; i < 40; i++)
+      LinagoraAccountItem(id: 'd$i', name: 'Delegate $i', email: 'd$i@x.com'),
+  ];
+  await tester.pumpWidget(
+    MaterialApp(
+      home: Scaffold(
+        body: Align(
+          alignment: Alignment.topRight,
+          child: LinagoraAccountSwitcher<String>(
+            label: 'Viewing Nora Hale',
+            sections: [
+              _sections.first,
+              LinagoraAccountSection(title: 'Delegated to you', items: many),
+            ],
+            selectedId: 'me',
+            onSelected: (_) {},
+            menuSemanticLabel: 'Switch mailbox',
+          ),
+        ),
+      ),
+    ),
+  );
+  await _open(tester);
+
+  final maxHeight = LinagoraAccountSwitcherStyle.material().menuMaxHeight;
+  expect(tester.getRect(_menu).height, lessThanOrEqualTo(maxHeight));
+}
