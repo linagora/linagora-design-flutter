@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:linagora_design_flutter/style/linagora_text_theme.dart';
+import 'package:linagora_design_flutter/style/linagora_typography.dart';
 
 /// Tokens for [LinagoraPersonTile] and [LinagoraTileGroup].
 @immutable
@@ -90,7 +91,7 @@ class LinagoraPersonTileStyle {
     }) colors,
   ) {
     final text = LinagoraTextTheme.material();
-    final extension = LinagoraTextThemeExtension.material();
+    final type = LinagoraTypography.material();
     return LinagoraPersonTileStyle(
       minHeight: 56,
       padding: const EdgeInsetsDirectional.fromSTEB(16, 8, 16, 8),
@@ -98,7 +99,7 @@ class LinagoraPersonTileStyle {
       avatarSize: 32,
       avatarGap: 16,
       trailingGap: 16,
-      nameTextStyle: extension.bodyMedium1.copyWith(color: colors.textColor),
+      nameTextStyle: type.body1.copyWith(color: colors.textColor),
       subtitleTextStyle:
           text.labelMedium!.copyWith(color: colors.secondaryTextColor),
       subtitleGap: 1,
@@ -108,7 +109,7 @@ class LinagoraPersonTileStyle {
       selectedColor: colors.selectedColor,
       hoverColor: colors.hoverColor,
       tileRadius: 12,
-      headerTextStyle: text.titleSmall!.copyWith(color: colors.textColor),
+      headerTextStyle: type.h6.copyWith(color: colors.textColor),
       headerGap: 12,
       groupRadius: 12,
       groupBorderColor: colors.groupBorderColor,

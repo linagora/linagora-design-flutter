@@ -128,7 +128,9 @@ void _expectAvatarMetrics(WidgetTester tester) {
 
 void _expectNameBesideAvatar(WidgetTester tester, Rect avatar) {
   expect(tester.getRect(find.text('Nora Hale')).left - avatar.right, 16);
-  expect(tester.widget<Text>(find.text('Nora Hale')).style?.fontSize, 16);
+  final name = tester.widget<Text>(find.text('Nora Hale')).style;
+  expect(name?.fontSize, 16);
+  expect(name?.height, 21 / 16);
 }
 
 Future<void> _omitsAvatar(WidgetTester tester) async {
@@ -188,6 +190,10 @@ Future<void> _actionSkipsRow(WidgetTester tester) async {
   expect(removed, 1);
   expect(rowTaps, 0);
   expect(find.byTooltip('Remove'), findsOneWidget);
+  final action = tester.getRect(find.byKey(LinagoraPersonTile.actionKey));
+  final row = tester.getRect(find.byType(LinagoraPersonTile));
+  expect(action.size, const Size(32, 32));
+  expect(row.right - action.center.dx, 24);
 }
 
 Future<void> _disablesAction(WidgetTester tester) async {
@@ -407,7 +413,7 @@ Future<void> _ellipsizes(WidgetTester tester) async {
     find.text('a.very.long.address.that.does.not.fit@example.com'),
   );
   expect(name.didExceedMaxLines, isTrue);
-  expect(name.size.height, 24);
+  expect(name.size.height, 21);
   expect(detail.didExceedMaxLines, isTrue);
 }
 
@@ -583,6 +589,10 @@ Future<void> _outlinedCard(WidgetTester tester) async {
   );
 
   expect(find.text('Who has access'), findsOneWidget);
+  expect(
+    LinagoraPersonTileStyle.material().headerTextStyle.height,
+    18.4 / 14,
+  );
   expect(find.byType(Divider), findsNWidgets(2));
   _expectOutlinedDecoration(tester);
   _expectHeaderAboveCard(tester);

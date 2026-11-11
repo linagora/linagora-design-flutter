@@ -93,9 +93,16 @@ class LinagoraPersonTile extends StatelessWidget {
   Widget _identity(LinagoraPersonTileStyle tokens) {
     final avatar = this.avatar;
     final trailing = this.trailing;
-    final padding = action == null
-        ? tokens.padding
-        : tokens.padding.copyWith(end: tokens.trailingGap);
+    // Trailing sits under the remove column: keep the 40dp action slot empty.
+    final padding = action != null
+        ? tokens.padding.copyWith(end: tokens.trailingGap)
+        : trailing != null
+            ? tokens.padding.copyWith(
+                end: tokens.padding.end +
+                    tokens.actionButtonSize +
+                    tokens.actionEndPadding,
+              )
+            : tokens.padding;
     final body = ConstrainedBox(
       constraints: BoxConstraints(minHeight: tokens.minHeight),
       child: Padding(
@@ -169,6 +176,10 @@ class LinagoraPersonTile extends StatelessWidget {
     LinagoraPersonTileStyle tokens,
     LinagoraPersonTileAction action,
   ) {
+    final buttonSize = Size(
+      tokens.actionButtonSize,
+      tokens.actionButtonSize,
+    );
     return IconButton(
       key: action.key,
       tooltip: action.tooltip,
@@ -178,16 +189,27 @@ class LinagoraPersonTile extends StatelessWidget {
         width: tokens.actionButtonSize,
         height: tokens.actionButtonSize,
       ),
+      style: IconButton.styleFrom(
+        padding: EdgeInsets.zero,
+        minimumSize: buttonSize,
+        maximumSize: buttonSize,
+        fixedSize: buttonSize,
+        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+        foregroundColor: tokens.actionIconColor,
+      ),
       color: tokens.actionIconColor,
-      icon: SvgPicture.asset(
-        LinagoraDesignImages.deleteIcon,
-        package: LinagoraDesignImages.packageName,
-        width: tokens.actionIconSize,
-        height: tokens.actionIconSize,
-        colorFilter: ColorFilter.mode(
-          tokens.actionIconColor,
-          BlendMode.srcIn,
-        ),
+      icon: Builder(
+        builder: (context) {
+          final color =
+              IconTheme.of(context).color ?? tokens.actionIconColor;
+          return SvgPicture.asset(
+            LinagoraDesignImages.deleteIcon,
+            package: LinagoraDesignImages.packageName,
+            width: tokens.actionIconSize,
+            height: tokens.actionIconSize,
+            colorFilter: ColorFilter.mode(color, BlendMode.srcIn),
+          );
+        },
       ),
     );
   }
