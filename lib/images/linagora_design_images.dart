@@ -12,6 +12,9 @@ class LinagoraDesignImages {
       'assets/images/video_conference_icon.svg';
   static const String copyLinkIcon = 'assets/images/copy_link_icon.svg';
 
+  /// Person-tile remove control (Material delete, outline, `#7A7781`).
+  static const String deleteIcon = 'assets/images/delete_icon.svg';
+
   /// Borderless symbols whose drawing fills the view box, so a
   /// `LinagoraSidebarSectionHeaderAction.iconWidget` shows them at its exact
   /// symbol size.

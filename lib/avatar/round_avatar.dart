@@ -77,8 +77,9 @@ class RoundAvatar extends StatelessWidget {
       gradientColors = text.avatarColors;
     }
 
-    if (text.runes.length > RoundAvatarStyle.defaultMaxChar) {
-      text = text.substring(0, RoundAvatarStyle.defaultMaxChar).toString();
+    final characters = text.characters;
+    if (characters.length > maxChar) {
+      text = characters.take(maxChar).toString();
     }
 
     Widget textWidget = Center(
