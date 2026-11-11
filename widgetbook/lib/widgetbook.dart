@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:linagora_design_flutter/linagora_design_flutter.dart';
 import 'package:widgetbook/widgetbook.dart' hide AlignmentAddon;
+import 'package:widgetbook_workspace/components/account_switcher/linagora_account_switcher_use_case.dart';
 import 'package:widgetbook_workspace/components/banners/linagora_alert_use_case.dart';
 import 'package:widgetbook_workspace/components/banners/linagora_banner_use_case.dart';
 import 'package:widgetbook_workspace/components/buttons/linagora_button_use_case.dart';
@@ -100,6 +101,29 @@ class WidgetbookApp extends StatelessWidget {
         ),
       ],
       directories: [
+        WidgetbookFolder(
+          name: 'Account switcher',
+          children: [
+            WidgetbookComponent(
+              name: 'Linagora account switcher',
+              useCases: [
+                WidgetbookUseCase(
+                  name: 'Default',
+                  builder: (context) => linagoraAccountSwitcherUseCase(context),
+                ),
+              ],
+            ),
+            WidgetbookComponent(
+              name: 'Linagora account menu',
+              useCases: [
+                WidgetbookUseCase(
+                  name: 'Default',
+                  builder: (context) => linagoraAccountMenuUseCase(context),
+                ),
+              ],
+            ),
+          ],
+        ),
         WidgetbookFolder(
           name: 'Banners',
           children: [
@@ -522,11 +546,13 @@ class WidgetbookApp extends StatelessWidget {
               useCases: [
                 WidgetbookUseCase(
                   name: 'All states',
-                  builder: (context) => eventActivityBadgeStatesUseCase(context),
+                  builder: (context) =>
+                      eventActivityBadgeStatesUseCase(context),
                 ),
                 WidgetbookUseCase(
                   name: 'Custom',
-                  builder: (context) => eventActivityBadgeCustomUseCase(context),
+                  builder: (context) =>
+                      eventActivityBadgeCustomUseCase(context),
                 ),
               ],
             ),
