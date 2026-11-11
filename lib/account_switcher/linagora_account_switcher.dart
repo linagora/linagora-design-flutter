@@ -259,10 +259,10 @@ class _LinagoraAccountSwitcherState<T>
     final above = rect.top - tokens.menuOffset - _screenMargin;
     final openAbove = below < _minMenuRoom && above > below;
     final room = openAbove ? above : below;
-    // Wrap content up to the free space on screen; scroll only beyond that.
+    // Wrap content up to menuMaxHeight and the free space on screen, then scroll.
     return (
       dx: dx,
-      maxHeight: math.max(0.0, room),
+      maxHeight: math.min(tokens.menuMaxHeight, math.max(0.0, room)),
       openAbove: openAbove,
     );
   }

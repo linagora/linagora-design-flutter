@@ -205,7 +205,7 @@ class LinagoraAccountSwitcherStyle {
       headerNameTextStyle: type.h4.copyWith(color: colors.textColor),
       headerEmailGap: 8,
       headerEmailTextStyle: type.body2.copyWith(color: colors.secondaryColor),
-      headerCopyGap: 4,
+      headerCopyGap: 8,
       headerCopySize: 24,
       headerCopyIconSize: 24,
       headerCopyColor: colors.secondaryColor,
@@ -227,12 +227,12 @@ class LinagoraAccountSwitcherStyle {
         nameTextStyle: rowText,
       ),
       // Footer items are 40 high (py 4); start 8 + itemPadding 16 and a 20
-      // avatar slot put the manage / sign-out glyph at x24.
+      // avatar slot put the manage / sign-out glyph at x24, gap 16 the label at x60.
       footerTileStyle: colors.tileStyle.copyWith(
         minHeight: 40,
         avatarSize: 20,
         padding: const EdgeInsetsDirectional.fromSTEB(8, 4, 8, 4),
-        avatarGap: 8,
+        avatarGap: 16,
         trailingGap: 8,
         tileRadius: 8,
         nameTextStyle: rowText,
@@ -260,8 +260,8 @@ class LinagoraAccountSwitcherStyle {
       menuWidth: 326,
       menuRadius: 14,
       menuPadding: const EdgeInsets.fromLTRB(0, 16, 0, 8),
-      // Titles at x24; sectionGap 8 + title top 4 → 12 from a row to the next title.
-      sectionPadding: const EdgeInsetsDirectional.fromSTEB(24, 4, 24, 8),
+      // Titles at x24, rows 4 below. sectionGap 8 + title top 4 → 12 from a row to the next title.
+      sectionPadding: const EdgeInsetsDirectional.fromSTEB(24, 4, 24, 4),
       sectionGap: 8,
       // Rows at ~x19.5 so the highlight is 287 wide in a 326 panel.
       itemPadding: const EdgeInsets.symmetric(horizontal: 19.5),

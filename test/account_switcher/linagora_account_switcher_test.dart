@@ -499,7 +499,7 @@ void _avatarMenuTokens() {
   expect(style.menuPadding, const EdgeInsets.fromLTRB(0, 16, 0, 8));
   expect(
     style.sectionPadding,
-    const EdgeInsetsDirectional.fromSTEB(24, 4, 24, 8),
+    const EdgeInsetsDirectional.fromSTEB(24, 4, 24, 4),
   );
   expect(style.sectionGap, 8);
   expect(style.itemPadding, const EdgeInsets.symmetric(horizontal: 19.5));
