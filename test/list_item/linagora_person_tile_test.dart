@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:linagora_design_flutter/linagora_design_flutter.dart';
 
@@ -42,11 +43,16 @@ void main() {
     testWidgets('drops a blank detail', _dropsBlankDetail);
     testWidgets('runs the trailing action and not the row', _actionSkipsRow);
     testWidgets('disables the action without a callback', _disablesAction);
+    testWidgets('dims the remove glyph without a callback', _dimsDisabledGlyph);
     testWidgets(
       'a disabled action does not open the row',
       _disabledActionSkipsRow,
     );
     testWidgets('shows a custom trailing widget', _showsTrailing);
+    testWidgets(
+      'lines a trailing widget up with the remove column',
+      _trailingAlignsWithActionColumn,
+    );
     testWidgets('keeps the action at the end in RTL', _actionStaysAtEndInRtl);
     testWidgets(
       'paints the selected row and reports taps',
@@ -93,6 +99,7 @@ void main() {
     testWidgets('has no header for a single row', _singleRow);
     testWidgets('renders an empty card', _emptyCard);
     testWidgets('paints the dark tokens', _darkGroup);
+    testWidgets('outlines the dark card', _darkOutlinedGroup);
     test('copyWith overrides one field and keeps the rest', _copyWith);
   });
 }
@@ -203,6 +210,49 @@ Future<void> _disablesAction(WidgetTester tester) async {
   expect(button.onPressed, isNull);
 }
 
+Future<void> _dimsDisabledGlyph(WidgetTester tester) async {
+  await tester.pumpWidget(
+    _host(
+      Column(
+        children: [
+          LinagoraPersonTile(
+            name: 'Nora Hale',
+            action: LinagoraPersonTileAction(
+              key: LinagoraPersonTile.actionKeyFor('enabled'),
+              tooltip: 'Remove',
+              onPressed: () {},
+            ),
+          ),
+          LinagoraPersonTile(
+            name: 'Milo Kent',
+            action: LinagoraPersonTileAction(
+              key: LinagoraPersonTile.actionKeyFor('disabled'),
+              tooltip: 'Remove',
+              onPressed: null,
+            ),
+          ),
+        ],
+      ),
+    ),
+  );
+
+  expect(
+    _glyphFilter(tester, 'disabled'),
+    isNot(_glyphFilter(tester, 'enabled')),
+  );
+}
+
+ColorFilter? _glyphFilter(WidgetTester tester, String id) {
+  return tester
+      .widget<SvgPicture>(
+        find.descendant(
+          of: find.byKey(LinagoraPersonTile.actionKeyFor(id)),
+          matching: find.byType(SvgPicture),
+        ),
+      )
+      .colorFilter;
+}
+
 Future<void> _disabledActionSkipsRow(WidgetTester tester) async {
   var rowTaps = 0;
   await tester.pumpWidget(
@@ -232,6 +282,22 @@ Future<void> _showsTrailing(WidgetTester tester) async {
   );
 
   expect(find.text('deleted'), findsOneWidget);
+}
+
+Future<void> _trailingAlignsWithActionColumn(WidgetTester tester) async {
+  await tester.pumpWidget(
+    _host(
+      const LinagoraTileGroup(
+        filled: true,
+        children: [
+          LinagoraPersonTile(name: 'Thomas Leroy', trailing: Text('deleted')),
+        ],
+      ),
+    ),
+  );
+
+  final row = tester.getRect(find.byType(LinagoraPersonTile));
+  expect(row.right - tester.getRect(find.text('deleted')).right, 56);
 }
 
 Future<void> _actionStaysAtEndInRtl(WidgetTester tester) async {
@@ -613,6 +679,29 @@ Future<void> _darkGroup(WidgetTester tester) async {
   expect(
     tester.widget<IconButton>(find.byType(IconButton)).color,
     const Color(0xA3FFFFFF),
+  );
+}
+
+Future<void> _darkOutlinedGroup(WidgetTester tester) async {
+  final style = LinagoraPersonTileStyle.dark();
+  await tester.pumpWidget(
+    _host(
+      LinagoraTileGroup(
+        style: style,
+        children: [
+          LinagoraPersonTile(name: 'Nora Hale', style: style),
+          LinagoraPersonTile(name: 'Milo Kent', style: style),
+        ],
+      ),
+    ),
+  );
+
+  final decoration = _cardDecoration(tester);
+  expect(decoration.border, Border.all(color: const Color(0x1FFFFFFF)));
+  expect(decoration.color, isNull);
+  expect(
+    tester.widget<Divider>(find.byType(Divider)).color,
+    const Color(0x1FFFFFFF),
   );
 }
 
