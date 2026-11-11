@@ -2,6 +2,9 @@
 
 ### Added
 
+* `LinagoraStackedAvatars`: overlapping round avatars with a ring and a `+N` bubble past the visible count, styled by `LinagoraStackedAvatarsStyle.material()` or `.dark()`.
+* `LinagoraDismissibleChip`: a painted 32 high rounded rectangle (radius 8) with a label, an optional leading widget and a close button whose layout grows to a 48dp tap target, styled by `LinagoraDismissibleChipStyle.material()` or `.dark()`.
+* `LinagoraStatusBadge`: a read-only pill naming a state, such as "Delegated mailbox", styled by `LinagoraStatusBadgeStyle.material()` or `.dark()`.
 * `LinagoraSidebarStyle` gains section header action tokens:
   `sectionHeaderActionSize` (16.67), `sectionHeaderActionIconSize` (10.42),
   `sectionHeaderActionSpacing` (10.25) and `sectionHeaderActionTargetSize` (24),
