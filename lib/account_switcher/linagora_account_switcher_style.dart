@@ -216,8 +216,7 @@ class LinagoraAccountSwitcherStyle {
       // Icon frame is 20 (glyph ~16.67).
       footerIconSize: 20,
       footerIconColor: colors.secondaryColor,
-      // Person-tile defaults already match account rows (56 / 32 / py 8).
-      // End pad 8 + a trailing box of avatarSize centres the 24 check 12 from the edge.
+      // Zero remove-action slot so end pad 8 + avatarSize trailing puts the check 12 from the edge.
       tileStyle: colors.tileStyle.copyWith(
         padding: const EdgeInsetsDirectional.fromSTEB(16, 8, 8, 8),
         avatarGap: 8,
@@ -225,6 +224,8 @@ class LinagoraAccountSwitcherStyle {
         subtitleGap: 4,
         tileRadius: 8,
         nameTextStyle: rowText,
+        actionButtonSize: 0,
+        actionEndPadding: 0,
       ),
       // Footer items are 40 high (py 4); start 8 + itemPadding 16 and a 20
       // avatar slot put the manage / sign-out glyph at x24, gap 16 the label at x60.

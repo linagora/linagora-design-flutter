@@ -478,6 +478,9 @@ void _dropdownTokens() {
     style.tileStyle.padding,
     const EdgeInsetsDirectional.fromSTEB(16, 8, 8, 8),
   );
+  // Clears PersonTile's remove-action slot so the check sits 12 from the edge.
+  expect(style.tileStyle.actionButtonSize, 0);
+  expect(style.tileStyle.actionEndPadding, 0);
   expect(style.tileStyle.subtitleGap, 4);
   expect(style.tileStyle.nameTextStyle.height, type.body2.height);
   expect(style.footerTileStyle.minHeight, 40);
