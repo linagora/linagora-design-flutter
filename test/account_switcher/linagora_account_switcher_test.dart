@@ -92,6 +92,10 @@ void _menuTests() {
       'starts the footer labels at x60 in the avatar menu',
       _footerLabelInset,
     );
+    testWidgets(
+      'keys each row by id equality, not by its toString',
+      _keysRowsByIdEquality,
+    );
   });
 }
 
@@ -936,4 +940,53 @@ Future<void> _capsAtMenuMaxHeight(WidgetTester tester) async {
 
   final maxHeight = LinagoraAccountSwitcherStyle.material().menuMaxHeight;
   expect(tester.getRect(_menu).height, lessThanOrEqualTo(maxHeight));
+}
+
+class _OpaqueId {
+  const _OpaqueId(this.value);
+
+  final String value;
+
+  @override
+  bool operator ==(Object other) => other is _OpaqueId && other.value == value;
+
+  @override
+  int get hashCode => value.hashCode;
+
+  @override
+  String toString() => '_OpaqueId';
+}
+
+Future<void> _keysRowsByIdEquality(WidgetTester tester) async {
+  _OpaqueId? picked;
+  await tester.pumpWidget(
+    _host(
+      SizedBox(
+        width: 326,
+        child: LinagoraAccountMenu<_OpaqueId>(
+          selectedId: const _OpaqueId('me'),
+          onSelected: (id) => picked = id,
+          sections: const [
+            LinagoraAccountSection(
+              title: 'Your mailbox',
+              items: [
+                LinagoraAccountItem(id: _OpaqueId('me'), name: 'Nora Hale'),
+              ],
+            ),
+            LinagoraAccountSection(
+              title: 'Delegated to you',
+              items: [
+                LinagoraAccountItem(id: _OpaqueId('mira'), name: 'Mira Calder'),
+              ],
+            ),
+          ],
+        ),
+      ),
+    ),
+  );
+
+  final mira = find.byKey(LinagoraAccountMenu.itemKey(const _OpaqueId('mira')));
+  expect(mira, findsOneWidget);
+  await tester.tap(mira);
+  expect(picked, const _OpaqueId('mira'));
 }
