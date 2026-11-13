@@ -65,7 +65,9 @@ class LinagoraAccountMenu<T> extends StatelessWidget {
   });
 
   /// Key of the row showing the account [id].
-  static Key itemKey(Object? id) => ValueKey('linagora_account_menu_$id');
+  // Compares [id] with ==, so ids whose toString() is not unique (e.g. an
+  // Equatable without stringify in release builds) still get distinct keys.
+  static Key itemKey(Object? id) => ValueKey(('linagora_account_menu', id));
 
   @override
   Widget build(BuildContext context) {
