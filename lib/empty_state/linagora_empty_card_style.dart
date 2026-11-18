@@ -112,15 +112,15 @@ class LinagoraEmptyCardStyle {
   ) {
     final text = LinagoraTextTheme.material();
     return LinagoraEmptyCardStyle(
-      // Empty card: 16 inset from the border, 16 radius, 8 content gap.
+      // Empty card: 16 inset, 12 radius, 16 around the illustration, message 16 further in, 8 gap.
       padding: const EdgeInsets.all(16),
       backgroundColor: colors.backgroundColor,
       borderColor: colors.borderColor,
-      radius: 16,
-      illustrationPadding: EdgeInsets.zero,
+      radius: 12,
+      illustrationPadding: const EdgeInsets.all(16),
       illustrationGap: 8,
       messageGap: 8,
-      messagePadding: EdgeInsets.zero,
+      messagePadding: const EdgeInsets.symmetric(horizontal: 16),
       actionPadding: const EdgeInsets.only(top: 8),
       // Title: Inter 500 / 16 / 24 / 0.15. Message: Inter 500 / 14 / 20 / 0.25.
       titleTextStyle: text.titleMedium!.copyWith(color: colors.titleColor),

@@ -9,6 +9,9 @@ void main() {
   group('LinagoraEmptyCard', () {
     testWidgets('centres title, message and action in a bordered card', _card);
     testWidgets('fills the parent width by default', _fillsParentWidth);
+    testWidgets('fills a loose parent at content height', _fillsLooseParent);
+    testWidgets('sizes inside an intrinsic-sizing dialog', _intrinsicParent);
+    testWidgets('keeps the content at the top of a taller parent', _tallParent);
     testWidgets('honours a fixed width', _fixedWidth);
     testWidgets('shows only the title when nothing else is given', _titleOnly);
     testWidgets('drops a blank message', _dropsBlankMessage);
@@ -65,7 +68,7 @@ Future<void> _card(WidgetTester tester) async {
     _decoration(tester)?.border,
     Border.all(color: const Color(0x29424242)),
   );
-  expect(_decoration(tester)?.borderRadius, BorderRadius.circular(16));
+  expect(_decoration(tester)?.borderRadius, BorderRadius.circular(12));
   expect(_decoration(tester)?.color, Colors.white);
 
   await tester.tap(find.byKey(LinagoraEmptyCard.actionKey));
@@ -76,6 +79,53 @@ Future<void> _fillsParentWidth(WidgetTester tester) async {
   await tester.pumpWidget(_host(const LinagoraEmptyCard(title: _title)));
 
   expect(tester.getSize(find.byType(LinagoraEmptyCard)).width, 488);
+}
+
+Future<void> _fillsLooseParent(WidgetTester tester) async {
+  await tester.pumpWidget(_host(const LinagoraEmptyCard(title: _title)));
+  final contentHeight = tester.getSize(find.byType(LinagoraEmptyCard)).height;
+
+  await tester.pumpWidget(
+    const MaterialApp(
+      home: Scaffold(
+        body: Center(child: LinagoraEmptyCard(title: _title)),
+      ),
+    ),
+  );
+
+  final size = tester.getSize(find.byType(LinagoraEmptyCard));
+  expect(size.width, 800);
+  expect(size.height, contentHeight);
+}
+
+Future<void> _intrinsicParent(WidgetTester tester) async {
+  await tester.pumpWidget(
+    const MaterialApp(
+      home: Scaffold(
+        body: AlertDialog(
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              SizedBox(width: 500),
+              LinagoraEmptyCard(title: _title),
+            ],
+          ),
+        ),
+      ),
+    ),
+  );
+
+  expect(tester.takeException(), isNull);
+  expect(tester.getSize(find.byType(LinagoraEmptyCard)).width, 500);
+}
+
+Future<void> _tallParent(WidgetTester tester) async {
+  await tester.pumpWidget(
+    _host(const SizedBox(height: 300, child: LinagoraEmptyCard(title: _title))),
+  );
+
+  final card = tester.getRect(find.byType(LinagoraEmptyCard));
+  expect(tester.getRect(find.text(_title)).top, card.top + 1 + 16);
 }
 
 Future<void> _fixedWidth(WidgetTester tester) async {
@@ -193,6 +243,7 @@ Future<void> _unboundedWidth(WidgetTester tester) async {
     isNull,
     reason: 'default width must not assume a bounded parent',
   );
+  expect(tester.getSize(find.byType(LinagoraEmptyCard)).width, lessThan(800));
 }
 
 Future<void> _rtl(WidgetTester tester) async {
@@ -236,7 +287,7 @@ Future<void> _unbordered(WidgetTester tester) async {
 
   expect(_decoration(tester)?.border, isNull);
   expect(_decoration(tester)?.color, const Color(0xFF3E424A));
-  expect(_decoration(tester)?.borderRadius, BorderRadius.circular(16));
+  expect(_decoration(tester)?.borderRadius, BorderRadius.circular(12));
 }
 
 Future<void> _disabledAction(WidgetTester tester) async {

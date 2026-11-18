@@ -21,8 +21,8 @@ class LinagoraEmptyCardAction {
 /// A short bordered card for a list that has nothing yet.
 ///
 /// Distinct from [LinagoraEmptyState], which is a tall filled card with a
-/// large illustration and no action. Width defaults to the parent (typically
-/// the screen); pass [width] to lock a fixed size.
+/// large illustration and no action. Width fills a bounded parent and shrinks
+/// to the content in an unbounded one. Pass [width] to lock a fixed size.
 class LinagoraEmptyCard extends StatelessWidget {
   static const Key actionKey = ValueKey('linagora_empty_card_action');
 
@@ -32,7 +32,7 @@ class LinagoraEmptyCard extends StatelessWidget {
   final LinagoraEmptyCardAction? action;
   final bool bordered;
 
-  /// Null fills the parent width (`double.infinity`).
+  /// Null fills a bounded parent and shrinks to the content in an unbounded one.
   final double? width;
   final LinagoraEmptyCardStyle? style;
 
@@ -55,57 +55,62 @@ class LinagoraEmptyCard extends StatelessWidget {
     final action = this.action;
 
     return Container(
-      width: width ?? double.infinity,
+      width: width,
       padding: tokens.padding,
       decoration: _decoration(tokens),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          if (illustration != null) ...[
-            Padding(
-              padding: tokens.illustrationPadding,
-              child: ExcludeSemantics(child: illustration),
-            ),
-            SizedBox(height: tokens.illustrationGap),
-          ],
-          Semantics(
-            header: true,
-            child: Text(
-              title,
-              textAlign: TextAlign.center,
-              style: tokens.titleTextStyle,
-            ),
-          ),
-          if (message != null && message.isNotEmpty) ...[
-            SizedBox(height: tokens.messageGap),
-            Padding(
-              padding: tokens.messagePadding,
+      // Align, not LayoutBuilder, so intrinsic-sizing parents such as dialogs work.
+      child: Align(
+        alignment: Alignment.topCenter,
+        heightFactor: 1,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            if (illustration != null) ...[
+              Padding(
+                padding: tokens.illustrationPadding,
+                child: ExcludeSemantics(child: illustration),
+              ),
+              SizedBox(height: tokens.illustrationGap),
+            ],
+            Semantics(
+              header: true,
               child: Text(
-                message,
+                title,
                 textAlign: TextAlign.center,
-                style: tokens.messageTextStyle,
+                style: tokens.titleTextStyle,
               ),
             ),
-          ],
-          if (action != null) ...[
-            Padding(
-              padding: tokens.actionPadding,
-              child: LinagoraButton(
-                key: actionKey,
-                label: action.label,
-                icon: action.icon,
-                onPressed: action.onPressed,
-                minimumHeight: tokens.actionHeight,
-                padding: tokens.actionButtonPadding,
-                iconSize: tokens.actionIconSize,
-                backgroundColor: tokens.actionBackgroundColor,
-                foregroundColor: tokens.actionForegroundColor,
-                disabledBackgroundColor: tokens.actionDisabledBackgroundColor,
-                disabledForegroundColor: tokens.actionDisabledForegroundColor,
+            if (message != null && message.isNotEmpty) ...[
+              SizedBox(height: tokens.messageGap),
+              Padding(
+                padding: tokens.messagePadding,
+                child: Text(
+                  message,
+                  textAlign: TextAlign.center,
+                  style: tokens.messageTextStyle,
+                ),
               ),
-            ),
+            ],
+            if (action != null) ...[
+              Padding(
+                padding: tokens.actionPadding,
+                child: LinagoraButton(
+                  key: actionKey,
+                  label: action.label,
+                  icon: action.icon,
+                  onPressed: action.onPressed,
+                  minimumHeight: tokens.actionHeight,
+                  padding: tokens.actionButtonPadding,
+                  iconSize: tokens.actionIconSize,
+                  backgroundColor: tokens.actionBackgroundColor,
+                  foregroundColor: tokens.actionForegroundColor,
+                  disabledBackgroundColor: tokens.actionDisabledBackgroundColor,
+                  disabledForegroundColor: tokens.actionDisabledForegroundColor,
+                ),
+              ),
+            ],
           ],
-        ],
+        ),
       ),
     );
   }

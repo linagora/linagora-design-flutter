@@ -33,11 +33,13 @@
 * `LinagoraTileGroup` draws a divider between each pair of children so a
   multi-row card matches the access-list outline (single outer border,
   shared separators).
-* `LinagoraEmptyCard` matches the access empty-state layout: 16 radius,
-  16 padding, 8 gaps, `titleMedium` / `bodyMedium` copy, and a filled 48
+* `LinagoraEmptyCard` matches the access empty-state layout: 12 radius,
+  16 padding, 16 around the illustration, 8 gaps, the message inset 32
+  from each side, `titleMedium` / `bodyMedium` copy, and a filled 48
   action pill (`32×14` padding, 20 icon) with
-  `actionBackgroundColor` / `actionForegroundColor`. It fills the parent
-  width by default; pass `width` for a fixed size.
+  `actionBackgroundColor` / `actionForegroundColor`. It fills a bounded
+  parent width by default and shrinks to its content in an unbounded one.
+  Pass `width` for a fixed size.
 * `LinagoraSidebarSectionHeaderAction` pads its circular `InkResponse` to
   `sectionHeaderActionTargetSize` around the glyph box, and draws an
   `iconWidget` at `sectionHeaderActionIconSize`.

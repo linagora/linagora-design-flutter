@@ -33,7 +33,7 @@ Future<void> _defaultKnobs(WidgetTester tester) async {
   expect(card.illustration, isA<SvgPicture>());
   expect(card.action, isNotNull);
   expect(card.bordered, isTrue);
-  expect(card.style?.radius, 16);
+  expect(card.style?.radius, 12);
   expect(card.style?.backgroundColor, Colors.white);
   expect(find.byKey(LinagoraEmptyCard.actionKey), findsOneWidget);
 }
