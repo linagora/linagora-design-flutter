@@ -15,6 +15,10 @@ void main() {
     testWidgets('trims trailing newlines from the message', _trimsMessage);
     testWidgets('honours a taller actionHeight floor', _tallerAction);
     testWidgets('puts the illustration above the title', _illustration);
+    testWidgets('uses the Figma corner radius', _radius);
+    testWidgets('insets the message 32 from each side', _messageInset);
+    testWidgets('does not throw in an unbounded-width parent', _unboundedWidth);
+    testWidgets('lays out symmetrically in right-to-left', _rtl);
     testWidgets('drops the border when not bordered', _unbordered);
     testWidgets('disables the action without a callback', _disabledAction);
     testWidgets('wraps long text on a phone without overflow', _wraps);
@@ -144,8 +148,79 @@ Future<void> _illustration(WidgetTester tester) async {
 
   final art = tester.getRect(find.byKey(const ValueKey('art')));
   final card = tester.getRect(find.byType(LinagoraEmptyCard));
-  expect(art.top, card.top + 1 + 16);
-  expect(tester.getRect(find.text(_title)).top, art.bottom + 8);
+  // Figma: 16 card padding + 16 visual-container padding above the icon, and
+  // 16 container padding + 8 gap between the icon and the title.
+  expect(art.top, card.top + 1 + 32);
+  expect(tester.getRect(find.text(_title)).top, art.bottom + 24);
+}
+
+Future<void> _radius(WidgetTester tester) async {
+  await tester.pumpWidget(_host(const LinagoraEmptyCard(title: _title)));
+
+  expect(
+    LinagoraEmptyCardStyle.material().radius,
+    12,
+    reason: 'Figma card radius is 12',
+  );
+  expect(_decoration(tester)?.borderRadius, BorderRadius.circular(12));
+}
+
+Future<void> _messageInset(WidgetTester tester) async {
+  await tester.pumpWidget(
+    _host(const LinagoraEmptyCard(title: _title, message: _message)),
+  );
+
+  final card = tester.getRect(find.byType(LinagoraEmptyCard));
+  final message = tester.getRect(find.text(_message));
+  // Figma: the message sits 32 in from each side; the border takes 1.
+  expect(message.left, card.left + 1 + 32);
+  expect(message.right, card.right - 1 - 32);
+}
+
+Future<void> _unboundedWidth(WidgetTester tester) async {
+  await tester.pumpWidget(
+    const MaterialApp(
+      home: Scaffold(
+        body: Row(
+          children: [LinagoraEmptyCard(title: _title, message: _message)],
+        ),
+      ),
+    ),
+  );
+
+  expect(
+    tester.takeException(),
+    isNull,
+    reason: 'default width must not assume a bounded parent',
+  );
+}
+
+Future<void> _rtl(WidgetTester tester) async {
+  await tester.pumpWidget(
+    Directionality(
+      textDirection: TextDirection.rtl,
+      child: _host(
+        const LinagoraEmptyCard(
+          title: _title,
+          message: _message,
+          action: LinagoraEmptyCardAction(
+            label: 'Add',
+            icon: Icons.add,
+            onPressed: _noop,
+          ),
+        ),
+      ),
+    ),
+  );
+
+  expect(tester.takeException(), isNull);
+  final card = tester.getRect(find.byType(LinagoraEmptyCard));
+  final message = tester.getRect(find.text(_message));
+  expect(message.left - card.left, closeTo(card.right - message.right, 0.5));
+  expect(
+    tester.getRect(find.byKey(LinagoraEmptyCard.actionKey)).center.dx,
+    closeTo(card.center.dx, 0.5),
+  );
 }
 
 Future<void> _unbordered(WidgetTester tester) async {
@@ -257,10 +332,7 @@ Future<void> _darkTokens(WidgetTester tester) async {
         title: _title,
         message: _message,
         style: style,
-        action: const LinagoraEmptyCardAction(
-          label: 'Add',
-          onPressed: null,
-        ),
+        action: const LinagoraEmptyCardAction(label: 'Add', onPressed: null),
       ),
     ),
   );
