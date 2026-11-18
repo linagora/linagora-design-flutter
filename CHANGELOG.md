@@ -2,6 +2,7 @@
 
 ### Added
 
+* `LinagoraCheckboxItem`: an option of a multiple-choice list, the checkbox counterpart of `LinagoraRadioItem` (Figma "Radio Card / Item", 57 high with a divider), with an optional subtitle and leading widget.
 * `LinagoraStackedAvatars`: overlapping round avatars with a ring and a `+N` bubble past the visible count, styled by `LinagoraStackedAvatarsStyle.material()` or `.dark()`.
 * `LinagoraDismissibleChip`: a painted 32 high rounded rectangle (radius 8) with a label, an optional leading widget and a close button whose layout grows to a 48dp tap target, styled by `LinagoraDismissibleChipStyle.material()` or `.dark()`.
 * `LinagoraStatusBadge`: a read-only pill naming a state, such as "Delegated mailbox", styled by `LinagoraStatusBadgeStyle.material()` or `.dark()`.
@@ -27,6 +28,8 @@
 
 ### Changed
 
+* `LinagoraSettingItem.selectable(control: checkbox)` draws the Figma "Checkboxes" mark: filled primary when checked, instead of a grey outlined icon in both states.
+* `LinagoraSettingItem.minHeight` is 88 (was 92), the Figma `Style=Title+Desc` height. Rows with a one-line subtitle get 4 dp shorter.
 * `LinagoraPersonTileAction` always draws the package delete SVG
   (`LinagoraDesignImages.deleteIcon`) at `#7A7781` in material style; the
   caller no longer passes an `IconData`.

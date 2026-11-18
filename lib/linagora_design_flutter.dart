@@ -31,6 +31,7 @@ export 'package:linagora_design_flutter/list_item/session_device_avatar.dart';
 export 'package:linagora_design_flutter/list_item/session_device_list_item.dart';
 export 'package:linagora_design_flutter/list_item/linagora_setting_item.dart';
 export 'package:linagora_design_flutter/list_item/linagora_radio_item.dart';
+export 'package:linagora_design_flutter/list_item/linagora_checkbox_item.dart';
 export 'package:linagora_design_flutter/list_item/linagora_section_header.dart';
 export 'package:linagora_design_flutter/list_item/linagora_avatar_list_item.dart';
 export 'package:linagora_design_flutter/account_switcher/linagora_account_menu.dart';
