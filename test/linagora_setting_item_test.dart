@@ -311,12 +311,22 @@ void main() {
 
     testWidgets('shows the checkbox state', (tester) async {
       await tester.pumpWidget(buildCheckbox(value: true, onChanged: (_) {}));
-      expect(find.byIcon(Icons.check_box_outlined), findsOneWidget);
+      final checkbox = tester.widget<Checkbox>(find.byType(Checkbox));
+      expect(checkbox.value, isTrue);
+      expect(
+        checkbox.fillColor?.resolve({WidgetState.selected}),
+        LinagoraSysColors.material().primary,
+      );
       expect(find.byType(Switch), findsNothing);
       expect(find.byIcon(Icons.chevron_right), findsNothing);
 
       await tester.pumpWidget(buildCheckbox(value: false, onChanged: (_) {}));
-      expect(find.byIcon(Icons.check_box_outline_blank), findsOneWidget);
+      expect(tester.widget<Checkbox>(find.byType(Checkbox)).value, isFalse);
+    });
+
+    testWidgets('is 88 high with a one-line subtitle', (tester) async {
+      await tester.pumpWidget(buildCheckbox(value: false, onChanged: (_) {}));
+      expect(tester.getSize(find.byType(LinagoraSettingItem)).height, 88);
     });
 
     testWidgets('tapping the row toggles the value', (tester) async {
@@ -325,7 +335,7 @@ void main() {
         buildCheckbox(value: true, onChanged: (v) => changed = v),
       );
 
-      await tester.tap(find.byIcon(Icons.check_box_outlined));
+      await tester.tap(find.text('Name'));
       await tester.pump();
 
       expect(changed, isFalse);

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:linagora_design_flutter/colors/linagora_ref_colors.dart';
 import 'package:linagora_design_flutter/colors/linagora_state_layer.dart';
 import 'package:linagora_design_flutter/colors/linagora_sys_colors.dart';
+import 'package:linagora_design_flutter/list_item/linagora_list_checkbox.dart';
 import 'package:linagora_design_flutter/spacings/linagora_spacing.dart';
 import 'package:linagora_design_flutter/style/linagora_divider_style.dart';
 import 'package:linagora_design_flutter/style/linagora_hover_style.dart';
@@ -12,7 +13,7 @@ enum LinagoraSettingItemControl { toggle, checkbox }
 /// A settings row with a trailing chevron, or a switch/checkbox with
 /// [LinagoraSettingItem.selectable].
 class LinagoraSettingItem extends StatelessWidget {
-  static const double minHeight = 92;
+  static const double minHeight = 88;
   static const double titleOnlyMinHeight = 84;
 
   /// For items not flush with the screen edge.
@@ -222,10 +223,9 @@ class LinagoraSettingItem extends StatelessWidget {
         ),
         if (control == LinagoraSettingItemControl.checkbox) ...[
           const SizedBox(width: _gap),
-          Icon(
-            value ? Icons.check_box_outlined : Icons.check_box_outline_blank,
-            size: _iconSize,
-            color: resolvedIconColor,
+          LinagoraListCheckbox(
+            value: value,
+            enabled: enabled && onChanged != null,
           ),
         ],
       ],
