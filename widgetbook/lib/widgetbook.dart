@@ -8,6 +8,7 @@ import 'package:widgetbook_workspace/components/chips/linagora_dismissible_chip_
 import 'package:widgetbook_workspace/components/chips/linagora_status_badge_use_case.dart';
 import 'package:widgetbook_workspace/components/banners/linagora_banner_use_case.dart';
 import 'package:widgetbook_workspace/components/buttons/linagora_button_use_case.dart';
+import 'package:widgetbook_workspace/components/empty_state/linagora_empty_card_use_case.dart';
 import 'package:widgetbook_workspace/components/empty_state/linagora_empty_state_use_case.dart';
 import 'package:widgetbook_workspace/components/chat/message_bubble_use_case.dart';
 import 'package:widgetbook_workspace/components/contact_component/matrix_contact_use_case.dart';
@@ -59,7 +60,7 @@ class WidgetbookApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return Widgetbook.material(
       themeMode: ThemeMode.light,
-      darkTheme: ThemeData.light(),
+      darkTheme: ThemeData.dark(),
       addons: [
         GitHubAddon('widgetbook'),
         ViewportAddon(Viewports.all),
@@ -79,12 +80,14 @@ class WidgetbookApp extends StatelessWidget {
               data: TwakeThemes.buildTheme(
                 context,
                 Brightness.dark,
-                LinagoraSysColors.material().onPrimary,
+                LinagoraSysColors.material().onPrimaryDark,
               ),
             ),
           ],
+          // Preview chrome must follow the selected theme — a fixed light
+          // `onPrimary` fill left Dark looking broken for every use case.
           themeBuilder: (context, theme, child) => ColoredBox(
-            color: LinagoraSysColors.material().onPrimary,
+            color: theme.scaffoldBackgroundColor,
             child: DefaultTextStyle(
               style: theme.textTheme.bodyLarge ?? const TextStyle(),
               child: Theme(
@@ -232,6 +235,15 @@ class WidgetbookApp extends StatelessWidget {
         WidgetbookFolder(
           name: 'Empty state',
           children: [
+            WidgetbookComponent(
+              name: 'Linagora empty card',
+              useCases: [
+                WidgetbookUseCase(
+                  name: 'Default',
+                  builder: (context) => linagoraEmptyCardUseCase(context),
+                ),
+              ],
+            ),
             WidgetbookComponent(
               name: 'Linagora empty state',
               useCases: [

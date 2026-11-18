@@ -5,6 +5,9 @@
 * `LinagoraStackedAvatars`: overlapping round avatars with a ring and a `+N` bubble past the visible count, styled by `LinagoraStackedAvatarsStyle.material()` or `.dark()`.
 * `LinagoraDismissibleChip`: a painted 32 high rounded rectangle (radius 8) with a label, an optional leading widget and a close button whose layout grows to a 48dp tap target, styled by `LinagoraDismissibleChipStyle.material()` or `.dark()`.
 * `LinagoraStatusBadge`: a read-only pill naming a state, such as "Delegated mailbox", styled by `LinagoraStatusBadgeStyle.material()` or `.dark()`.
+* `LinagoraEmptyCard`: a short bordered card with a title, an optional message and an optional action, styled by `LinagoraEmptyCardStyle.material()` or `.dark()`. Distinct from `LinagoraEmptyState`, which stays the tall filled illustration card.
+* `LinagoraDesignImages.emptyCardShareIcon` and `emptyCardMailIcon`:
+  empty-card illustrations for the access “by me” and “with me” states.
 * `LinagoraSidebarStyle` gains section header action tokens:
   `sectionHeaderActionSize` (16.67), `sectionHeaderActionIconSize` (10.42),
   `sectionHeaderActionSpacing` (10.25) and `sectionHeaderActionTargetSize` (24),
@@ -30,6 +33,13 @@
 * `LinagoraTileGroup` draws a divider between each pair of children so a
   multi-row card matches the access-list outline (single outer border,
   shared separators).
+* `LinagoraEmptyCard` matches the access empty-state layout: 12 radius,
+  16 padding, 16 around the illustration, 8 gaps, the message inset 32
+  from each side, `titleMedium` / `bodyMedium` copy, and a filled 48
+  action pill (`32×14` padding, 20 icon) with
+  `actionBackgroundColor` / `actionForegroundColor`. It fills a bounded
+  parent width by default and shrinks to its content in an unbounded one.
+  Pass `width` for a fixed size.
 * `LinagoraSidebarSectionHeaderAction` pads its circular `InkResponse` to
   `sectionHeaderActionTargetSize` around the glyph box, and draws an
   `iconWidget` at `sectionHeaderActionIconSize`.
