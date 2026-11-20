@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:linagora_design_flutter/linagora_design_flutter.dart';
 import 'package:widgetbook/widgetbook.dart' hide AlignmentAddon;
 import 'package:widgetbook_workspace/components/account_switcher/linagora_account_switcher_use_case.dart';
+import 'package:widgetbook_workspace/components/avatar/linagora_presence_badge_use_case.dart';
 import 'package:widgetbook_workspace/components/avatar/linagora_stacked_avatars_use_case.dart';
 import 'package:widgetbook_workspace/components/banners/linagora_alert_use_case.dart';
 import 'package:widgetbook_workspace/components/chips/linagora_dismissible_chip_use_case.dart';
@@ -133,6 +134,20 @@ class WidgetbookApp extends StatelessWidget {
         WidgetbookFolder(
           name: 'Avatar',
           children: [
+            WidgetbookComponent(
+              name: 'Linagora presence badge',
+              useCases: [
+                WidgetbookUseCase(
+                  name: 'Default',
+                  builder: (context) => linagoraPresenceBadgeUseCase(context),
+                ),
+                WidgetbookUseCase(
+                  name: 'All states and sizes',
+                  builder: (context) =>
+                      linagoraPresenceBadgeGalleryUseCase(context),
+                ),
+              ],
+            ),
             WidgetbookComponent(
               name: 'Linagora stacked avatars',
               useCases: [
