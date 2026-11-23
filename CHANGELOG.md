@@ -2,6 +2,7 @@
 
 ### Added
 
+* `LinagoraPresenceBadge` and `LinagoraPresence`: a presence dot over the bottom right of an avatar, green online, amber away, none offline or unknown; 10 up to a 40 avatar, 12 above, with a 2 ring of the surface colour and a 150 ms colour fade (none under reduced motion), styled by `LinagoraPresenceBadgeStyle.material()` or `.dark()`.
 * `LinagoraStackedAvatars`: overlapping round avatars with a ring and a `+N` bubble past the visible count, styled by `LinagoraStackedAvatarsStyle.material()` or `.dark()`.
 * `LinagoraDismissibleChip`: a painted 32 high rounded rectangle (radius 8) with a label, an optional leading widget and a close button whose layout grows to a 48dp tap target, styled by `LinagoraDismissibleChipStyle.material()` or `.dark()`.
 * `LinagoraStatusBadge`: a read-only pill naming a state, such as "Delegated mailbox", styled by `LinagoraStatusBadgeStyle.material()` or `.dark()`.
