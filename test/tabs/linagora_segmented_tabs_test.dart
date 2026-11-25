@@ -99,6 +99,14 @@ void main() {
       _hoverMatchesFigma,
     );
   });
+
+  group('LinagoraSegmentedTabs more segments', () {
+    testWidgets('lays out three segments fixed and expanded', _threeSegments);
+    testWidgets(
+      'follows a segment list that shrinks under it',
+      _segmentListShrinks,
+    );
+  });
 }
 
 Future<void> _defaultSize(WidgetTester tester) async {
@@ -646,4 +654,54 @@ Future<void> _hoverMatchesFigma(WidgetTester tester) async {
     find.descendant(of: _segment(_Tab.shared), matching: find.byType(InkWell)),
   );
   expect(ink.hoverColor, Colors.transparent);
+}
+
+const _threeSegmentList = [
+  ..._segments,
+  LinagoraSegment(value: _Tab.archived, label: 'Archived'),
+];
+
+Future<void> _threeSegments(WidgetTester tester) async {
+  await tester.pumpWidget(
+    _host(_tabs(selected: _Tab.archived, segments: _threeSegmentList)),
+  );
+  expect(
+    tester.getSize(find.byType(LinagoraSegmentedTabs<_Tab>)),
+    const Size(480, 32),
+  );
+  expect(_segmentDecoration(tester, _Tab.archived).color, Colors.white);
+
+  await tester.pumpWidget(
+    _host(
+      _tabs(
+        selected: _Tab.archived,
+        segments: _threeSegmentList,
+        expanded: true,
+      ),
+      width: 450,
+    ),
+  );
+  for (final tab in _Tab.values) {
+    expect(tester.getSize(_segment(tab)).width, 150);
+  }
+}
+
+Future<void> _segmentListShrinks(WidgetTester tester) async {
+  await tester.pumpWidget(
+    _host(_tabs(selected: _Tab.archived, segments: _threeSegmentList)),
+  );
+  await tester.sendKeyEvent(LogicalKeyboardKey.tab);
+  await tester.pump();
+
+  final changes = <_Tab>[];
+  await tester.pumpWidget(
+    _host(_tabs(selected: _Tab.shared, onChanged: changes.add)),
+  );
+  await tester.sendKeyEvent(LogicalKeyboardKey.arrowRight);
+  await tester.pump();
+
+  expect(tester.takeException(), isNull);
+  expect(_segment(_Tab.archived), findsNothing);
+  expect(_segmentDecoration(tester, _Tab.shared).color, Colors.white);
+  expect(changes, isEmpty, reason: 'shared is now the last segment');
 }
