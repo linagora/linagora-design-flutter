@@ -25,6 +25,10 @@ Widget linagoraReactionChipUseCase(BuildContext context) {
     max: 999,
   );
   final reactionCount = showCount ? count : null;
+  final selected = context.knobs.boolean(
+    label: 'Selected',
+    initialValue: false,
+  );
 
   return ColoredBox(
     color: const Color(0xFFF5F7FA),
@@ -36,11 +40,13 @@ Widget linagoraReactionChipUseCase(BuildContext context) {
           _ChipVariant.emoji => LinagoraReactionChip(
               emoji: emoji,
               count: reactionCount,
+              selected: selected,
               onTap: () {},
             ),
           _ChipVariant.image => LinagoraReactionChip.image(
               image: const FlutterLogo(),
               count: reactionCount,
+              selected: selected,
               onTap: () {},
             ),
           _ChipVariant.remaining => LinagoraReactionChip.remaining(

@@ -52,6 +52,10 @@ class LinagoraReactionChip extends StatelessWidget {
   /// `👍, 3 reactions`.
   final String? semanticLabel;
 
+  /// A reaction the current user gave: tinted with a primary border, and
+  /// selected for screen readers.
+  final bool selected;
+
   final VoidCallback? onTap;
   final VoidCallback? onLongPress;
   final GestureTapDownCallback? onTapDown;
@@ -62,6 +66,7 @@ class LinagoraReactionChip extends StatelessWidget {
     required String emoji,
     int? count,
     this.semanticLabel,
+    this.selected = false,
     this.onTap,
     this.onLongPress,
   }) : _kind = _ChipKind.reaction,
@@ -76,6 +81,7 @@ class LinagoraReactionChip extends StatelessWidget {
     required Widget image,
     int? count,
     this.semanticLabel,
+    this.selected = false,
     this.onTap,
     this.onLongPress,
   }) : _kind = _ChipKind.reaction,
@@ -96,6 +102,7 @@ class LinagoraReactionChip extends StatelessWidget {
        _emoji = null,
        _image = null,
        _count = count,
+       selected = false,
        onLongPress = null;
 
   /// The button opening the full list of reactions.
@@ -108,6 +115,7 @@ class LinagoraReactionChip extends StatelessWidget {
        _emoji = null,
        _image = null,
        _count = null,
+       selected = false,
        onLongPress = null;
 
   Widget? get _content {
@@ -163,10 +171,12 @@ class LinagoraReactionChip extends StatelessWidget {
     final label = _label;
 
     return Material(
-      color: sysColors.surface,
+      color: selected ? sysColors.primaryContainer : sysColors.surface,
       shape: RoundedRectangleBorder(
         borderRadius: borderRadius,
-        side: BorderSide(color: sysColors.onPrimary),
+        side: BorderSide(
+          color: selected ? sysColors.primary : sysColors.onPrimary,
+        ),
       ),
       child: InkWell(
         onTap: onTap,
@@ -175,6 +185,7 @@ class LinagoraReactionChip extends StatelessWidget {
         borderRadius: borderRadius,
         child: Semantics(
           button: onTap != null,
+          selected: _kind == _ChipKind.reaction ? selected : null,
           label: semanticLabel,
           excludeSemantics: semanticLabel != null,
           child: Container(
