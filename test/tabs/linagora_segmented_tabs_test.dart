@@ -92,6 +92,13 @@ void main() {
       _ignoresModifiedArrows,
     );
   });
+
+  group('LinagoraSegmentedTabs Figma hover', () {
+    testWidgets(
+      'darkens the hovered unselected label without tinting its background',
+      _hoverMatchesFigma,
+    );
+  });
 }
 
 Future<void> _defaultSize(WidgetTester tester) async {
@@ -623,4 +630,20 @@ Future<void> _ignoresModifiedArrows(WidgetTester tester) async {
 
     expect(changes, isEmpty, reason: '$modifier + ArrowLeft');
   }
+}
+
+Future<void> _hoverMatchesFigma(WidgetTester tester) async {
+  await tester.pumpWidget(_host(_tabs(selected: _Tab.mine)));
+  final mouse = await tester.createGesture(kind: PointerDeviceKind.mouse);
+  await mouse.addPointer(location: Offset.zero);
+  addTearDown(mouse.removePointer);
+  await mouse.moveTo(tester.getCenter(_segment(_Tab.shared)));
+  await tester.pumpAndSettle();
+
+  // Figma picker tab, state=hover: no fill, label Text/secondary at 90%.
+  expect(_labelColor(tester, 'Delegated to me'), const Color(0xE6424244));
+  final ink = tester.widget<InkWell>(
+    find.descendant(of: _segment(_Tab.shared), matching: find.byType(InkWell)),
+  );
+  expect(ink.hoverColor, Colors.transparent);
 }
