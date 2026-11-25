@@ -1,4 +1,6 @@
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:linagora_design_flutter/linagora_design_flutter.dart';
@@ -71,6 +73,25 @@ void main() {
     );
     test('keys a segment by equality, not its print', _keysByEquality);
   });
+
+  group('LinagoraSegmentedTabs pointer and layout edges', () {
+    testWidgets(
+      'hides the keyboard ring after a mouse click on the selected segment',
+      _mouseClickSelectedHidesRing,
+    );
+    testWidgets(
+      'lays out when expanded inside a row with unbounded width',
+      _expandedUnboundedWidth,
+    );
+    testWidgets(
+      'does not clip the label at 2x text scale',
+      _noLabelClipAtTextScale,
+    );
+    testWidgets(
+      'leaves arrow keys held with Alt, Control or Meta to the platform',
+      _ignoresModifiedArrows,
+    );
+  });
 }
 
 Future<void> _defaultSize(WidgetTester tester) async {
@@ -124,9 +145,7 @@ Future<void> _selectedPaint(WidgetTester tester) async {
 
 Future<void> _darkTokens(WidgetTester tester) async {
   final style = LinagoraSegmentedTabsStyle.dark();
-  await tester.pumpWidget(
-    _host(_tabs(selected: _Tab.shared, style: style)),
-  );
+  await tester.pumpWidget(_host(_tabs(selected: _Tab.shared, style: style)));
 
   expect(_trackColor(tester), const Color(0x14FFFFFF));
   expect(
@@ -554,4 +573,54 @@ Color? _trackColor(WidgetTester tester) {
         .first,
   );
   return (track.decoration! as BoxDecoration).color;
+}
+
+Future<void> _mouseClickSelectedHidesRing(WidgetTester tester) async {
+  await tester.pumpWidget(_host(_tabs(selected: _Tab.mine)));
+  await tester.sendKeyEvent(LogicalKeyboardKey.tab);
+  await tester.pump();
+  expect(_segmentChrome(tester, _Tab.mine).foregroundDecoration, isNotNull);
+
+  await tester.tap(_segment(_Tab.mine), kind: PointerDeviceKind.mouse);
+  await tester.pump();
+
+  expect(_segmentChrome(tester, _Tab.mine).foregroundDecoration, isNull);
+}
+
+Future<void> _expandedUnboundedWidth(WidgetTester tester) async {
+  await tester.pumpWidget(
+    MaterialApp(
+      home: Scaffold(
+        body: Row(children: [_tabs(selected: _Tab.mine, expanded: true)]),
+      ),
+    ),
+  );
+
+  expect(tester.takeException(), isNull);
+}
+
+Future<void> _noLabelClipAtTextScale(WidgetTester tester) async {
+  tester.platformDispatcher.textScaleFactorTestValue = 2;
+  addTearDown(tester.platformDispatcher.clearTextScaleFactorTestValue);
+  await tester.pumpWidget(_host(_tabs(selected: _Tab.mine)));
+
+  final label = tester.renderObject<RenderParagraph>(find.text('My delegates'));
+  final needed = label.getMinIntrinsicHeight(label.size.width);
+  expect(label.size.height, greaterThanOrEqualTo(needed - 0.5));
+}
+
+Future<void> _ignoresModifiedArrows(WidgetTester tester) async {
+  for (final modifier in [
+    LogicalKeyboardKey.altLeft,
+    LogicalKeyboardKey.controlLeft,
+    LogicalKeyboardKey.metaLeft,
+  ]) {
+    final changes = await _pressKeys(tester, const [], selected: _Tab.shared);
+    await tester.sendKeyDownEvent(modifier);
+    await tester.sendKeyEvent(LogicalKeyboardKey.arrowLeft);
+    await tester.sendKeyUpEvent(modifier);
+    await tester.pump();
+
+    expect(changes, isEmpty, reason: '$modifier + ArrowLeft');
+  }
 }
