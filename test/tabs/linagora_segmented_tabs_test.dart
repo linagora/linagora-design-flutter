@@ -169,7 +169,8 @@ Future<void> _darkTokens(WidgetTester tester) async {
   );
   expect(_labelColor(tester, 'Delegated to me'), const Color(0xFF91BFFF));
   expect(_labelColor(tester, 'My delegates'), const Color(0xA3FFFFFF));
-  expect(style.hoverColor, const Color(0x14FFFFFF));
+  expect(style.hoveredTextStyle.color, const Color(0xE6FFFFFF));
+  expect(style.disabledTextStyle.color, const Color(0x61FFFFFF));
   expect(style.focusColor, const Color(0xFF91BFFF));
   expect(
     style.selectedShadow,

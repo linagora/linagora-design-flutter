@@ -3,7 +3,8 @@ import 'package:linagora_design_flutter/style/linagora_text_theme.dart';
 
 /// Tokens for [LinagoraSegmentedTabs].
 ///
-/// The track is 32 high. Use [copyWith] to change a few tokens.
+/// The track is at least 32 high and grows with the text scale. Use
+/// [copyWith] to change a few tokens.
 @immutable
 class LinagoraSegmentedTabsStyle {
   final double height;
@@ -16,12 +17,17 @@ class LinagoraSegmentedTabsStyle {
 
   final Color selectedColor;
   final List<BoxShadow> selectedShadow;
-  final Color hoverColor;
   final Color focusColor;
   final double focusWidth;
 
   final TextStyle selectedTextStyle;
   final TextStyle unselectedTextStyle;
+  final TextStyle hoveredTextStyle;
+  final TextStyle disabledTextStyle;
+
+  final double iconSize;
+  final Color badgeColor;
+  final TextStyle badgeTextStyle;
 
   final Duration animationDuration;
 
@@ -33,11 +39,15 @@ class LinagoraSegmentedTabsStyle {
     required this.segmentPadding,
     required this.selectedColor,
     required this.selectedShadow,
-    required this.hoverColor,
     required this.focusColor,
     required this.focusWidth,
     required this.selectedTextStyle,
     required this.unselectedTextStyle,
+    required this.hoveredTextStyle,
+    required this.disabledTextStyle,
+    required this.iconSize,
+    required this.badgeColor,
+    required this.badgeTextStyle,
     required this.animationDuration,
   });
 
@@ -68,10 +78,12 @@ class LinagoraSegmentedTabsStyle {
     trackColor: const Color(0x0C1D212A),
     // Selected thumb: Background/paper.
     selectedColor: Colors.white,
-    // Selected label: Primary/main. Unselected: Text/secondary @ 64%.
+    // Selected label: Primary/main. Text/secondary @ 64% unselected,
+    // 90% hovered, 38% disabled.
     selectedTextColor: const Color(0xFF0A84FF),
     unselectedTextColor: const Color(0xA3424244),
-    hoverColor: const Color(0x0A424244),
+    hoveredTextColor: const Color(0xE6424244),
+    disabledTextColor: const Color(0x61424244),
     focusColor: const Color(0xFF0A84FF),
   ));
 
@@ -82,7 +94,8 @@ class LinagoraSegmentedTabsStyle {
     // Selected label: Primary/main. Unselected: Text/secondary @ 64%.
     selectedTextColor: const Color(0xFF91BFFF),
     unselectedTextColor: const Color(0xA3FFFFFF),
-    hoverColor: const Color(0x14FFFFFF),
+    hoveredTextColor: const Color(0xE6FFFFFF),
+    disabledTextColor: const Color(0x61FFFFFF),
     focusColor: const Color(0xFF91BFFF),
   ));
 
@@ -96,7 +109,8 @@ class LinagoraSegmentedTabsStyle {
       Color selectedColor,
       Color selectedTextColor,
       Color unselectedTextColor,
-      Color hoverColor,
+      Color hoveredTextColor,
+      Color disabledTextColor,
       Color focusColor,
     }) colors,
   ) {
@@ -108,11 +122,16 @@ class LinagoraSegmentedTabsStyle {
       segmentPadding: const EdgeInsets.symmetric(horizontal: 16),
       selectedColor: colors.selectedColor,
       selectedShadow: _selectedShadow,
-      hoverColor: colors.hoverColor,
       focusColor: colors.focusColor,
       focusWidth: 2,
       selectedTextStyle: _text(colors.selectedTextColor),
       unselectedTextStyle: _text(colors.unselectedTextColor),
+      hoveredTextStyle: _text(colors.hoveredTextColor),
+      disabledTextStyle: _text(colors.disabledTextColor),
+      iconSize: 20,
+      // Count badge: Primary/main fill, white count.
+      badgeColor: colors.focusColor,
+      badgeTextStyle: _text(Colors.white).copyWith(fontSize: 11, height: 1),
       animationDuration: const Duration(milliseconds: 150),
     );
   }
@@ -126,11 +145,15 @@ class LinagoraSegmentedTabsStyle {
     EdgeInsetsGeometry? segmentPadding,
     Color? selectedColor,
     List<BoxShadow>? selectedShadow,
-    Color? hoverColor,
     Color? focusColor,
     double? focusWidth,
     TextStyle? selectedTextStyle,
     TextStyle? unselectedTextStyle,
+    TextStyle? hoveredTextStyle,
+    TextStyle? disabledTextStyle,
+    double? iconSize,
+    Color? badgeColor,
+    TextStyle? badgeTextStyle,
     Duration? animationDuration,
   }) =>
       LinagoraSegmentedTabsStyle(
@@ -141,11 +164,15 @@ class LinagoraSegmentedTabsStyle {
         segmentPadding: segmentPadding ?? this.segmentPadding,
         selectedColor: selectedColor ?? this.selectedColor,
         selectedShadow: selectedShadow ?? this.selectedShadow,
-        hoverColor: hoverColor ?? this.hoverColor,
         focusColor: focusColor ?? this.focusColor,
         focusWidth: focusWidth ?? this.focusWidth,
         selectedTextStyle: selectedTextStyle ?? this.selectedTextStyle,
         unselectedTextStyle: unselectedTextStyle ?? this.unselectedTextStyle,
+        hoveredTextStyle: hoveredTextStyle ?? this.hoveredTextStyle,
+        disabledTextStyle: disabledTextStyle ?? this.disabledTextStyle,
+        iconSize: iconSize ?? this.iconSize,
+        badgeColor: badgeColor ?? this.badgeColor,
+        badgeTextStyle: badgeTextStyle ?? this.badgeTextStyle,
         animationDuration: animationDuration ?? this.animationDuration,
       );
 }

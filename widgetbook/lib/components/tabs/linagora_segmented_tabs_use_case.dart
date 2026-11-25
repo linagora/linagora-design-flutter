@@ -14,6 +14,15 @@ Widget linagoraSegmentedTabsUseCase(BuildContext context) {
     initialValue: 'With me',
   );
   final expanded = context.knobs.boolean(label: 'Expanded');
+  final hugContent = context.knobs.boolean(label: 'Hug content');
+  final secondEnabled = context.knobs.boolean(
+    label: 'Second enabled',
+    initialValue: true,
+  );
+  final secondBadgeCount = context.knobs.int.input(
+    label: 'Second badge count',
+    initialValue: 0,
+  );
   final isDark = Theme.of(context).brightness == Brightness.dark;
   final style = isDark
       ? LinagoraSegmentedTabsStyle.dark()
@@ -31,6 +40,9 @@ Widget linagoraSegmentedTabsUseCase(BuildContext context) {
         first: first,
         second: second,
         expanded: expanded,
+        hugContent: hugContent && !expanded,
+        secondEnabled: secondEnabled,
+        secondBadgeCount: secondBadgeCount,
         style: style,
       ),
     ),
@@ -41,12 +53,18 @@ class _InteractiveTabs extends StatefulWidget {
   final String first;
   final String second;
   final bool expanded;
+  final bool hugContent;
+  final bool secondEnabled;
+  final int secondBadgeCount;
   final LinagoraSegmentedTabsStyle style;
 
   const _InteractiveTabs({
     required this.first,
     required this.second,
     required this.expanded,
+    required this.hugContent,
+    required this.secondEnabled,
+    required this.secondBadgeCount,
     required this.style,
   });
 
@@ -63,10 +81,16 @@ class _InteractiveTabsState extends State<_InteractiveTabs> {
         child: LinagoraSegmentedTabs<int>(
           segments: [
             LinagoraSegment(value: 0, label: widget.first),
-            LinagoraSegment(value: 1, label: widget.second),
+            LinagoraSegment(
+              value: 1,
+              label: widget.second,
+              enabled: widget.secondEnabled,
+              badgeCount: widget.secondBadgeCount,
+            ),
           ],
           selected: _selected,
           expanded: widget.expanded,
+          hugContent: widget.hugContent,
           style: widget.style,
           onChanged: (value) => setState(() => _selected = value),
         ),
