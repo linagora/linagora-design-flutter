@@ -9,6 +9,7 @@
 * `LinagoraEmptyCard`: a short bordered card with a title, an optional message and an optional action, styled by `LinagoraEmptyCardStyle.material()` or `.dark()`. Distinct from `LinagoraEmptyState`, which stays the tall filled illustration card.
 * `LinagoraDesignImages.emptyCardShareIcon` and `emptyCardMailIcon`:
   empty-card illustrations for the access “by me” and “with me” states.
+* `LinagoraSegmentedTabs`: a pill at least 32 high that switches between two or more views, with fixed, content-hugging or expanded segments, disabled segments, count badges and icon-only segments, with arrow, Home and End keys, styled by `LinagoraSegmentedTabsStyle.material()` or `.dark()`.
 * `LinagoraSidebarStyle` gains section header action tokens:
   `sectionHeaderActionSize` (16.67), `sectionHeaderActionIconSize` (10.42),
   `sectionHeaderActionSpacing` (10.25) and `sectionHeaderActionTargetSize` (24),
