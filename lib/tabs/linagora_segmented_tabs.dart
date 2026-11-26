@@ -326,7 +326,10 @@ class _LinagoraSegmentButtonState extends State<_LinagoraSegmentButton> {
           minHeight: tokens.height - tokens.trackPadding.vertical,
         ),
         decoration: BoxDecoration(
-          color: widget.selected ? tokens.selectedColor : Colors.transparent,
+          // Same RGB as the selected fill, so the switch animation fades instead of passing through grey.
+          color: widget.selected
+              ? tokens.selectedColor
+              : tokens.selectedColor.withValues(alpha: 0),
           borderRadius: radius,
           boxShadow: widget.selected ? tokens.selectedShadow : null,
         ),
