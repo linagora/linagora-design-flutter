@@ -1,3 +1,9 @@
+## Unreleased
+
+### Added
+
+* `LinagoraReactionChip` and `LinagoraReactionChip.image` take `selected`: a reaction the current user gave gets a `primaryContainer` background and a `primary` border, and is selected for screen readers.
+
 ## 0.4.3
 
 ### Added

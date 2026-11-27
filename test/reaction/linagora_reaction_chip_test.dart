@@ -159,4 +159,71 @@ void main() {
     expect(find.bySemanticsLabel(RegExp('3\$')), findsNothing);
     handle.dispose();
   });
+
+  ShapeBorder? shapeOf(WidgetTester tester) => tester
+      .widget<Material>(
+        find.descendant(
+          of: find.byType(LinagoraReactionChip),
+          matching: find.byType(Material),
+        ),
+      )
+      .shape;
+
+  Color? colorOf(WidgetTester tester) => tester
+      .widget<Material>(
+        find.descendant(
+          of: find.byType(LinagoraReactionChip),
+          matching: find.byType(Material),
+        ),
+      )
+      .color;
+
+  testWidgets('a selected reaction has the primary tint and border', (
+    tester,
+  ) async {
+    final colors = LinagoraSysColors.material();
+    await tester.pumpWidget(
+      build(const LinagoraReactionChip(emoji: '👍', count: 2, selected: true)),
+    );
+
+    expect(colorOf(tester), colors.primaryContainer);
+    expect(
+      (shapeOf(tester) as RoundedRectangleBorder).side.color,
+      colors.primary,
+    );
+    expect(chipSize(tester).height, LinagoraReactionChip.height);
+  });
+
+  testWidgets('a reaction is not selected by default', (tester) async {
+    final colors = LinagoraSysColors.material();
+    await tester.pumpWidget(build(const LinagoraReactionChip(emoji: '👍')));
+
+    expect(colorOf(tester), colors.surface);
+    expect(
+      (shapeOf(tester) as RoundedRectangleBorder).side.color,
+      colors.onPrimary,
+    );
+  });
+
+  testWidgets('a selected reaction is selected for screen readers', (
+    tester,
+  ) async {
+    final handle = tester.ensureSemantics();
+    await tester.pumpWidget(
+      build(
+        LinagoraReactionChip(
+          emoji: '👍',
+          semanticLabel: 'Thumbs up',
+          selected: true,
+          onTap: () {},
+        ),
+      ),
+    );
+
+    expect(
+      tester.getSemantics(find.bySemanticsLabel('Thumbs up')),
+      containsSemantics(isButton: true, isSelected: true),
+    );
+    handle.dispose();
+  });
 }
