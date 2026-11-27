@@ -1,3 +1,9 @@
+## Unreleased
+
+### Fixed
+
+* `TwakeWelcomeScreen`: on a small screen or with a large text scale, the buttons no longer cover the logo and the description. The content now scrolls with the buttons below it; phones where everything fits look the same.
+
 ## 0.4.3
 
 ### Added

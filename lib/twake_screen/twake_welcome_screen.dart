@@ -70,159 +70,162 @@ class TwakeWelcomeScreen extends StatelessWidget {
       body: Container(
         width: double.infinity,
         decoration: BoxDecoration(
-          gradient: LinagoraSysColors
-              .material()
-              .linearGradientStartingPage,
+          gradient: LinagoraSysColors.material().linearGradientStartingPage,
         ),
         child: Stack(
-          alignment: Alignment.center,
           children: [
-            Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                if (logo != null) logo!,
-                Text(
-                  description,
-                  textAlign: TextAlign.center,
-                  style: descriptionTextStyle ??
-                      const TextStyle(
-                        fontSize: 17,
-                        fontWeight: FontWeight.w500,
-                        color: Colors.black,
-                      ),
-                ),
-              ],
+            SafeArea(
+              bottom: false,
+              child: CustomScrollView(
+                slivers: [
+                  SliverFillRemaining(
+                    hasScrollBody: false,
+                    child: Column(
+                      children: [
+                        Expanded(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              if (logo != null) logo!,
+                              Text(
+                                description,
+                                textAlign: TextAlign.center,
+                                style:
+                                    descriptionTextStyle ??
+                                    const TextStyle(
+                                      fontSize: 17,
+                                      fontWeight: FontWeight.w500,
+                                      color: Colors.black,
+                                    ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        Padding(
+                          padding: TwakeWelcomeScreenStyle.buttonPadding,
+                          child: Column(
+                            children: [
+                              if (createTwakeIdTitle != null) ...[
+                                HomeserverButtonWidget(
+                                  focusColor: focusColor,
+                                  hoverColor: hoverColor,
+                                  highlightColor: highlightColor,
+                                  overlayColor: overlayColor,
+                                  splashColor: splashColor,
+                                  onTap: onCreateTwakeIdOnTap,
+                                  title: createTwakeIdTitle!,
+                                  textStyle:
+                                      createTwakeIdTextStyle ??
+                                      TextStyle(
+                                        fontSize: 17,
+                                        fontWeight: FontWeight.w500,
+                                        color: LinagoraSysColors.material()
+                                            .onPrimary,
+                                      ),
+                                ),
+                                const SizedBox(height: 12),
+                              ],
+                              if (signInTitle != null)
+                                HomeserverButtonWidget(
+                                  focusColor: focusColor,
+                                  hoverColor: hoverColor,
+                                  highlightColor: highlightColor,
+                                  overlayColor: overlayColor,
+                                  splashColor: splashColor,
+                                  onTap: onSignInOnTap,
+                                  title: signInTitle!,
+                                  backgroundColor:
+                                      LinagoraSysColors.material().surface,
+                                  textStyle:
+                                      createTwakeIdTextStyle ??
+                                      TextStyle(
+                                        fontSize: 17,
+                                        fontWeight: FontWeight.w500,
+                                        color: LinagoraSysColors.material()
+                                            .primary,
+                                      ),
+                                ),
+                              const SizedBox(height: 12),
+                              InkWell(
+                                focusColor: focusColor,
+                                hoverColor: hoverColor,
+                                highlightColor: highlightColor,
+                                overlayColor: overlayColor,
+                                splashColor: splashColor,
+                                onTap: onUseCompanyServerOnTap,
+                                child: Padding(
+                                  padding: TwakeWelcomeScreenStyle
+                                      .useCompanyServerTitlePadding,
+                                  child: Text(
+                                    useCompanyServerTitle,
+                                    textAlign: TextAlign.center,
+                                    style:
+                                        useCompanyServerTextStyle ??
+                                        TextStyle(
+                                          fontSize: 17,
+                                          fontWeight: FontWeight.w500,
+                                          color: LinagoraSysColors.material()
+                                              .primary,
+                                          decoration: TextDecoration.underline,
+                                          decorationColor:
+                                              LinagoraSysColors.material()
+                                                  .primary,
+                                        ),
+                                  ),
+                                ),
+                              ),
+                              if (privacyPolicy != null) ...[
+                                const SizedBox(height: 32),
+                                Column(
+                                  children: [
+                                    Text(
+                                      descriptionPrivacyPolicy ?? '',
+                                      textAlign: TextAlign.center,
+                                      style:
+                                          descriptionPrivacyPolicyTextStyle ??
+                                          TextStyle(
+                                            fontSize: 12,
+                                            fontWeight: FontWeight.w500,
+                                            color: LinagoraSysColors.material()
+                                                .outlineVariantDark,
+                                          ),
+                                    ),
+                                    InkWell(
+                                      focusColor: focusColor,
+                                      hoverColor: hoverColor,
+                                      highlightColor: highlightColor,
+                                      overlayColor: overlayColor,
+                                      splashColor: splashColor,
+                                      onTap: onPrivacyPolicyOnTap,
+                                      child: Text(
+                                        privacyPolicy!,
+                                        textAlign: TextAlign.center,
+                                        style:
+                                            privacyPolicyTextStyle ??
+                                            TextStyle(
+                                              fontSize: 14,
+                                              fontWeight: FontWeight.w500,
+                                              color:
+                                                  LinagoraSysColors.material()
+                                                      .primary,
+                                            ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                              const SizedBox(height: 16),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
             ),
             if (backButton != null)
-              Positioned(
-                top: 56,
-                left: 0,
-                child: backButton!,
-              ),
-            Positioned(
-              bottom: 0,
-              child: Padding(
-                padding: TwakeWelcomeScreenStyle.buttonPadding,
-                child: Column(
-                  children: [
-                    if (createTwakeIdTitle != null) ...[
-                      HomeserverButtonWidget(
-                        focusColor: focusColor,
-                        hoverColor: hoverColor,
-                        highlightColor: highlightColor,
-                        overlayColor: overlayColor,
-                        splashColor: splashColor,
-                        onTap: onCreateTwakeIdOnTap,
-                        title: createTwakeIdTitle!,
-                        textStyle: createTwakeIdTextStyle ??
-                            TextStyle(
-                              fontSize: 17,
-                              fontWeight: FontWeight.w500,
-                              color: LinagoraSysColors
-                                  .material()
-                                  .onPrimary,
-                            ),
-                      ),
-                      const SizedBox(
-                        height: 12,
-                      ),
-                    ],
-                    if (signInTitle != null)
-                      HomeserverButtonWidget(
-                        focusColor: focusColor,
-                        hoverColor: hoverColor,
-                        highlightColor: highlightColor,
-                        overlayColor: overlayColor,
-                        splashColor: splashColor,
-                        onTap: onSignInOnTap,
-                        title: signInTitle!,
-                        backgroundColor: LinagoraSysColors
-                            .material()
-                            .surface,
-                        textStyle: createTwakeIdTextStyle ??
-                            TextStyle(
-                              fontSize: 17,
-                              fontWeight: FontWeight.w500,
-                              color: LinagoraSysColors
-                                  .material()
-                                  .primary,
-                            ),
-                      ),
-                    const SizedBox(
-                      height: 12,
-                    ),
-                    InkWell(
-                      focusColor: focusColor,
-                      hoverColor: hoverColor,
-                      highlightColor: highlightColor,
-                      overlayColor: overlayColor,
-                      splashColor: splashColor,
-                      onTap: onUseCompanyServerOnTap,
-                      child: Padding(
-                        padding: TwakeWelcomeScreenStyle
-                            .useCompanyServerTitlePadding,
-                        child: Text(
-                          useCompanyServerTitle,
-                          style: useCompanyServerTextStyle ??
-                              TextStyle(
-                                fontSize: 17,
-                                fontWeight: FontWeight.w500,
-                                color: LinagoraSysColors
-                                    .material()
-                                    .primary,
-                                decoration: TextDecoration.underline,
-                                decorationColor:
-                                LinagoraSysColors
-                                    .material()
-                                    .primary,
-                              ),
-                        ),
-                      ),
-                    ),
-                    if (privacyPolicy != null) ...[
-                      const SizedBox(
-                        height: 32,
-                      ),
-                      Column(
-                        children: [
-                          Text(
-                            descriptionPrivacyPolicy ?? '',
-                            style: descriptionPrivacyPolicyTextStyle ??
-                                TextStyle(
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.w500,
-                                  color: LinagoraSysColors
-                                      .material()
-                                      .outlineVariantDark,
-                                ),
-                          ),
-                          InkWell(
-                            focusColor: focusColor,
-                            hoverColor: hoverColor,
-                            highlightColor: highlightColor,
-                            overlayColor: overlayColor,
-                            splashColor: splashColor,
-                            onTap: onPrivacyPolicyOnTap,
-                            child: Text(
-                              privacyPolicy!,
-                              style: privacyPolicyTextStyle ??
-                                  TextStyle(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.w500,
-                                    color: LinagoraSysColors
-                                        .material()
-                                        .primary,
-                                  ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
-                    const SizedBox(height: 16),
-                  ],
-                ),
-              ),
-            )
+              Positioned(top: 56, left: 0, child: backButton!),
           ],
         ),
       ),
