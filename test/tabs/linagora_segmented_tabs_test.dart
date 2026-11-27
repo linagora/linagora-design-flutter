@@ -39,6 +39,15 @@ void main() {
       _tapThenArrow,
     );
     testWidgets('does not paint a focus ring after a pointer tap', _tapNoRing);
+    testWidgets(
+      'does not paint a focus ring when a closed dialog restores focus',
+      _dialogCloseNoRing,
+    );
+    testWidgets('does not flash an ink highlight on tap', _tapNoInk);
+    testWidgets(
+      'fades the old selection without a grey frame',
+      _switchFadesWithoutGrey,
+    );
   });
 
   group('LinagoraSegmentedTabs keyboard', () {
@@ -230,6 +239,60 @@ Future<void> _tapNoRing(WidgetTester tester) async {
 
   expect(_segmentChrome(tester, _Tab.shared).foregroundDecoration, isNull);
   expect(_segmentChrome(tester, _Tab.mine).foregroundDecoration, isNull);
+}
+
+Future<void> _dialogCloseNoRing(WidgetTester tester) async {
+  await tester.pumpWidget(_host(_tabs(selected: _Tab.mine)));
+  await tester.tap(_segment(_Tab.shared), kind: PointerDeviceKind.mouse);
+  await tester.pump();
+  final context = tester.element(_segment(_Tab.shared));
+
+  showDialog<void>(
+    context: context,
+    builder: (dialogContext) => TextButton(
+      onPressed: () => Navigator.of(dialogContext).pop(),
+      child: const Text('Close'),
+    ),
+  );
+  await tester.pumpAndSettle();
+  await tester.tap(find.text('Close'), kind: PointerDeviceKind.mouse);
+  await tester.pumpAndSettle();
+
+  expect(_segmentChrome(tester, _Tab.shared).foregroundDecoration, isNull);
+  expect(_segmentChrome(tester, _Tab.mine).foregroundDecoration, isNull);
+}
+
+Future<void> _tapNoInk(WidgetTester tester) async {
+  await tester.pumpWidget(_host(_tabs(selected: _Tab.mine)));
+
+  final inkWell = tester.widget<InkWell>(
+    find.descendant(of: _segment(_Tab.shared), matching: find.byType(InkWell)),
+  );
+
+  expect(inkWell.highlightColor, Colors.transparent);
+  expect(inkWell.splashFactory, NoSplash.splashFactory);
+}
+
+Future<void> _switchFadesWithoutGrey(WidgetTester tester) async {
+  await tester.pumpWidget(_host(_tabs(selected: _Tab.mine)));
+  await tester.pumpWidget(_host(_tabs(selected: _Tab.shared)));
+  await tester.pump(
+    LinagoraSegmentedTabsStyle.material().animationDuration ~/ 2,
+  );
+
+  final fill = tester
+      .widgetList<DecoratedBox>(
+        find.descendant(
+          of: _segment(_Tab.mine),
+          matching: find.byType(DecoratedBox),
+        ),
+      )
+      .map((box) => (box.decoration as BoxDecoration).color)
+      .firstWhere((color) => color != null)!;
+  final selected = LinagoraSegmentedTabsStyle.material().selectedColor;
+
+  expect(fill.a, inExclusiveRange(0, 1));
+  expect(fill.withValues(alpha: 1), selected.withValues(alpha: 1));
 }
 
 Future<void> _focusRing(WidgetTester tester) async {

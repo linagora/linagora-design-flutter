@@ -221,7 +221,11 @@ class _LinagoraSegmentedTabsState<T> extends State<LinagoraSegmentedTabs<T>> {
         if (!mounted) return;
         setState(() {
           _focused = focused;
-          if (!focused) _suppressFocusHighlight = false;
+          // Focus restored without a key held (e.g. a closed dialog) is not keyboard focus.
+          if (focused) {
+            _suppressFocusHighlight =
+                HardwareKeyboard.instance.logicalKeysPressed.isEmpty;
+          }
         });
       },
       child: Container(
@@ -322,7 +326,10 @@ class _LinagoraSegmentButtonState extends State<_LinagoraSegmentButton> {
           minHeight: tokens.height - tokens.trackPadding.vertical,
         ),
         decoration: BoxDecoration(
-          color: widget.selected ? tokens.selectedColor : Colors.transparent,
+          // Same RGB as the selected fill, so the switch animation fades instead of passing through grey.
+          color: widget.selected
+              ? tokens.selectedColor
+              : tokens.selectedColor.withValues(alpha: 0),
           borderRadius: radius,
           boxShadow: widget.selected ? tokens.selectedShadow : null,
         ),
@@ -341,6 +348,8 @@ class _LinagoraSegmentButtonState extends State<_LinagoraSegmentButton> {
             canRequestFocus: false,
             borderRadius: radius,
             hoverColor: Colors.transparent,
+            highlightColor: Colors.transparent,
+            splashFactory: NoSplash.splashFactory,
             onHover: (hovered) => setState(() => _hovered = hovered),
             onTap: widget.onTap,
             child: Padding(
