@@ -23,6 +23,7 @@ import 'package:widgetbook_workspace/components/event/linagora_event_info_row_us
 import 'package:widgetbook_workspace/components/file_transfer/linagora_file_transfer_use_case.dart';
 import 'package:widgetbook_workspace/components/file_transfer/linagora_file_transfer_simulated_use_case.dart';
 import 'package:widgetbook_workspace/components/chips/linagora_filter_chip_use_case.dart';
+import 'package:widgetbook_workspace/components/list_item/linagora_checkbox_item_use_case.dart';
 import 'package:widgetbook_workspace/components/list_item/linagora_radio_item_use_case.dart';
 import 'package:widgetbook_workspace/components/list_item/linagora_avatar_list_item_use_case.dart';
 import 'package:widgetbook_workspace/components/list_item/linagora_person_tile_use_case.dart';
@@ -323,6 +324,15 @@ class WidgetbookApp extends StatelessWidget {
                 WidgetbookUseCase(
                   name: 'Group',
                   builder: (context) => linagoraRadioItemUseCase(context),
+                ),
+              ],
+            ),
+            WidgetbookComponent(
+              name: 'Linagora checkbox item',
+              useCases: [
+                WidgetbookUseCase(
+                  name: 'Group',
+                  builder: (context) => linagoraCheckboxItemUseCase(context),
                 ),
               ],
             ),

@@ -1,3 +1,14 @@
+## Unreleased
+
+### Added
+
+* `LinagoraCheckboxItem`: an option of a multiple-choice list, the checkbox counterpart of `LinagoraRadioItem` (Figma "Radio Card / Item", 57 high with a divider), with an optional subtitle and leading widget.
+
+### Changed
+
+* `LinagoraSettingItem.selectable(control: checkbox)` draws the Figma "Checkboxes" mark: filled primary when checked, instead of a grey outlined icon in both states.
+* `LinagoraSettingItem.minHeight` is 88 (was 92), the Figma `Style=Title+Desc` height. Rows with a one-line subtitle get 4 dp shorter.
+
 ## 0.4.3
 
 ### Added
