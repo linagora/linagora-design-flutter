@@ -33,6 +33,7 @@ import 'package:widgetbook_workspace/components/reaction/linagora_reaction_chip_
 import 'package:widgetbook_workspace/components/reaction/linagora_reaction_tabs_use_case.dart';
 import 'package:widgetbook_workspace/components/reaction/linagora_reactions_use_case.dart';
 import 'package:widgetbook_workspace/components/reaction/linagora_reaction_item_use_case.dart';
+import 'package:widgetbook_workspace/components/reaction/reactions_picker_use_case.dart';
 import 'package:widgetbook_workspace/components/sidebar/linagora_sidebar_item_use_case.dart';
 import 'package:widgetbook_workspace/components/sidebar/linagora_sidebar_actions_use_case.dart';
 import 'package:widgetbook_workspace/components/sidebar/linagora_sidebar_footer_use_case.dart';
@@ -442,6 +443,15 @@ class WidgetbookApp extends StatelessWidget {
                   name: 'Custom emoji',
                   builder: (context) =>
                       linagoraReactionItemImageUseCase(context),
+                ),
+              ],
+            ),
+            WidgetbookComponent(
+              name: 'Reactions picker',
+              useCases: [
+                WidgetbookUseCase(
+                  name: 'Default',
+                  builder: (context) => reactionsPickerUseCase(context),
                 ),
               ],
             ),

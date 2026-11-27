@@ -1,3 +1,9 @@
+## Unreleased
+
+### Changed
+
+* `ReactionsPicker`: the user's reaction (`myEmojiReacted`) sits on a `primaryContainer` circle instead of `onSurface` at 10 %, matches whatever its variation selector (`👍` and `👍️` are one reaction), and each emoji is a button for screen readers, the user's one `selected`.
+
 ## 0.4.3
 
 ### Added

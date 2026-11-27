@@ -9,6 +9,14 @@ typedef OnClickEmojiReactionAction = void Function(
 
 typedef OnPickEmojiReactionAction = void Function();
 
+final _variationSelectors = RegExp('[\uFE0E\uFE0F]');
+
+// `👍` and `👍️` (with U+FE0F) are one reaction.
+bool _isSameEmoji(String? reacted, String emoji) =>
+    reacted != null &&
+    reacted.replaceAll(_variationSelectors, '') ==
+        emoji.replaceAll(_variationSelectors, '');
+
 class ReactionsPicker extends StatelessWidget {
   final OnClickEmojiReactionAction? onClickEmojiReactionAction;
   final OnPickEmojiReactionAction? onPickEmojiReactionAction;
@@ -80,38 +88,41 @@ class ReactionsPicker extends StatelessWidget {
                         ],
                   ),
                   child: Row(
-                    children: (emojis ?? AppEmojis.emojisDefault).map((emoji) {
-                      return InkWell(
-                        onTap: () async {
-                          Navigator.of(context).pop();
-                          onClickEmojiReactionAction?.call(emoji);
-                        },
-                        highlightColor: Colors.transparent,
-                        hoverColor: Colors.transparent,
-                        splashColor: Colors.transparent,
-                        focusColor: Colors.transparent,
-                        child: Container(
-                          height: emojiSize ?? 40,
-                          width: emojiSize ?? 40,
-                          alignment: Alignment.center,
-                          decoration:
-                              myEmojiReacted != null && myEmojiReacted == emoji
-                                  ? BoxDecoration(
-                                      color: LinagoraSysColors.material()
-                                          .onSurface
-                                          .withOpacity(0.1),
-                                      shape: BoxShape.circle,
-                                    )
-                                  : null,
-                          margin: const EdgeInsets.symmetric(
-                            vertical: 4,
-                            horizontal: 3,
-                          ),
-                          child: Text(
-                            emoji,
-                            style:
-                                emojiTextStyle ?? const TextStyle(fontSize: 28),
-                            textAlign: TextAlign.center,
+                    children: (emojis ?? AppEmojis.emojisDefault).map<Widget>((emoji) {
+                      final isMine = _isSameEmoji(myEmojiReacted, emoji);
+                      return Semantics(
+                        button: true,
+                        selected: isMine,
+                        child: InkWell(
+                          onTap: () async {
+                            Navigator.of(context).pop();
+                            onClickEmojiReactionAction?.call(emoji);
+                          },
+                          highlightColor: Colors.transparent,
+                          hoverColor: Colors.transparent,
+                          splashColor: Colors.transparent,
+                          focusColor: Colors.transparent,
+                          child: Container(
+                            height: emojiSize ?? 40,
+                            width: emojiSize ?? 40,
+                            alignment: Alignment.center,
+                            decoration: isMine
+                                ? BoxDecoration(
+                                    color: LinagoraSysColors.material()
+                                        .primaryContainer,
+                                    shape: BoxShape.circle,
+                                  )
+                                : null,
+                            margin: const EdgeInsets.symmetric(
+                              vertical: 4,
+                              horizontal: 3,
+                            ),
+                            child: Text(
+                              emoji,
+                              style: emojiTextStyle ??
+                                  const TextStyle(fontSize: 28),
+                              textAlign: TextAlign.center,
+                            ),
                           ),
                         ),
                       );
